@@ -32,7 +32,22 @@ export LC_ALL=C
 
 usage (){
     cat 1>&2 <<'EOF'
-blablabla help, see README
+Usage: pkgnih [global options] command [command options] [command args]
+nih -h
+nih help            - Display help message
+nih <command> -h    - Display help message for a <command>
+
+nih refresh         - Download pkg_summary and SHA512 files
+nih install|upgrade - Install or upgrade packages
+nih uninstall|delete|remove 
+                    - Uninstall packages
+nih verify          - Verify packages integrity
+nih status          - Show the status of installed packages
+nih audit           - Security audit
+nih leaf            - Output or remove leaf packages
+nih license         - Working with licenses
+nih list            - List packages
+nih clean           - Clean-up DESTDIR or packages cache directories
 EOF
 }
 
@@ -50,7 +65,7 @@ elif test -r "$confdir/config"; then
     conffile="$confdir/config"
 else
     cat <<EOF
-Neither $sysconfdir/config not $confdir/config are readable.
+Neither $sysconfdir/config nor $confdir/config are readable.
 Sorry, I cannot help.
 EOF
     exit 1
