@@ -1,0 +1,9 @@
+Runtime requiremenets:
+    wip/runawk,
+    wip/pkg_summary-utils,
+
+Build requirements:
+    wip/mk-configure
+
+Installation:
+    mkcmake all install
