@@ -1,4 +1,4 @@
-SUBPRJ =		nih
+SUBPRJ =	nih
 
 BIRTHDATE=	2010-11-13
 
