@@ -1,0 +1,58 @@
+#!/bin/sh
+
+set -e 
+
+export LC_ALL=C
+
+usage (){
+    cat 1>&2 <<'EOF'
+blablabla help, see README
+EOF
+}
+
+while getopts hV f
+do
+    case $f in
+	h)      usage; exit 0;;
+	V)      echo pkgnih @VERSION@;;
+	'?')    usage; exit 1;;
+    esac
+done
+shift `expr $OPTIND - 1`
+
+if test $# -eq 0; then
+    usage
+    exit 1
+fi
+
+case "$1" in
+    help)
+	usage
+	exit 0;;
+    refresh)
+	echo todo;;
+    install)
+	echo todo;;
+    upgrade)
+	echo todo;;
+    uninstall|delete|remove)
+	echo todo;;
+    verify)
+	echo todo;;
+    status)
+	echo todo;;
+    audit)
+	echo todo;;
+    search)
+	echo todo;;
+    leaf)
+	echo todo;;
+    list)
+	echo todo;;
+    license)
+	echo todo;;
+    *)
+	echo "Unknown command '$1', see nih -h for more information" 1>&2
+	exit 2
+esac
+exit 0
