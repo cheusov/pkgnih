@@ -30,15 +30,13 @@ fi
 . "$conffile"
 
 # handling global options
-while getopts hV f
-do
-    case $f in
-	h)      usage; exit 0;;
-	V)      echo pkgnih @VERSION@;;
-	'?')    usage; exit 1;;
-    esac
-done
-shift `expr $OPTIND - 1`
+if test "_$1" = _-h; then
+    usage
+    exit 0
+elif test "_$1" = _-V; then
+    echo pkgnih @VERSION@
+    exit 0
+fi
 
 if test $# -eq 0; then
     usage
@@ -62,13 +60,13 @@ fi
 
 ######################################################################
 # install | upgrade
-if test "$1" = install -o test "$1" = upgrade; then
+if test "_$1" = _install -o "_$1" = _upgrade; then
     exit 0
 fi
 
 ######################################################################
 # uninstall | remove | delete
-if test "$1" = uninstall -o test "$1" = remove -o test "$1" = delete; then
+if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
     exit 0
 fi
 
@@ -80,7 +78,42 @@ fi
 
 ######################################################################
 # status
+usage_status (){
+    cat <<'EOF'
+nih status [options] [PKGBASEs]
+     Compare installed packages with pkg_summary.txt (default) or
+     pkgsrc tree.
+   options:
+       -h     display this help message
+       -b     compare installed packages against pkg_summary.txt (default)
+       -s     compare installed packages against pkgsrc tree
+       -r     raw output (pkg_summary format)
+       -u     analyse packages marked as installed by user (the default, see -a)
+       -a     analyse all packages (see -u)
+       -Q     No noisy reminder about output format
+EOF
+}
+
 if test "$1" = status; then
+    shift
+    opts='b'
+    while getopts hbsruaQ f; do
+	case "$f" in
+	    '?')
+		echo "Unknown suboption $f for command 'status'"
+		exit 1;;
+	    h)
+		usage_status
+		exit 0;;
+	    *)
+		opts="${opts}$f";;
+	esac
+    done
+    shift `expr $OPTIND - 1`
+
+    export PKG_SUMMARY
+    pkg_status "-$opts" "$@"
+
     exit 0
 fi
 
