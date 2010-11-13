@@ -10,6 +10,26 @@ blablabla help, see README
 EOF
 }
 
+sysconfdir=${NIH_SYSCONFDIR-@sysconfdir@}/nih
+libexecdir=${NIH_LIBEXECDIR-@libexecdir@}
+confdir=$HOME/.nih
+
+# loading config files
+if test -r "$sysconfdir/config"; then
+    conffile="$sysconfdir/config"
+elif test -r "$confdir/config"; then
+    conffile="$confdir/config"
+else
+    cat <<EOF
+Neither $sysconfdir/config not $confdir/config are readable.
+Sorry, I cannot help.
+EOF
+    exit 1
+fi
+
+. "$conffile"
+
+# handling global options
 while getopts hV f
 do
     case $f in
@@ -25,34 +45,76 @@ if test $# -eq 0; then
     exit 1
 fi
 
-case "$1" in
-    help)
-	usage
-	exit 0;;
-    refresh)
-	echo todo;;
-    install)
-	echo todo;;
-    upgrade)
-	echo todo;;
-    uninstall|delete|remove)
-	echo todo;;
-    verify)
-	echo todo;;
-    status)
-	echo todo;;
-    audit)
-	echo todo;;
-    search)
-	echo todo;;
-    leaf)
-	echo todo;;
-    list)
-	echo todo;;
-    license)
-	echo todo;;
-    *)
-	echo "Unknown command '$1', see nih -h for more information" 1>&2
-	exit 2
-esac
-exit 0
+# handling commands
+
+######################################################################
+# help
+if test "$1" = help; then
+    usage
+    exit 0
+fi
+
+######################################################################
+# refresh
+if test "$1" = refresh; then
+    exit 0
+fi
+
+######################################################################
+# install | upgrade
+if test "$1" = install -o test "$1" = upgrade; then
+    exit 0
+fi
+
+######################################################################
+# uninstall | remove | delete
+if test "$1" = uninstall -o test "$1" = remove -o test "$1" = delete; then
+    exit 0
+fi
+
+######################################################################
+# verify
+if test "$1" = verify; then
+    exit 0
+fi
+
+######################################################################
+# status
+if test "$1" = status; then
+    exit 0
+fi
+
+######################################################################
+# audit
+if test "$1" = audit; then
+    exit 0
+fi
+
+######################################################################
+# search
+if test "$1" = search; then
+    exit 0
+fi
+
+######################################################################
+# leaf
+if test "$1" = leaf; then
+    exit 0
+fi
+
+######################################################################
+# list
+if test "$1" = list; then
+    exit 0
+fi
+
+######################################################################
+# license
+if test "$1" = license; then
+    exit 0
+fi
+
+######################################################################
+# <bad> command
+echo "Unknown command '$1', see nih -h for more information" 1>&2
+exit 2
