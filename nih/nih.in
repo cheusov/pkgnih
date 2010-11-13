@@ -33,21 +33,25 @@ export LC_ALL=C
 usage (){
     cat 1>&2 <<'EOF'
 Usage: pkgnih [global options] command [command options] [command args]
-nih -h
-nih help            - Display help message
-nih <command> -h    - Display help message for a <command>
 
-nih refresh         - Download pkg_summary and SHA512 files
-nih install|upgrade - Install or upgrade packages
-nih uninstall|delete|remove 
-                    - Uninstall packages
-nih verify          - Verify packages integrity
-nih status          - Show the status of installed packages
-nih audit           - Security audit
-nih leaf            - Output or remove leaf packages
-nih license         - Working with licenses
-nih list            - List packages
-nih clean           - Clean-up DESTDIR or packages cache directories
+Commands:
+ nih -h
+ nih help            - Display help message
+ nih <command> -h    - Display help message for a <command>
+
+ nih refresh         - Download pkg_summary and SHA512 files
+ nih install
+ nih upgrade         - Install or upgrade packages
+ nih uninstall
+ nih delete
+ nih remove          - Uninstall packages
+ nih verify          - Verify packages integrity
+ nih status          - Show the status of installed packages
+ nih audit           - Security audit
+ nih leaf            - Output or remove leaf packages
+ nih license         - Working with licenses
+ nih list            - List packages
+ nih clean           - Clean-up DESTDIR or packages cache directories
 EOF
 }
 
@@ -272,7 +276,44 @@ fi
 
 ######################################################################
 # search
+usage_search (){
+    cat <<'EOF'
+nih search [options] [arguments]
+      Search for packages
+
+   option:
+      -h    display this help message
+      -b    search pkg_summary.txt (the default)
+      -o    search using pkg_online
+      -<X>  All other options are passed directly to
+            pkg_digger(1), see 'pkg_digger -h'
+EOF
+}
+
 if test "$1" = search; then
+    shift
+    export PKG_DIGGER_SUMMARY="$PKG_SUMMARY"
+
+    while getopts hbosf139irq f; do
+	case "$f" in
+	    '?')
+		echo "Unknown suboption $f for command 'leaf'"
+		exit 1;;
+	    b)
+		unset PKG_DIGGER_BACKEND || true;;
+	    o)
+		export PKG_DIGGER_BACKEND=pkg_online_client;;
+	    h)
+		usage_search
+		exit 0;;
+	    *)
+		opts="${opts}$f";;
+	esac
+    done
+    shift `expr $OPTIND - 1`
+
+    pkg_digger ${opts+-$opts} "$@"
+
     exit 0
 fi
 
