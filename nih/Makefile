@@ -1,5 +1,7 @@
-INSCRIPTS =	nih
+INTEXTS_REPLS +=	PKG_INFO_CMD  ${SBINDIR}/pkg_info
+INTEXTS_REPLS +=	PKG_ADMIN_CMD ${SBINDIR}/pkg_admin
 
+INSCRIPTS =	nih
 SCRIPTS =	${INSCRIPTS}
 
 .include <mkc.prog.mk>

@@ -14,6 +14,9 @@ sysconfdir=${NIH_SYSCONFDIR-@sysconfdir@}/nih
 libexecdir=${NIH_LIBEXECDIR-@libexecdir@}
 confdir=$HOME/.nih
 
+PKG_INFO_CMD=${PKG_INFO_CMD-@PKG_INFO_CMD@}
+PKG_ADMIN_CMD=${PKG_ADMIN_CMD-@PKG_ADMIN_CMD@}
+
 # loading config files
 if test -r "$sysconfdir/config"; then
     conffile="$sysconfdir/config"
@@ -141,7 +144,40 @@ fi
 
 ######################################################################
 # verify
+usage_verify (){
+    cat <<'EOF'
+nih verify [options] [PKGBASEs]
+      Verify installed or listed packages.
+      By default all installed packages are verified.
+   options:
+       -h   display this help message
+       -m   check checksums of installed files
+       -U   check for REQUIRES/PROVIDES coherence
+       -L   check for existence of library files listed in REQUIRES
+       -d   check for presence of dependencies
+EOF
+}
+
 if test "$1" = verify; then
+    shift
+    opts='k'
+    while getopts hmULdD f; do
+	case "$f" in
+	    '?')
+		echo "Unknown suboption $f for command 'verify'"
+		exit 1;;
+	    h)
+		usage_verify
+		exit 0;;
+	    *)
+		opts="${opts}$f";;
+	esac
+    done
+    shift `expr $OPTIND - 1`
+
+    export PKG_SUMMARY
+    pkg_status "-$opts" "$@"
+
     exit 0
 fi
 
