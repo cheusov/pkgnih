@@ -55,7 +55,36 @@ fi
 ######################################################################
 # refresh
 if test "$1" = refresh; then
+    if test -n "$PKG_SUMMARY"; then
+	cat 1>&2 <<EOF
+Variable PKG_SUMMARY is set in configuration file.
+Nothing to do.
+EOF
+	exit 1
+    fi
+
+    cd "$confdir"
+
+    fetch=""
+    echo 'Downloading pkg_summary.bz2...'
+    fetch "$PKG_SUMMARY_URL/All/pkg_summary.bz2"
+    echo done
+
+    echo 'Downloading SHA512.bz2...'
+    fetch "$PKG_SUMMARY_URL/SHA512.bz2"
+    echo done
+
+    bzip2 -dc pkg_summary.bz2 > pkg_summary.txt.tmp
+    mv pkg_summary.txt.tmp pkg_summary.txt
+
+    bzip2 -dc SHA512.bz2 > SHA512.txt.tmp
+    mv SHA512.txt.tmp SHA512.txt
+
     exit 0
+fi
+
+if test -z "$PKG_SUMMARY"; then
+    PKG_SUMMARY=$confdir/pkg_summary.txt
 fi
 
 ######################################################################
