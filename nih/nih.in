@@ -54,6 +54,23 @@ fi
 
 ######################################################################
 # refresh
+usage_refresh (){
+    cat <<'EOF'
+nih refresh [options]
+     Download pkg_summary.bz2 and SHA512.bz2, save them to ~/.nih/, and
+     then unpack them to .txt files.
+
+   options:
+      -h    display this help message
+
+~/.nih/config:
+   PKG_SUMMARY_URL - URL or file name for pkg_summary.bz2/pkg_summary.txt
+   PKG_SUMMARY     - path to pkg_summary.txt, set this variable if you use
+                   local pkg_summary, otherwise keep it unset
+   fetch function  - download command
+EOF
+}
+
 if test "$1" = refresh; then
     if test -n "$PKG_SUMMARY"; then
 	cat 1>&2 <<EOF
@@ -62,6 +79,19 @@ Nothing to do.
 EOF
 	exit 1
     fi
+
+    shift
+    while getopts h f; do
+	case "$f" in
+	    '?')
+		echo "Unknown suboption $f for command 'refresh'"
+		exit 1;;
+	    h)
+		usage_refresh
+		exit 0;;
+	esac
+    done
+    shift `expr $OPTIND - 1`
 
     cd "$confdir"
 
@@ -83,8 +113,18 @@ EOF
     exit 0
 fi
 
+######################################################################
+# ensure that pkg_summary.txt exists
 if test -z "$PKG_SUMMARY"; then
     PKG_SUMMARY=$confdir/pkg_summary.txt
+fi
+
+if ! test -r "$PKG_SUMMARY"; then
+    cat 1>&2 <<EOF
+'$PKG_SUMMARY' file doesn't exist or is not readable.
+Perhaps you need to run 'nih refresh'
+EOF
+    exit 1
 fi
 
 ######################################################################
@@ -110,16 +150,17 @@ fi
 usage_status (){
     cat <<'EOF'
 nih status [options] [PKGBASEs]
-     Compare installed packages with pkg_summary.txt (default) or
-     pkgsrc tree.
+      Compare installed packages with pkg_summary.txt (default) or
+      pkgsrc tree.
+
    options:
-       -h     display this help message
-       -b     compare installed packages against pkg_summary.txt (default)
-       -s     compare installed packages against pkgsrc tree
-       -r     raw output (pkg_summary format)
-       -u     analyse packages marked as installed by user (the default, see -a)
-       -a     analyse all packages (see -u)
-       -Q     No noisy reminder about output format
+      -h     display this help message
+      -b     compare installed packages against pkg_summary.txt (default)
+      -s     compare installed packages against pkgsrc tree
+      -r     raw output (pkg_summary format)
+      -u     analyse packages marked as installed by user (the default, see -a)
+      -a     analyse all packages (see -u)
+      -q     No noisy reminder about output format
 EOF
 }
 
@@ -160,7 +201,40 @@ fi
 
 ######################################################################
 # leaf
+usage_leaf (){
+    cat <<'EOF'
+nih leaf [options]
+      Output or remove automatically installed leaf packages,
+      by default list of packages is output.
+
+   option:
+      -h    display this help message
+      -t    output only PKGNAME
+      -R    remove automatically installed leaf packages
+      -E    the same as -R but with 'pkg_delete -A'
+      -n    pass -n to pkg_delete
+EOF
+}
+
 if test "$1" = leaf; then
+    shift
+    opts='l'
+    while getopts htREn f; do
+	case "$f" in
+	    '?')
+		echo "Unknown suboption $f for command 'leaf'"
+		exit 1;;
+	    h)
+		usage_leaf
+		exit 0;;
+	    *)
+		opts="${opts}$f";;
+	esac
+    done
+    shift `expr $OPTIND - 1`
+
+    pkg_status "-$opts" "$@"
+
     exit 0
 fi
 
