@@ -61,6 +61,7 @@ confdir=$HOME/.nih
 
 PKG_INFO_CMD=${PKG_INFO_CMD-@PKG_INFO_CMD@}
 PKG_ADMIN_CMD=${PKG_ADMIN_CMD-@PKG_ADMIN_CMD@}
+PKG_DELETE_CMD=${PKG_DELETE_CMD-@PKG_DELETE_CMD@}
 
 # loading config files
 if test -r "$sysconfdir/config"; then
@@ -77,6 +78,11 @@ fi
 
 . "$conffile"
 
+# temp directory
+tmp_dir=`mktemp -d /tmp/nih.XXXXXX`
+trap "rm -rf $tmp_dir" 0 1 2 15
+test -n "$tmp_dir" || exit 1
+
 # handling global options
 if test "_$1" = _-h; then
     usage
@@ -91,7 +97,70 @@ if test $# -eq 0; then
     exit 1
 fi
 
-# handling commands
+
+######################################################################
+# functions
+format (){
+    # $1 - indentation (a number of spaces)
+    # $2 - max line size
+    spcs="$1"
+    shift
+    maxsz="$1"
+    shift
+
+    runawk -v spcs="$spcs" -v maxsz="$maxsz" -e '
+BEGIN {
+   pad = ""
+   for (i=1; i < spcs; ++i){ # spcs-1 spaces
+      pad = pad " "
+   }
+   nl=1
+}
+
+{
+   for (i=1; i <= NF; ++i){
+      if (nl){
+         printf "%s", pad
+         nl = 0
+         rest = maxsz
+      }
+      printf " %s", $i
+      rest = rest - length($i) - 1
+      if (rest < 0){
+         nl = 1
+         printf "\n"
+      }
+   }
+}
+
+END {
+   if (!nl)
+      printf "\n"
+}
+' "$@"
+}
+
+show_packages (){
+    # $@ - filenames, pkg_info -I format
+#    cat "$@"
+    awk '{print "    " $0}' "$@"
+#    awk '{print $1}' "$@" | format 4 60
+}
+
+yesno (){
+    # $1 - question
+    while true; do
+	printf '%s (y/N)? ' "$1"
+	read answer
+	answer=${answer:-no}
+	case "$answer" in
+	    y|Y|yes|Yes|YES)
+		return 0;;
+	    n|N|no|No|NO)
+		return 1;;
+	esac
+    done
+}
 
 ######################################################################
 # help
@@ -183,7 +252,78 @@ fi
 
 ######################################################################
 # uninstall | remove | delete
+usage_uninstall (){
+    cat <<'EOF'
+nih uninstall|delete|remove <PKGBASEs>
+      Remove specified packages, dependent packages and automatically installed
+      leaf packages.
+   options:
+      -n     output shell program to execute without running it
+      -y     answer "Yes" to all questions
+EOF
+}
+
 if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
+    shift
+    while getopts hn f; do
+	case "$f" in
+	    '?')
+		echo "Unknown suboption $f for command 'uninstall'"
+		exit 1;;
+	    n)
+		pkg_delete_opts='-n';;
+	    h)
+		usage_uninstall
+		exit 0;;
+	    *)
+		opts="${opts}$f";;
+	esac
+    done
+    shift `expr $OPTIND - 1`
+
+    if test $# -eq 0; then
+	echo 'Nothing to do' 1>&2
+	exit 1
+    fi
+    pkg_info -I "$@" > "$tmp_dir/1" || true
+    if ! test -s "$tmp_dir/1"; then
+	echo 'Nothing to do' 1>&2
+	exit 1
+    fi
+    awk '{print $1}' "$tmp_dir/1" > "$tmp_dir/2"
+
+    echo 'The following packages will be removed:'
+    show_packages "$tmp_dir/1"
+
+    echo 'The following dependent packages will be removed:'
+    pkg_bin_summary -f 'PKGNAME PKGPATH DEPENDS COMMENT' |
+    tee "$tmp_dir/installed_pkgs" | pkg_summary2deps -nrd |
+	pkg_subgraph_deps -xnf "$tmp_dir/2" > "$tmp_dir/4"
+    pkg_grep_summary -S PKGNAME "$tmp_dir/4" < "$tmp_dir/installed_pkgs" |
+    awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
+         /^COMMENT=/ {comment=substr($0, 9)}
+         NF == 0 {printf "%-19s %s\n", pkgname, comment}' > "$tmp_dir/3"
+    show_packages "$tmp_dir/3"
+
+    if ! yesno 'Remove them'; then
+	exit 0
+    fi
+
+    cat "$tmp_dir/4" "$tmp_dir/2" | xargs $PKG_DELETE_CMD $pkg_delete_opts
+
+    cat <<'EOF'
+The following packages were installed as dependencies
+and are no longer needed:
+EOF
+    pkg_status -l | tee "$tmp_dir/1" | show_packages -
+    if ! yesno 'Remove them'; then
+	exit 0
+    fi
+    if yesno 'Recursively'; then
+	pkg_delete_opts="$pkg_delete_opts -A"
+    fi
+    awk '{print $1}' "$tmp_dir/1" | xargs $PKG_DELETE_CMD $pkg_delete_opts
+
     exit 0
 fi
 
