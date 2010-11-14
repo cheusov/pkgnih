@@ -34,11 +34,14 @@ usage (){
     cat 1>&2 <<'EOF'
 Usage: pkgnih [global options] command [command options] [command args]
 
-Commands:
- nih -h
- nih help            - Display help message
- nih <command> -h    - Display help message for a <command>
+Global options:
+ nih -h              - Display help message
+ nih -V              - Display nih version
+ nih -y              - Answer 'Yes' to all questions
 
+Commands:
+ nih <command> -h    - Display help message for a <command>
+ nih help            - Display help message
  nih refresh         - Download pkg_summary and SHA512 files
  nih install
  nih upgrade         - Install or upgrade packages
@@ -84,13 +87,15 @@ trap "rm -rf $tmp_dir" 0 1 2 15
 test -n "$tmp_dir" || exit 1
 
 # handling global options
-if test "_$1" = _-h; then
-    usage
-    exit 0
-elif test "_$1" = _-V; then
-    echo pkgnih @VERSION@
-    exit 0
-fi
+process_options (){
+    alt_getopt \
+	h     'usage; exit 0' \
+	V     'echo nih-@VERSION@; exit 0' \
+	y     'always_yes=1' \
+	-- "$@"
+}
+cmds=`process_options "$@"`
+eval "$cmds"
 
 if test $# -eq 0; then
     usage
@@ -151,6 +156,11 @@ yesno (){
     # $1 - question
     while true; do
 	printf '%s (y/N)? ' "$1"
+	if test -n "$always_yes"; then
+	    echo Yes
+	    return 0
+	fi
+
 	read answer
 	answer=${answer:-no}
 	case "$answer" in
@@ -258,8 +268,8 @@ nih uninstall|delete|remove <PKGBASEs>
       Remove specified packages, dependent packages and automatically installed
       leaf packages.
    options:
-      -n     output shell program to execute without running it
-      -y     answer "Yes" to all questions
+      -n     Don't actually deinstall a package, just report the steps that
+             would be taken if it were.
 EOF
 }
 
