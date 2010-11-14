@@ -370,6 +370,11 @@ if test "$1" = verify; then
     done
     shift `expr $OPTIND - 1`
 
+    if test k = "$opts"; then
+	echo 'Nothing to do' 1>&2
+	exit 1
+    fi
+
     export PKG_SUMMARY
     pkg_status "-$opts" "$@"
 
