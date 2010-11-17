@@ -440,6 +440,8 @@ nih search [options] [arguments]
       -h    display this help message
       -b    search pkg_summary.txt (the default)
       -o    search using pkg_online
+      -s    output search strategies
+      -f    output search fields
       -<X>  All other options are passed directly to
             pkg_digger(1), see 'pkg_digger -h'
 EOF
