@@ -145,6 +145,15 @@ END {
 ' "$@"
 }
 
+show_summary (){
+    awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
+         /^PKGPATH=/ {pkgpath=substr($0, 9)}
+         /^COMMENT=/ {comment=substr($0, 9)}
+         NF == 0 {printf "%-20s %s\n", pkgpath, comment}' "$@" |
+    sort |
+    show_packages
+}
+
 show_packages (){
     # $@ - filenames, pkg_info -I format
 #    cat "$@"
@@ -224,10 +233,12 @@ EOF
 
     fetch=""
     echo 'Downloading pkg_summary.bz2...'
+    mv pkg_summary.bz2 pkg_summary.bz2.old
     fetch "$PKG_SUMMARY_URL/All/pkg_summary.bz2"
     echo done
 
     echo 'Downloading SHA512.bz2...'
+    mv SHA512.bz2 SHA512.bz2.old
     fetch "$PKG_SUMMARY_URL/SHA512.bz2"
     echo done
 
@@ -286,21 +297,31 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     done
     shift `expr $OPTIND - 1`
 
-    if test $# -gt 0; then
-	echo "Not implemented yet" 1>&2
-	exit 1
-    elif test "$cmd" = install; then
-	echo '"nih install" needs package list as an argument' 1>&2
-	exit 1
-    else
-	installed_pkgs="$tmp_dir/installed_pkgs"
-	cmp_pkgs="$tmp_dir/cmp_pkgs"
+    plan_summary="$tmp_dir/plan_summary"
 
-	pkg_bin_summary -f PKGNAME,PKGPATH -- -u > "$installed_pkgs"
-	pkg_cmp_summary "$installed_pkgs" "$PKG_SUMMARY" |
-	sed -e '/^[+=]/ d' > "$cmp_pkgs"
-	cat "$cmp_pkgs"
+    installed_summary="$tmp_dir/installed_summary"
+    pkg_bin_summary -fPKGNAME,PKGPATH,COMMENT,automatic > "$installed_summary"
+
+    if test $# -gt 0; then
+	for p in "$@"; do
+	    if echo "$p" | grep / > /dev/null; then
+		field=PKGPATHe
+	    else
+		field=PKGBASE
+	    fi
+	    if ! pkg_grep_summary -fPKGNAME,PKGPATH,COMMENT \
+		-r -s "$field" "$p" < "$PKG_SUMMARY" >> "$plan_summary"
+	    then
+		echo "Package '$p' not found" 1>&2
+		exit 1
+	    fi
+	done
+    else
+	pkg_grep_summary -e automatic \
+	    < "$installed_summary" > "$plan_summary"
     fi
+
+    cat "$cmp_pkgs"
 
     exit 0
 fi
@@ -353,9 +374,9 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
 
     echo 'The following dependent packages will be removed:'
     pkg_bin_summary -f 'PKGNAME PKGPATH DEPENDS COMMENT' |
-    tee "$tmp_dir/installed_pkgs" | pkg_summary2deps -nrd |
+    tee "$tmp_dir/installed_summary" | pkg_summary2deps -nrd |
 	pkg_subgraph_deps -xnf "$tmp_dir/2" > "$tmp_dir/4"
-    pkg_grep_summary -S PKGNAME "$tmp_dir/4" < "$tmp_dir/installed_pkgs" |
+    pkg_grep_summary -S PKGNAME "$tmp_dir/4" < "$tmp_dir/installed_summary" |
     awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
          /^COMMENT=/ {comment=substr($0, 9)}
          NF == 0 {printf "%-19s %s\n", pkgname, comment}' > "$tmp_dir/3"
