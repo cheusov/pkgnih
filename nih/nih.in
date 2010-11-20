@@ -188,7 +188,7 @@ nih refresh [options]
      then unpack them to .txt files.
 
    options:
-      -h    display this help message
+      -h     display this help message
 
 ~/.nih/config:
    PKG_SUMMARY_URL - URL or file name for pkg_summary.bz2/pkg_summary.txt
@@ -256,7 +256,52 @@ fi
 
 ######################################################################
 # install | upgrade
+usage_install (){
+    cat <<'EOF'
+nih install|upgrade <PKGBASEs or PKGPATHs>
+      Install or upgrade specified packages.
+   options:
+      -h     display this help message
+      -n     don't actually install a package, just report the steps that
+             would be taken if it were.
+EOF
+}
+
 if test "_$1" = _install -o "_$1" = _upgrade; then
+    cmd="$1"
+    shift
+    while getopts hn f; do
+	case "$f" in
+	    '?')
+		echo "Unknown suboption $f for command 'install'"
+		exit 1;;
+	    n)
+		pkg_opts='-n';;
+	    h)
+		usage_install
+		exit 0;;
+	    *)
+		opts="${opts}$f";;
+	esac
+    done
+    shift `expr $OPTIND - 1`
+
+    if test $# -gt 0; then
+	echo "Not implemented yet" 1>&2
+	exit 1
+    elif test "$cmd" = install; then
+	echo '"nih install" needs package list as an argument' 1>&2
+	exit 1
+    else
+	installed_pkgs="$tmp_dir/installed_pkgs"
+	cmp_pkgs="$tmp_dir/cmp_pkgs"
+
+	pkg_bin_summary -f PKGNAME,PKGPATH -- -u > "$installed_pkgs"
+	pkg_cmp_summary "$installed_pkgs" "$PKG_SUMMARY" |
+	sed -e '/^[+=]/ d' > "$cmp_pkgs"
+	cat "$cmp_pkgs"
+    fi
+
     exit 0
 fi
 
@@ -268,7 +313,8 @@ nih uninstall|delete|remove <PKGBASEs>
       Remove specified packages, dependent packages and automatically installed
       leaf packages.
    options:
-      -n     Don't actually deinstall a package, just report the steps that
+      -h     display this help message
+      -n     don't actually deinstall a package, just report the steps that
              would be taken if it were.
 EOF
 }
@@ -396,7 +442,7 @@ nih status [options] [PKGBASEs]
       -r     raw output (pkg_summary format)
       -u     analyse packages marked as installed by user (the default, see -a)
       -a     analyse all packages (see -u)
-      -q     No noisy reminder about output format
+      -q     no noisy reminder about output format
 EOF
 }
 
@@ -442,7 +488,7 @@ nih search [options] [arguments]
       -o    search using pkg_online
       -s    output search strategies
       -f    output search fields
-      -<X>  All other options are passed directly to
+      -<X>  all other options are passed directly to
             pkg_digger(1), see 'pkg_digger -h'
 EOF
 }
