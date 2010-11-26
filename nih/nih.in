@@ -321,7 +321,38 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
 	    < "$installed_summary" > "$plan_summary"
     fi
 
-    cat "$cmp_pkgs"
+    wip_summary="$tmp_dir/wip_summary"
+    pkg_grep_summary -t prefix PKGPATH wip/ < "$plan_summary" > "$wip_summary"
+    if test -s "$wip_summary"; then
+	echo 'WIP packages were detected'
+	show_summary "$wip_summary"
+	if yesno 'Remove them'; then
+	    pkg_grep_summary -v -t prefix PKGPATH wip/ \
+		< "$plan_summary" > "$plan_summary".tmp
+	    mv "$plan_summary".tmp "$plan_summary"
+	fi
+    fi
+
+    cmp="$tmp_dir/cmp"
+    pkg_cmp_summary "$plan_summary" "$PKG_SUMMARY" > "$cmp"
+
+    disapp_pkgbases="$tmp_dir/disapp_pkgbases"
+    awk '$1 == "-" {print $2}' "$cmp" > "$disapp_pkgbases"
+
+    if test -s "$disapp_pkgbases"; then
+	echo 'The following package were not found in package summary'
+	disapp_summary="$tmp_dir/disapp_summary"
+	pkg_grep_summary -S PKGBASE "$disapp_pkgbases" \
+	    < "$plan_summary" > "$disapp_summary"
+	show_summary "$disapp_summary"
+	if yesno 'Remove them'; then
+	    pkg_grep_summary -v -S PKGBASE "$disapp_pkgbases" \
+		< "$plan_summary" > "$plan_summary".tmp
+	    mv "$plan_summary".tmp "$plan_summary"
+	fi
+    fi
+    echo 'Final summary'
+    show_summary "$plan_summary"
 
     exit 0
 fi
