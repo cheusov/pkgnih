@@ -304,13 +304,11 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
 
     if test $# -gt 0; then
 	for p in "$@"; do
-	    if echo "$p" | grep / > /dev/null; then
-		field=PKGPATHe
-	    else
-		field=PKGBASE
+	    if echo "$p" | grep -v / > /dev/null; then
+		p=`$PKG_INFO_CMD -QPKGPATH "$p"`
 	    fi
 	    if ! pkg_grep_summary -fPKGNAME,PKGPATH,COMMENT \
-		-r -s "$field" "$p" < "$PKG_SUMMARY" >> "$plan_summary"
+		-r -s PKGPATH "$p" < "$PKG_SUMMARY" >> "$plan_summary"
 	    then
 		echo "Package '$p' not found" 1>&2
 		exit 1
@@ -351,8 +349,9 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
 	    mv "$plan_summary".tmp "$plan_summary"
 	fi
     fi
-    echo 'Final summary'
-    show_summary "$plan_summary"
+
+    curr_summary="$tmp_dir/curr_summary"
+    pkg_uniq_summary -n "$plan_summary" "$curr_summary"
 
     exit 0
 fi
