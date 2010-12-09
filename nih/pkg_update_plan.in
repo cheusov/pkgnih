@@ -1,0 +1,77 @@
+#!/usr/bin/env runawk
+
+#use "power_getopt.awk"
+#use "xgetline.awk"
+#use "tmpfile.awk"
+#use "shquote.awk"
+#use "xclose.awk"
+
+#.begin-str help
+# Usage: pkg_update_plan <installed_summary> <avail_summary> PKGPATHs...
+#.end-str
+
+BEGIN {
+	if (ARGC < 2){
+		exit 45
+	}
+
+	installed_summary = ARGV [1]
+	avail_summary     = ARGV [2]
+
+	update_pkgpath_list = ""
+	for (i=3; i < ARGC; ++i){
+		pkg = ARGV [i]
+		if (update_pkgpath_list != "")
+			update_pkgpath_list = update_pkgpath_list " " pkg
+		else
+			update_pkgpath_list = pkg
+
+		update_pkgpaths [pkg] = 0
+	}
+
+	deps_graph = tmpfile()
+
+	# updatable PKGPATH to PKGNAME
+	pipe = "pkg_grep_summary -t strlist PKGPATH '" \
+		update_pkgpath_list "' < " shquote(avail_summary)
+	while ((pipe | getline) > 0){
+		if ($0 ~ /^PKGNAME=/){
+			pkgname = substr($0, 9)
+		}else if ($0 ~ /^PKGPATH=/){
+			pkgpath = substr($0, 9)
+		}else if (NF == 0){
+			print pkgpath, pkgname
+			update_pkgpath2pkgname [pkgpath] = pkgname
+			pkgpath = pkgname = ""
+		}
+	}
+	xclose(pipe)
+}
+
+############################################################
+# reading and analysing installed_summary
+BEGIN {
+	while (xgetline0(installed_summary)){
+		if ($0 ~ /^PKGNAME=/){
+			pkgname = substr($0, 9)
+		}else if ($0 ~ /^PKGPATH=/){
+			pkgpath = substr($0, 9)
+		}else if ($0 ~ /^automatic=/){
+			auto = substr($0, 11)
+		}else if (NF == 0){
+			sub(/-[^-]*$/, "", pkgname)
+			if (auto){
+				auto_base [pkgname] = 1
+				auto_path [pkgpath] = 1
+			}
+
+			pkgname = pkgpath = auto = ""
+		}
+	}
+	xclose(installed_summary)
+}
+
+############################################################
+BEGIN {
+	exitnow(0)
+}
