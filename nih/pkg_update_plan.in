@@ -180,5 +180,9 @@ BEGIN {
 #	pipe = "pkg_summary2deps -ndarR " inst_summary " " avail_summary
 #	system(cmd)
 #	while(1);
-	exitnow(system(cmd))
+	ex = system(cmd)
+	if (ex)
+		exitnow(ex)
+
+	exitnow(system("cat " inst_summary))
 }

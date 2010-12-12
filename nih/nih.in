@@ -278,6 +278,8 @@ nih install|upgrade <PKGBASEs or PKGPATHs>
 EOF
 }
 
+PKG_UPDATE_PLAN_CMD=${PKG_UPDATE_PLAN_CMD-pkg_update_plan}
+
 if test "_$1" = _install -o "_$1" = _upgrade; then
     cmd="$1"
     shift
@@ -297,61 +299,90 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     done
     shift `expr $OPTIND - 1`
 
-    plan_summary="$tmp_dir/plan_summary"
-
     installed_summary="$tmp_dir/installed_summary"
-    pkg_bin_summary -fPKGNAME,PKGPATH,COMMENT,automatic > "$installed_summary"
+    pkg_bin_summary -fPKGNAME,PKGPATH,COMMENT,automatic,DEPENDS > "$installed_summary"
 
-    if test $# -gt 0; then
-	for p in "$@"; do
-	    if echo "$p" | grep -v / > /dev/null; then
-		p=`$PKG_INFO_CMD -QPKGPATH "$p"`
-	    fi
-	    if ! pkg_grep_summary -fPKGNAME,PKGPATH,COMMENT \
-		-r -s PKGPATH "$p" < "$PKG_SUMMARY" >> "$plan_summary"
-	    then
-		echo "Package '$p' not found" 1>&2
-		exit 1
-	    fi
-	done
+    if test $# -eq 0; then
+	echo 'Not implemented yet' 1>&2
+	exit 1
+    fi
+
+    plan_summary="$tmp_dir/plan_summary"
+    cmp_summary="$tmp_dir/cmp_summary"
+    if $PKG_UPDATE_PLAN_CMD "$installed_summary" "$PKG_SUMMARY" \
+	"$@" > "$plan_summary"
+    then
+	echo ok
     else
-	pkg_grep_summary -e automatic \
-	    < "$installed_summary" > "$plan_summary"
+	echo 'Something goes wrong' 1>&2
+	exit 1
     fi
+    pkg_cmp_summary "$installed_summary" "$plan_summary" |
+    grep -v '^=' > "$cmp_summary"
 
-    wip_summary="$tmp_dir/wip_summary"
-    pkg_grep_summary -t prefix PKGPATH wip/ < "$plan_summary" > "$wip_summary"
-    if test -s "$wip_summary"; then
-	echo 'WIP packages were detected'
-	show_summary "$wip_summary"
-	if yesno 'Remove them'; then
-	    pkg_grep_summary -v -t prefix PKGPATH wip/ \
-		< "$plan_summary" > "$plan_summary".tmp
-	    mv "$plan_summary".tmp "$plan_summary"
-	fi
-    fi
+#    cat "$cmp_summary"
+    rem_pkgs=`awk '$1 == "-" {print $2}' "$cmp_summary"`
+    rem_pkgs=`echo $rem_pkgs` # remove NL characters
+    rem_summary="$tmp_dir/rem_summary"
+    pkg_grep_summary -t strlist PKGBASE "$rem_pkgs" \
+	< "$installed_summary" > "$rem_summary"
+    echo 'The following packages will be removed'
+    show_summary "$rem_summary"
+#     plan_summary="$tmp_dir/plan_summary"
 
-    cmp="$tmp_dir/cmp"
-    pkg_cmp_summary "$plan_summary" "$PKG_SUMMARY" > "$cmp"
+#     installed_summary="$tmp_dir/installed_summary"
+#     pkg_bin_summary -fPKGNAME,PKGPATH,COMMENT,automatic,DEPENDS > "$installed_summary"
 
-    disapp_pkgbases="$tmp_dir/disapp_pkgbases"
-    awk '$1 == "-" {print $2}' "$cmp" > "$disapp_pkgbases"
+#     if test $# -gt 0; then
+# 	for p in "$@"; do
+# 	    if echo "$p" | grep -v / > /dev/null; then
+# 		p=`$PKG_INFO_CMD -QPKGPATH "$p"`
+# 	    fi
+# 	    if ! pkg_grep_summary -fPKGNAME,PKGPATH,COMMENT \
+# 		-r -s PKGPATH "$p" < "$PKG_SUMMARY" >> "$plan_summary"
+# 	    then
+# 		echo "Package '$p' not found" 1>&2
+# 		exit 1
+# 	    fi
+# 	done
+#     else
+# 	pkg_grep_summary -e automatic \
+# 	    < "$installed_summary" > "$plan_summary"
+#     fi
 
-    if test -s "$disapp_pkgbases"; then
-	echo 'The following package were not found in package summary'
-	disapp_summary="$tmp_dir/disapp_summary"
-	pkg_grep_summary -S PKGBASE "$disapp_pkgbases" \
-	    < "$plan_summary" > "$disapp_summary"
-	show_summary "$disapp_summary"
-	if yesno 'Remove them'; then
-	    pkg_grep_summary -v -S PKGBASE "$disapp_pkgbases" \
-		< "$plan_summary" > "$plan_summary".tmp
-	    mv "$plan_summary".tmp "$plan_summary"
-	fi
-    fi
+#     wip_summary="$tmp_dir/wip_summary"
+#     pkg_grep_summary -t prefix PKGPATH wip/ < "$plan_summary" > "$wip_summary"
+#     if test -s "$wip_summary"; then
+# 	echo 'WIP packages were detected'
+# 	show_summary "$wip_summary"
+# 	if yesno 'Remove them'; then
+# 	    pkg_grep_summary -v -t prefix PKGPATH wip/ \
+# 		< "$plan_summary" > "$plan_summary".tmp
+# 	    mv "$plan_summary".tmp "$plan_summary"
+# 	fi
+#     fi
 
-    curr_summary="$tmp_dir/curr_summary"
-    pkg_uniq_summary -n "$plan_summary" "$curr_summary"
+#     cmp="$tmp_dir/cmp"
+#     pkg_cmp_summary "$plan_summary" "$PKG_SUMMARY" > "$cmp"
+
+#     disapp_pkgbases="$tmp_dir/disapp_pkgbases"
+#     awk '$1 == "-" {print $2}' "$cmp" > "$disapp_pkgbases"
+
+#     if test -s "$disapp_pkgbases"; then
+# 	echo 'The following package were not found in package summary'
+# 	disapp_summary="$tmp_dir/disapp_summary"
+# 	pkg_grep_summary -S PKGBASE "$disapp_pkgbases" \
+# 	    < "$plan_summary" > "$disapp_summary"
+# 	show_summary "$disapp_summary"
+# 	if yesno 'Remove them'; then
+# 	    pkg_grep_summary -v -S PKGBASE "$disapp_pkgbases" \
+# 		< "$plan_summary" > "$plan_summary".tmp
+# 	    mv "$plan_summary".tmp "$plan_summary"
+# 	fi
+#     fi
+
+#     curr_summary="$tmp_dir/curr_summary"
+#     pkg_uniq_summary -n "$plan_summary" "$curr_summary"
 
     exit 0
 fi
