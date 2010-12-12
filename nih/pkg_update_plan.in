@@ -147,7 +147,8 @@ BEGIN {
 
 	if (add_pkgs != ""){
 		# add specified packages to inst_summary
-		cmd = grep_package_cmd(add_pkgs, "PKGBASE") \
+		tmpfn = tmpfile()
+		cmd = grep_package_cmd(add_pkgs, "PKGBASE")		\
 			" < " shquote(avail_summary) " > " tmpfn
 		system(cmd)
 
