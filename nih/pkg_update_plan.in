@@ -5,9 +5,10 @@
 #use "tmpfile.awk"
 #use "shquote.awk"
 #use "xclose.awk"
+#use "xsystem.awk"
 
 #.begin-str help
-# Usage: pkg_update_plan <installed_summary> <avail_summary> PKGPATHs...
+# Usage: pkg_update_plan <inst_summary> <avail_summary> PKGPATHs...
 #.end-str
 
 BEGIN {
@@ -15,63 +16,168 @@ BEGIN {
 		exit 45
 	}
 
-	installed_summary = ARGV [1]
-	avail_summary     = ARGV [2]
-
-	update_pkgpath_list = ""
-	for (i=3; i < ARGC; ++i){
-		pkg = ARGV [i]
-		if (update_pkgpath_list != "")
-			update_pkgpath_list = update_pkgpath_list " " pkg
-		else
-			update_pkgpath_list = pkg
-
-		update_pkgpaths [pkg] = 0
-	}
+	inst_summary  = ARGV [1]
+	avail_summary = ARGV [2]
 
 	deps_graph = tmpfile()
-
-	# updatable PKGPATH to PKGNAME
-	pipe = "pkg_grep_summary -t strlist PKGPATH '" \
-		update_pkgpath_list "' < " shquote(avail_summary)
-	while ((pipe | getline) > 0){
-		if ($0 ~ /^PKGNAME=/){
-			pkgname = substr($0, 9)
-		}else if ($0 ~ /^PKGPATH=/){
-			pkgpath = substr($0, 9)
-		}else if (NF == 0){
-			print pkgpath, pkgname
-			update_pkgpath2pkgname [pkgpath] = pkgname
-			pkgpath = pkgname = ""
-		}
-	}
-	xclose(pipe)
 }
 
 ############################################################
-# reading and analysing installed_summary
+# preparations
 BEGIN {
-	while (xgetline0(installed_summary)){
-		if ($0 ~ /^PKGNAME=/){
-			pkgname = substr($0, 9)
-		}else if ($0 ~ /^PKGPATH=/){
-			pkgpath = substr($0, 9)
-		}else if ($0 ~ /^automatic=/){
-			auto = substr($0, 11)
-		}else if (NF == 0){
-			sub(/-[^-]*$/, "", pkgname)
-			if (auto){
-				auto_base [pkgname] = 1
-				auto_path [pkgpath] = 1
-			}
-
-			pkgname = pkgpath = auto = ""
+	update_pkgpath_list = ""
+	for (i=3; i < ARGC; ++i){
+		pkg = ARGV [i] # PKGPATH
+		if (pkg ~ /^-/){
+			rem_pkgs = rem_pkgs " " substr(pkg, 2)
+		}else if (pkg ~ /^[*]/){
+			add_auto_pkgs = add_auto_pkgs " " substr(pkg, 2)
+			rem_pkgs = rem_pkgs " " substr(pkg, 2)
+		}else{
+			add_pkgs = add_pkgs " " pkg
+			rem_pkgs = rem_pkgs " " pkg
 		}
 	}
-	xclose(installed_summary)
+}
+
+############################################################
+# converting PKGPATHs of upgraded packages to PKGNAMEs
+# BEGIN {
+# 	# updatable PKGPATH to PKGNAME
+# 	pipe = "pkg_grep_summary -t strlist PKGPATH '" \
+# 		update_pkgpath_list "' < " shquote(avail_summary)
+# 	while ((pipe | getline) > 0){
+# 		if ($0 ~ /^PKGNAME=/){
+# 			pkgname = substr($0, 9)
+# 		}else if ($0 ~ /^PKGPATH=/){
+# 			pkgpath = substr($0, 9)
+# 		}else if (NF == 0){
+# #			print pkgpath, pkgname
+# 			update_pkgpath2pkgname [pkgpath] = pkgname
+# 			pkgpath = pkgname = ""
+# 		}
+# 	}
+# 	xclose(pipe)
+# }
+
+############################################################
+# reading and analysing installed and available summaries
+# BEGIN {
+# 	auto = 0
+# 	while (xgetline0(inst_summary)){
+# 		if ($0 ~ /^PKGNAME=/){
+# 			pkgname = substr($0, 9)
+# 		}else if ($0 ~ /^PKGPATH=/){
+# 			pkgpath = substr($0, 9)
+# 		}else if ($0 ~ /^automatic=/){
+# 			auto = (substr($0, 11) != "")
+# 		}else if (NF == 0){
+# 			pkgbase = pkgname
+# 			sub(/-[^-]*$/, "", pkgbase)
+# 			inst_name2base [pkgname] = pkgbase
+# 			inst_name2auto [pkgname] = auto
+# 			inst_name2path [pkgname] = pkgpath
+
+# 			pkgname = pkgpath = ""
+# 			auto = 0
+# 		}
+# 	}
+# 	xclose(inst_summary)
+
+# 	while (xgetline0(avail_summary)){
+# 		if ($0 ~ /^PKGNAME=/){
+# 			pkgname = substr($0, 9)
+# 		}else if ($0 ~ /^PKGPATH=/){
+# 			pkgpath = substr($0, 9)
+# 		}else if (NF == 0){
+# 			pkgbase = pkgname
+# 			sub(/-[^-]*$/, "", pkgbase)
+# 			avail_name2base [pkgname] = pkgbase
+# 			avail_name2path [pkgname] = pkgpath
+
+# 			pkgname = pkgpath = ""
+# 		}
+# 	}
+# 	xclose(avail_summary)
+# }
+
+############################################################
+function grep_package_cmd (package, field){
+	return "pkg_grep_summary -r -fPKGNAME,PKGPATH,DEPENDS,CONFLICTS -t strlist " \
+		field " " shquote(package)
+}
+
+function rm (file){
+	xsystem("rm " shquote(file))
+}
+
+BEGIN {
+	tmpfn = tmpfile()
+	if (rem_pkgs != ""){
+		# remove specified packages from inst_summary
+		cmd = "pkg_grep_summary -v -t strlist PKGPATH '" rem_pkgs "' < " \
+			shquote(inst_summary) \
+			" | pkg_grep_summary -v -t strlist PKGNAME '" rem_pkgs "'" \
+			" | pkg_grep_summary -v -t strlist PKGBASE '" rem_pkgs "'" \
+			" > " tmpfn
+		system(cmd)
+	}else{
+		system("cp " shquote(inst_summary) " " tmpfn)
+	}
+	inst_summary = tmpfn
+
+	if (add_auto_pkgs != ""){
+		# add specified packages as dependencies to inst_summary
+		tmpfn = tmpfile()
+		cmd = grep_package_cmd(add_auto_pkgs, "PKGBASE")	\
+			" < " shquote(avail_summary) " > " tmpfn
+		system(cmd)
+
+		cmd = grep_package_cmd(add_auto_pkgs, "PKGPATH")	\
+			" < " shquote(avail_summary) " >> " tmpfn
+		system(cmd)
+
+		cmd = grep_package_cmd(add_auto_pkgs, "PKGNAME")	\
+			" < " shquote(avail_summary) " >> " tmpfn
+		system(cmd)
+
+		system("awk 'NF == 0 {print \"automatic=yes\"} {print}' " tmpfn " >> " inst_summary)
+		rm(tmpfn)
+	}
+
+	if (add_pkgs != ""){
+		# add specified packages to inst_summary
+		cmd = grep_package_cmd(add_pkgs, "PKGBASE") \
+			" < " shquote(avail_summary) " > " tmpfn
+		system(cmd)
+
+		cmd = grep_package_cmd(add_pkgs, "PKGPATH") \
+			" < " shquote(avail_summary) " >> " tmpfn
+		system(cmd)
+
+		cmd = grep_package_cmd(add_pkgs, "PKGNAME") \
+			" < " shquote(avail_summary) " >> " tmpfn
+		system(cmd)
+
+#		system("cat " tmpfn)
+
+		system("cat " tmpfn " >> " inst_summary)
+		rm(tmpfn)
+	}
+#	system("cat " inst_summary)
 }
 
 ############################################################
 BEGIN {
-	exitnow(0)
+	tmpfn = tmpfile()
+	cmd = "pkg_summary2leaves -vra " inst_summary " > " tmpfn
+	system(cmd)
+	inst_summary = tmpfn
+#	system("cat " inst_summary)
+	cmd = "pkg_lint_summary -dcu " inst_summary
+#	print cmd
+#	pipe = "pkg_summary2deps -ndarR " inst_summary " " avail_summary
+#	system(cmd)
+#	while(1);
+	exitnow(system(cmd))
 }
