@@ -312,15 +312,19 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     if $PKG_UPDATE_PLAN_CMD "$installed_summary" "$PKG_SUMMARY" \
 	"$@" > "$plan_summary"
     then
-	echo ok
+	:
     else
 	echo 'Something goes wrong' 1>&2
+	cat "$plan_summary" 1>&2
 	exit 1
     fi
     pkg_cmp_summary "$installed_summary" "$plan_summary" |
     grep -v '^=' > "$cmp_summary"
 
-#    cat "$cmp_summary"
+    # note about our upgrade plan
+    echo '---------------------------'
+    echo '------- UPDATE PLAN -------'
+
     rem_pkgs=`awk '$1 == "-" {print $2}' "$cmp_summary"`
     rem_pkgs=`echo $rem_pkgs` # remove NL characters
     rem_summary="$tmp_dir/rem_summary"
@@ -328,6 +332,26 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
 	< "$installed_summary" > "$rem_summary"
     echo 'The following packages will be removed'
     show_summary "$rem_summary"
+
+    inst_pkgs=`awk '$1 ~ /^[+<>]$/ {print $2}' "$cmp_summary"`
+    inst_pkgs=`echo $inst_pkgs`
+
+    auto_pkgs=`pkg_grep_summary -v -e automatic < "$plan_summary" |
+	sed -n 's/^PKGNAME=//p'`
+    auto_pkgs=`echo $auto_pkgs`
+
+    inst_auto_summary="$tmp_dir/inst_auto_summary"
+    pkg_grep_summary -t strlist PKGBASE "$inst_pkgs" < "$plan_summary" |
+    pkg_grep_summary -t strlist PKGNAME "$auto_pkgs" > "$inst_auto_summary"
+    echo 'The following packages will be installed as dependencies'
+    show_summary "$inst_auto_summary"
+
+    inst_summary="$tmp_dir/inst_summary"
+    pkg_grep_summary -t strlist PKGBASE "$inst_pkgs" < "$plan_summary" |
+    pkg_grep_summary -v -t strlist PKGNAME "$auto_pkgs" > "$inst_summary"
+    echo 'The following packages will be installed'
+    show_summary "$inst_summary"
+
 #     plan_summary="$tmp_dir/plan_summary"
 
 #     installed_summary="$tmp_dir/installed_summary"
