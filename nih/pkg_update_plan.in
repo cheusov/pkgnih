@@ -58,7 +58,7 @@ BEGIN {
 		pkg = ARGV [i] # PKGPATH
 		if (pkg ~ /^-/){
 			rem_pkgs = rem_pkgs " " substr(pkg, 2)
-		}else if (pkg ~ /^[*]/){
+		}else if (pkg ~ /^[+*]/){
 			add_auto_pkgs = add_auto_pkgs " " substr(pkg, 2)
 			rem_pkgs = rem_pkgs " " substr(pkg, 2)
 		}else{
