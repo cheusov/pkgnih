@@ -165,6 +165,10 @@ show_packages (){
     awk -F'\t' '{printf "%s (%s)\n     %s\n", $1, $2, $3}' "$@" | indent
 }
 
+cleanup_db (){
+    $PKG_ADMIN_CMD rebuild-tree
+}
+
 yesno (){
     # $1 - question
     while true; do
@@ -389,12 +393,16 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     pkg_summary2deps -ndtr "$plan_summary" | tsort |
     while read pkg; do
 	if pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_auto_summary" > /dev/null; then
-	    pkg_add $pkg_opts -U -A "$PACKAGES/All/$pkg.tgz"
+	    if ! pkg_add $pkg_opts -U -A "$PACKAGES/All/$pkg.tgz"; then
+		cleanup_db; exit 1
+	    fi
 	elif pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_summary" > /dev/null; then
-	    pkg_add $pkg_opts -U "$PACKAGES/All/$pkg.tgz"
+	    if ! pkg_add $pkg_opts -U "$PACKAGES/All/$pkg.tgz"; then
+		cleanup_db; exit 1
+	    fi
 	fi
     done
-    $PKG_ADMIN_CMD rebuild-tree
+    cleanup_db
     exit 0
 fi
 
