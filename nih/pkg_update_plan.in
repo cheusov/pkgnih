@@ -40,7 +40,7 @@
 #.end-str
 
 BEGIN {
-	if (ARGC < 2){
+	if (ARGC < 3){
 		exit 45
 	}
 
@@ -139,6 +139,39 @@ function rm (file){
 	xsystem("rm " shquote(file))
 }
 
+function ensure_pkgs_exist (pkgs, filename,                i,arr,hash,cnt){
+	cnt = split(pkgs, arr)
+	for (i=1; i <= cnt; ++i){
+		hash [arr [i]] = 0
+	}
+
+	while (xgetline0(filename)){
+		if (/^PKGNAME=/){
+			name = substr($0, 9)
+			delete hash [name]
+			sub(/-[^-]*/, "", name)
+			delete hash [name]
+		}else if (/^PKGPATH=/){
+			name = substr($0, 9)
+			delete hash [name]
+		}
+	}
+	xclose(filename)
+ 
+	for (i in hash){
+		if (!failed)
+			print "The following packages cannot be found" > "/dev/stderr"
+		break
+	}
+	for (i in hash){
+		print "   " i
+	}
+	for (i in hash){
+		failed = 1
+		break
+	}
+}
+
 BEGIN {
 	tmpfn = tmpfile()
 	if (rem_pkgs != ""){
@@ -169,6 +202,8 @@ BEGIN {
 			" < " shquote(avail_summary) " >> " tmpfn
 		system(cmd)
 
+		ensure_pkgs_exist(add_auto_pkgs, tmpfn)
+
 		system("awk 'NF == 0 {print \"automatic=yes\"} {print}' " tmpfn " >> " inst_summary)
 		rm(tmpfn)
 	}
@@ -188,11 +223,15 @@ BEGIN {
 			" < " shquote(avail_summary) " >> " tmpfn
 		system(cmd)
 
+		ensure_pkgs_exist(add_pkgs, tmpfn)
+
 #		system("cat " tmpfn)
 
 		system("cat " tmpfn " >> " inst_summary)
 		rm(tmpfn)
 	}
+	if (failed)
+		exitnow(12)
 #	system("cat " inst_summary)
 }
 
