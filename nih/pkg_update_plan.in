@@ -149,7 +149,7 @@ function ensure_pkgs_exist (pkgs, filename,                i,arr,hash,cnt){
 		if (/^PKGNAME=/){
 			name = substr($0, 9)
 			delete hash [name]
-			sub(/-[^-]*/, "", name)
+			sub(/-[^-]*$/, "", name)
 			delete hash [name]
 		}else if (/^PKGPATH=/){
 			name = substr($0, 9)
