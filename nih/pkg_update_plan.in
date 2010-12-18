@@ -164,7 +164,7 @@ function ensure_pkgs_exist (pkgs, filename,                i,arr,hash,cnt){
 		break
 	}
 	for (i in hash){
-		print "   " i
+		print "   " i > "/dev/stderr"
 	}
 	for (i in hash){
 		failed = 1
