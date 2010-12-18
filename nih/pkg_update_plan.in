@@ -215,10 +215,10 @@ function hash_to_indices (hash,           i,ret){
 	return ret
 }
 
-BEGIN {
-	tmpfn = tmpfile()
-	rem_packages_from_summary(inst_summary, tmpfn)
-	inst_summary = tmpfn
+function generate_plan (output,           tmpfn,ii,s1)
+{
+	s1 = tmpfile()
+	rem_packages_from_summary(inst_summary, s1)
 
 	for (ii in add_auto_pkgs){
 		# add specified packages as dependencies to inst_summary
@@ -226,7 +226,7 @@ BEGIN {
 		create_packages_summary(tmpfn, add_auto_pkgs)
 		ensure_pkgs_exist(hash_to_indices(add_auto_pkgs), tmpfn)
 
-		system("awk 'NF == 0 {print \"automatic=yes\"} {print}' " tmpfn " >> " inst_summary)
+		system("awk 'NF == 0 {print \"automatic=yes\"} {print}' " tmpfn " >> " s1)
 		rm(tmpfn)
 		break
 	}
@@ -235,35 +235,26 @@ BEGIN {
 		# add specified packages to inst_summary
 		tmpfn = tmpfile()
 		create_packages_summary(tmpfn, add_pkgs)
-
 		ensure_pkgs_exist(hash_to_indices(add_pkgs), tmpfn)
 
-#		system("cat " tmpfn)
-
-		system("cat " tmpfn " >> " inst_summary)
+		system("cat " tmpfn " >> " s1)
 		rm(tmpfn)
 		break
 	}
 	if (failed)
 		exitnow(12)
-#	system("cat " inst_summary)
+
+	cmd = "pkg_summary2leaves -vra " s1 " > " output
+	system(cmd)
 }
 
-############################################################
 BEGIN {
 	tmpfn = tmpfile()
-	cmd = "pkg_summary2leaves -vra " inst_summary " > " tmpfn
-	system(cmd)
-	inst_summary = tmpfn
-#	system("cat " inst_summary)
-	cmd = "pkg_lint_summary -dcu " inst_summary
-#	print cmd
-#	pipe = "pkg_summary2deps -ndarR " inst_summary " " avail_summary
-#	system(cmd)
-#	while(1);
+	generate_plan(tmpfn)
+	cmd = "pkg_lint_summary -dcu " tmpfn
 	ex = system(cmd)
 	if (ex)
 		exitnow(ex)
 
-	exitnow(system("cat " inst_summary))
+	exitnow(system("cat " tmpfn))
 }
