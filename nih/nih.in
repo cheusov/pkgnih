@@ -62,9 +62,12 @@ sysconfdir=${NIH_SYSCONFDIR-@sysconfdir@}/nih
 libexecdir=${NIH_LIBEXECDIR-@libexecdir@}
 confdir=$HOME/.nih
 
+PREFIX=${PREFIX-@prefix@}
+PACKAGES=${PACKAGES-@PACKAGES@}
 PKG_INFO_CMD=${PKG_INFO_CMD-@PKG_INFO_CMD@}
 PKG_ADMIN_CMD=${PKG_ADMIN_CMD-@PKG_ADMIN_CMD@}
 PKG_DELETE_CMD=${PKG_DELETE_CMD-@PKG_DELETE_CMD@}
+PKG_UPDATE_PLAN_CMD=${PKG_UPDATE_PLAN_CMD-pkg_update_plan}
 
 # loading config files
 if test -r "$sysconfdir/config"; then
@@ -149,16 +152,17 @@ show_summary (){
     awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
          /^PKGPATH=/ {pkgpath=substr($0, 9)}
          /^COMMENT=/ {comment=substr($0, 9)}
-         NF == 0 {printf "%-20s %s\n", pkgpath, comment}' "$@" |
+         NF == 0 {printf "%s\t%s\t%s\n", pkgpath, pkgname, comment}' "$@" |
     sort |
     show_packages
 }
 
-show_packages (){
-    # $@ - filenames, pkg_info -I format
-#    cat "$@"
+indent (){
     awk '{print "    " $0}' "$@"
-#    awk '{print $1}' "$@" | format 4 60
+}
+
+show_packages (){
+    awk -F'\t' '{printf "%s (%s)\n     %s\n", $1, $2, $3}' "$@" | indent
 }
 
 yesno (){
@@ -278,7 +282,25 @@ nih install|upgrade <PKGBASEs or PKGPATHs>
 EOF
 }
 
-PKG_UPDATE_PLAN_CMD=${PKG_UPDATE_PLAN_CMD-pkg_update_plan}
+download_pkgs (){
+    (
+	cd "$PACKAGES/All"
+	while read pkg; do
+	    if ! test -f "$pkg.tgz"; then
+		echo "Downloading package $pkg..."
+		fetch "$PKG_SUMMARY_URL/All/$pkg.tgz"
+	    fi
+	done
+    )
+}
+
+grep_line (){
+    # $1 - line
+    # $2.. - files
+    line="$1"
+    shift
+    awk -v line="$line" '$0 == line {print $0; exit 0} END {exit 1}' "$@"
+}
 
 if test "_$1" = _install -o "_$1" = _upgrade; then
     cmd="$1"
@@ -314,7 +336,7 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     then
 	:
     else
-	echo 'Something goes wrong' 1>&2
+#	echo 'Something goes wrong' 1>&2
 	cat "$plan_summary" 1>&2
 	exit 1
     fi
@@ -322,8 +344,7 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     grep -v '^=' > "$cmp_summary"
 
     # note about our upgrade plan
-    echo '---------------------------'
-    echo '------- UPDATE PLAN -------'
+    printf '%s\n' '---------------------- UPDATE PLAN -------------------------'
 
     rem_pkgs=`awk '$1 == "-" {print $2}' "$cmp_summary"`
     rem_pkgs=`echo $rem_pkgs` # remove NL characters
@@ -352,62 +373,28 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     echo 'The following packages will be installed'
     show_summary "$inst_summary"
 
-#     plan_summary="$tmp_dir/plan_summary"
+    if ! yesno 'Proceed'; then
+	exit 0
+    fi
 
-#     installed_summary="$tmp_dir/installed_summary"
-#     pkg_bin_summary -fPKGNAME,PKGPATH,COMMENT,automatic,DEPENDS > "$installed_summary"
+    ######################## installing ###########################
+    sed -n 's/^PKGNAME=//p' "$inst_summary" "$inst_auto_summary" |
+    download_pkgs
 
-#     if test $# -gt 0; then
-# 	for p in "$@"; do
-# 	    if echo "$p" | grep -v / > /dev/null; then
-# 		p=`$PKG_INFO_CMD -QPKGPATH "$p"`
-# 	    fi
-# 	    if ! pkg_grep_summary -fPKGNAME,PKGPATH,COMMENT \
-# 		-r -s PKGPATH "$p" < "$PKG_SUMMARY" >> "$plan_summary"
-# 	    then
-# 		echo "Package '$p' not found" 1>&2
-# 		exit 1
-# 	    fi
-# 	done
-#     else
-# 	pkg_grep_summary -e automatic \
-# 	    < "$installed_summary" > "$plan_summary"
-#     fi
+    if test -s "$rem_summary"; then
+	sed -n 's/^PKGNAME=//p' "$rem_summary" |
+	xargs $PKG_DELETE_CMD -f $pkg_opts
+    fi
 
-#     wip_summary="$tmp_dir/wip_summary"
-#     pkg_grep_summary -t prefix PKGPATH wip/ < "$plan_summary" > "$wip_summary"
-#     if test -s "$wip_summary"; then
-# 	echo 'WIP packages were detected'
-# 	show_summary "$wip_summary"
-# 	if yesno 'Remove them'; then
-# 	    pkg_grep_summary -v -t prefix PKGPATH wip/ \
-# 		< "$plan_summary" > "$plan_summary".tmp
-# 	    mv "$plan_summary".tmp "$plan_summary"
-# 	fi
-#     fi
-
-#     cmp="$tmp_dir/cmp"
-#     pkg_cmp_summary "$plan_summary" "$PKG_SUMMARY" > "$cmp"
-
-#     disapp_pkgbases="$tmp_dir/disapp_pkgbases"
-#     awk '$1 == "-" {print $2}' "$cmp" > "$disapp_pkgbases"
-
-#     if test -s "$disapp_pkgbases"; then
-# 	echo 'The following package were not found in package summary'
-# 	disapp_summary="$tmp_dir/disapp_summary"
-# 	pkg_grep_summary -S PKGBASE "$disapp_pkgbases" \
-# 	    < "$plan_summary" > "$disapp_summary"
-# 	show_summary "$disapp_summary"
-# 	if yesno 'Remove them'; then
-# 	    pkg_grep_summary -v -S PKGBASE "$disapp_pkgbases" \
-# 		< "$plan_summary" > "$plan_summary".tmp
-# 	    mv "$plan_summary".tmp "$plan_summary"
-# 	fi
-#     fi
-
-#     curr_summary="$tmp_dir/curr_summary"
-#     pkg_uniq_summary -n "$plan_summary" "$curr_summary"
-
+    pkg_summary2deps -ndtr "$plan_summary" | tsort |
+    while read pkg; do
+	if pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_auto_summary" > /dev/null; then
+	    pkg_add $pkg_opts -U -A "$PACKAGES/All/$pkg.tgz"
+	elif pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_summary" > /dev/null; then
+	    pkg_add $pkg_opts -U "$PACKAGES/All/$pkg.tgz"
+	fi
+    done
+    $PKG_ADMIN_CMD rebuild-tree
     exit 0
 fi
 
@@ -455,7 +442,7 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
     awk '{print $1}' "$tmp_dir/1" > "$tmp_dir/2"
 
     echo 'The following packages will be removed:'
-    show_packages "$tmp_dir/1"
+    indent "$tmp_dir/1"
 
     echo 'The following dependent packages will be removed:'
     pkg_bin_summary -f 'PKGNAME PKGPATH DEPENDS COMMENT' |
@@ -465,7 +452,7 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
     awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
          /^COMMENT=/ {comment=substr($0, 9)}
          NF == 0 {printf "%-19s %s\n", pkgname, comment}' > "$tmp_dir/3"
-    show_packages "$tmp_dir/3"
+    indent "$tmp_dir/3"
 
     if ! yesno 'Remove them'; then
 	exit 0
@@ -477,7 +464,7 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
 The following packages were installed as dependencies
 and are no longer needed:
 EOF
-    pkg_status -l | tee "$tmp_dir/1" | show_packages -
+    pkg_status -l | tee "$tmp_dir/1" | indent -
     if ! yesno 'Remove them'; then
 	exit 0
     fi
