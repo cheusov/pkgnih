@@ -1,6 +1,7 @@
 Runtime requiremenets:
-    wip/runawk,
+    wip/runawk
     wip/pkg_summary-utils,
+    wip/pkg_status
 
 Build requirements:
     wip/mk-configure

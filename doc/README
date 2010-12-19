@@ -1,7 +1,7 @@
 TODO: Add samples of use
 
 --------------------------------------------------------------------------
-NIH is a planned package management tool for pkgsrc.
+NIH is a package management tool for pkgsrc.
 NIH means Not Invented Here, yes, I'm talking about NIH syndrome :-)
 
 Why not:
@@ -15,7 +15,7 @@ Why not:
   pkgin:
     - It is written in C, the worst programming language I've ever
       known for this sort of task. All other reasons are secondary.
-    - I think sqlite database is absoletely useless.
+    - I think sqlite database is absoletely useless for package management.
 
 Why NIH:
 
@@ -28,14 +28,14 @@ Why NIH:
     several years I've been using it for running bulk builds under
     Linux and NetBSD, and consider it rather stable.
 
-  - I've got pkg_status, small tool for comparing versions of
+  - I've got pkg_status, small tool for checking status of
     installed packages against pkg_summary.txt or pkgsrc source tree.
-    It also provides lots of other things usually implemented by
+    It also provides lots of other features usually implemented by
     full-featured package management tools. It is very small and
     stable.
 
-  - I've got pkg_online-client and pkg_grep_summary, very powerful and
-    fast tools for searching for packages. They are also small and stable.
+  - I've got pkg_digger and pkg_online_find, very powerful and fast
+    tools for searching for packages. They are also small and stable.
 
 Plans:
   - To provide features implemented in pkgchk, pkgin, pkg_comp,
