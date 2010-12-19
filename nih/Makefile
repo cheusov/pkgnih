@@ -1,8 +1,23 @@
-INTEXTS_REPLS +=	PKG_INFO_CMD   ${SBINDIR}/pkg_info
-INTEXTS_REPLS +=	PKG_ADMIN_CMD  ${SBINDIR}/pkg_admin
-INTEXTS_REPLS +=	PKG_DELETE_CMD ${SBINDIR}/pkg_delete
+LIBEXECDIR ?=		${PREFIX}/libexec/nih
+EGDIR ?=		${PREFIX}/share/nih
 
-INSCRIPTS =	nih
-SCRIPTS =	${INSCRIPTS}
+PACKAGES ?=		/usr/pkgsrc/packages
+
+PKG_INFO ?=		${SBINDIR}/pkg_info
+PKG_ADMIN ?=		${SBINDIR}/pkg_admin
+PKG_DELETE ?=		${SBINDIR}/pkg_delete
+
+INTEXTS_REPLS +=	PKG_INFO_CMD   ${PKG_INFO}
+INTEXTS_REPLS +=	PKG_ADMIN_CMD  ${PKG_ADMIN}
+INTEXTS_REPLS +=	PKG_DELETE_CMD ${PKG_DELETE}
+
+INTEXTS_REPLS +=	PACKAGES       ${PACKAGES}
+
+INSCRIPTS =		nih pkg_update_plan
+SCRIPTS =		${INSCRIPTS}
+SCRIPTSDIR_pkg_update_plan = ${LIBEXECDIR}
+
+FILES =			nih.conf
+FILESDIR_nih.conf=	${EGDIR}
 
 .include <mkc.prog.mk>

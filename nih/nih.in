@@ -62,12 +62,11 @@ sysconfdir=${NIH_SYSCONFDIR-@sysconfdir@}/nih
 libexecdir=${NIH_LIBEXECDIR-@libexecdir@}
 confdir=$HOME/.nih
 
-PREFIX=${PREFIX-@prefix@}
 PACKAGES=${PACKAGES-@PACKAGES@}
 PKG_INFO_CMD=${PKG_INFO_CMD-@PKG_INFO_CMD@}
 PKG_ADMIN_CMD=${PKG_ADMIN_CMD-@PKG_ADMIN_CMD@}
 PKG_DELETE_CMD=${PKG_DELETE_CMD-@PKG_DELETE_CMD@}
-PKG_UPDATE_PLAN_CMD=${PKG_UPDATE_PLAN_CMD-pkg_update_plan}
+PKG_UPDATE_PLAN_CMD=${PKG_UPDATE_PLAN_CMD-$libexecdir/pkg_update_plan}
 
 # loading config files
 if test -r "$sysconfdir/config"; then
