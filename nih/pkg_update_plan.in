@@ -34,6 +34,7 @@
 #use "shquote.awk"
 #use "xclose.awk"
 #use "xsystem.awk"
+#use "psu_funcs.awk"
 
 #.begin-str help
 # Usage: pkg_update_plan <inst_summary> <avail_summary> PKGPATHs...
@@ -90,27 +91,28 @@ BEGIN {
 
 ############################################################
 # reading and analysing installed and available summaries
-# BEGIN {
-# 	auto = 0
-# 	while (xgetline0(inst_summary)){
-# 		if ($0 ~ /^PKGNAME=/){
-# 			pkgname = substr($0, 9)
-# 		}else if ($0 ~ /^PKGPATH=/){
-# 			pkgpath = substr($0, 9)
-# 		}else if ($0 ~ /^automatic=/){
-# 			auto = (substr($0, 11) != "")
-# 		}else if (NF == 0){
-# 			pkgbase = pkgname
-# 			sub(/-[^-]*$/, "", pkgbase)
-# 			inst_name2base [pkgname] = pkgbase
-# 			inst_name2auto [pkgname] = auto
-# 			inst_name2path [pkgname] = pkgpath
+BEGIN {
+	auto = 0
+	while (xgetline0(inst_summary)){
+		if ($0 ~ /^PKGNAME=/){
+			pkgname = substr($0, 9)
+		}else if ($0 ~ /^PKGPATH=/){
+			pkgpath = substr($0, 9)
+		}else if ($0 ~ /^automatic=/){
+			auto = (substr($0, 11) != "")
+		}else if (NF == 0){
+			pkgbase = pkgname
+			sub(/-[^-]*$/, "", pkgbase)
+#			inst_base2name [pkgbase] = pkgname
+			inst_base2auto [pkgbase] = auto
+			inst_base2path [pkgbase] = pkgpath
 
-# 			pkgname = pkgpath = ""
-# 			auto = 0
-# 		}
-# 	}
-# 	xclose(inst_summary)
+			pkgname = pkgpath = ""
+			auto = 0
+		}
+	}
+	xclose(inst_summary)
+}
 
 # 	while (xgetline0(avail_summary)){
 # 		if ($0 ~ /^PKGNAME=/){
@@ -139,7 +141,7 @@ function rm (file){
 	xsystem("rm " shquote(file))
 }
 
-function ensure_pkgs_exist (pkgs, filename,                i,arr,hash,cnt){
+function ensure_pkgs_exist (pkgs, filename,                i,arr,hash,cnt,name){
 	cnt = split(pkgs, arr)
 	for (i=1; i <= cnt; ++i){
 		hash [arr [i]] = 0
@@ -172,7 +174,7 @@ function ensure_pkgs_exist (pkgs, filename,                i,arr,hash,cnt){
 	}
 }
 
-function rem_packages_from_summary (input, output,             i,pkgs){
+function rem_packages_from_summary (input, output,             pkgs,cmd){
 	pkgs = hash_to_indices(rem_pkgs)
 
 	if (pkgs != ""){
@@ -188,24 +190,24 @@ function rem_packages_from_summary (input, output,             i,pkgs){
 	}
 }
 
-function create_packages_summary (output, hash,                  pkg)
+function create_packages_summary (output, hash,                  pkgs,cmd)
 {
 	pkgs = hash_to_indices(hash)
-
 	cmd = grep_package_cmd(pkgs, "PKGBASE") \
-	" < " shquote(avail_summary) " > " output
+		" < " shquote(avail_summary) " > " output
 	system(cmd)
 
 	cmd = grep_package_cmd(pkgs, "PKGPATH") \
-	" < " shquote(avail_summary) " >> " output
+		" < " shquote(avail_summary) " >> " output
 	system(cmd)
 
 	cmd = grep_package_cmd(pkgs, "PKGNAME") \
-	" < " shquote(avail_summary) " >> " output
+		" < " shquote(avail_summary) " >> " output
 	system(cmd)
 }
 
 function hash_to_indices (hash,           i,ret){
+	ret = ""
 	for (i in hash){
 		if (ret == "")
 			ret = i
@@ -246,15 +248,55 @@ function generate_plan (output,           tmpfn,ii,s1)
 
 	cmd = "pkg_summary2leaves -vra " s1 " > " output
 	system(cmd)
+	rm(s1)
+}
+
+function get_imghash (){
+	return length(hash_to_indices(rem_pkgs)) " " length(hash_to_indices(add_pkgs)) " " length(hash_to_indices(add_auto_pkgs))
 }
 
 BEGIN {
-	tmpfn = tmpfile()
-	generate_plan(tmpfn)
-	cmd = "pkg_lint_summary -dcu " tmpfn
-	ex = system(cmd)
-	if (ex)
-		exitnow(ex)
+	planfn = tmpfile()
+	errfn  = tmpfile()
 
-	exitnow(system("cat " tmpfn))
+	old_imghash = get_imghash()
+
+	while (1){
+		generate_plan(planfn)
+		cmd = "pkg_lint_summary -dcu " planfn " > " errfn
+		ex = system(cmd)
+		if (!ex)
+			break
+
+		while (xgetline0(errfn)){
+			if ($1 == "d:" && $2 == "not_found"){
+				reqd = pkgname2pkgbase($3)
+				if (! (reqd in inst_base2path))
+					add_pkgs [reqd] = 0
+				else{
+					reqd_path = inst_base2path [reqd]
+					if (inst_base2auto [reqd])
+						add_auto_pkgs [reqd_path] = 0
+					else
+						add_pkgs [reqd_path] = 0
+				}
+				rem_pkgs [reqd] = 0
+			}
+		}
+		xclose(errfn)
+
+		new_imghash = get_imghash()
+		if (old_imghash == new_imghash){
+			break
+		}
+
+		old_imghash = new_imghash
+	}
+#	exit 65
+	if (ex){
+		system("cat " errfn)
+		exitnow(1)
+	}else{
+		exitnow(system("cat " planfn))
+	}
 }
