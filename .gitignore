@@ -1,0 +1,9 @@
+*~
+.gitignore
+nih/nih
+nih/pkg_update_plan
+pkg_summary.txt
+needed_summary.txt
+log
+installed_summary.txt
+installed_full_summary.txt
