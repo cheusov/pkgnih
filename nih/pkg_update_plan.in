@@ -38,9 +38,18 @@
 
 #.begin-str help
 # Usage: pkg_update_plan <inst_summary> <avail_summary> PKGPATHs...
+# OPTIONS:
+#   -h        display this help
+#   -v        verbose mode
 #.end-str
 
 BEGIN {
+	if (getarg("h")){
+		print_help()
+		exitnow(0)
+	}
+	verbose_mode = getarg("v")
+
 	if (ARGC < 3){
 		exit 45
 	}
@@ -255,6 +264,13 @@ function get_imghash (){
 	return length(hash_to_indices(rem_pkgs)) " " length(hash_to_indices(add_pkgs)) " " length(hash_to_indices(add_auto_pkgs))
 }
 
+function show_progress (){
+	if (verbose_mode){
+		printf "    R:%d U:%d A:%d\n", length(rem_pkgs), length(add_pkgs),
+			length(add_auto_pkgs) > "/dev/stderr"
+	}
+}
+
 BEGIN {
 	planfn = tmpfile()
 	errfn  = tmpfile()
@@ -262,6 +278,8 @@ BEGIN {
 	old_imghash = get_imghash()
 
 	while (1){
+		show_progress()
+
 		generate_plan(planfn)
 		cmd = "pkg_lint_summary -dcu " planfn " > " errfn
 		ex = system(cmd)
@@ -292,7 +310,9 @@ BEGIN {
 
 		old_imghash = new_imghash
 	}
-#	exit 65
+
+	show_progress()
+
 	if (ex){
 		system("cat " errfn)
 		exitnow(1)

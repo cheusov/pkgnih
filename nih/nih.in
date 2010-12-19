@@ -188,6 +188,10 @@ yesno (){
     done
 }
 
+verbose (){
+    printf "%s\n" "$1"
+}
+
 ######################################################################
 # help
 if test "$1" = help; then
@@ -324,6 +328,7 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     done
     shift `expr $OPTIND - 1`
 
+    verbose "Getting installed packages..."
     installed_summary="$tmp_dir/installed_summary"
     pkg_bin_summary -fPKGNAME,PKGPATH,COMMENT,automatic,DEPENDS > "$installed_summary"
 
@@ -332,9 +337,10 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
 	exit 1
     fi
 
+    verbose "Generating the update plan..."
     plan_summary="$tmp_dir/plan_summary"
     cmp_summary="$tmp_dir/cmp_summary"
-    if $PKG_UPDATE_PLAN_CMD "$installed_summary" "$PKG_SUMMARY" \
+    if $PKG_UPDATE_PLAN_CMD -v "$installed_summary" "$PKG_SUMMARY" \
 	"$@" > "$plan_summary"
     then
 	:
@@ -343,6 +349,8 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
 	cat "$plan_summary" 1>&2
 	exit 1
     fi
+#    verbose "Getting installed packages..."
+
     pkg_cmp_summary "$installed_summary" "$plan_summary" |
     grep -v '^=' > "$cmp_summary"
 
