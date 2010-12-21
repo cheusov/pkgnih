@@ -401,11 +401,11 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     pkg_summary2deps -ndtr "$plan_summary" | tsort |
     while read pkg; do
 	if pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_auto_summary" > /dev/null; then
-	    if ! pkg_add $pkg_opts -U -A "$PACKAGES/All/$pkg.tgz"; then
+	    if ! pkg_add $pkg_opts -fUA "$PACKAGES/All/$pkg.tgz"; then
 		cleanup_db; exit 1
 	    fi
 	elif pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_summary" > /dev/null; then
-	    if ! pkg_add $pkg_opts -U "$PACKAGES/All/$pkg.tgz"; then
+	    if ! pkg_add $pkg_opts -fU "$PACKAGES/All/$pkg.tgz"; then
 		cleanup_db; exit 1
 	    fi
 	fi
