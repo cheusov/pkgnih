@@ -299,9 +299,15 @@ BEGIN {
 						add_pkgs [reqd_path] = 0
 				}
 				rem_pkgs [reqd] = 0
+			}else{
+				ex = 1
+				break
 			}
 		}
 		xclose(errfn)
+
+		if (ex)
+			break
 
 		new_imghash = get_imghash()
 		if (old_imghash == new_imghash){
