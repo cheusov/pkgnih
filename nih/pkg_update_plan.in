@@ -290,7 +290,7 @@ BEGIN {
 			if ($1 == "d:" && $2 == "not_found"){
 				reqd = pkgname2pkgbase($3)
 				if (! (reqd in inst_base2path))
-					add_pkgs [reqd] = 0
+					add_auto_pkgs [reqd] = 0
 				else{
 					reqd_path = inst_base2path [reqd]
 					if (inst_base2auto [reqd])
