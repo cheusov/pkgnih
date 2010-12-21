@@ -54,6 +54,7 @@ Commands:
  nih leaf            - Output or remove leaf packages
  nih license         - Working with licenses
  nih list            - List packages
+ nih mark            - Mark packages
  nih clean           - Clean-up DESTDIR or packages cache directories
 EOF
 }
@@ -670,6 +671,62 @@ fi
 ######################################################################
 # list
 if test "$1" = list; then
+    exit 0
+fi
+
+######################################################################
+# mark
+usage_mark (){
+    cat <<'EOF'
+nih mark [options] PKGBASEs
+      Mark packages
+
+   option:
+      -h    display this help message
+      -u    mark packages as installed by user
+      -d    mark packages as dependencies
+EOF
+}
+
+if test "$1" = mark; then
+    shift
+    opts='l'
+    while getopts hud f; do
+	case "$f" in
+	    '?')
+		echo "Unknown suboption $f for command 'mark'"
+		exit 1;;
+	    h)
+		usage_mark
+		exit 0;;
+	    u)
+		mode_u=1;;
+	    d)
+		mode_d=1;;
+	    *)
+		opts="${opts}$f";;
+	esac
+    done
+    shift `expr $OPTIND - 1`
+
+    if test "$mode_u$mode_d" = 11; then
+	echo '-u and -d options are exclusive' 1>&2
+	exit 1
+    elif test -z "$mode_u$mode_d"; then
+	echo 'Either -u or -d must be applied' 1>&2
+	exit 1
+    elif test -n "$mode_d"; then
+	cmd='set automatic=yes'
+    else
+	cmd='unset automatic'
+    fi
+
+    if test $# -eq 0; then
+	echo 'No packages were specified' 1>&2
+	exit 
+    fi
+
+    $PKG_ADMIN_CMD $cmd "$@"
     exit 0
 fi
 
