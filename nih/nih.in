@@ -331,7 +331,8 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
 
     verbose "Getting installed packages..."
     installed_summary="$tmp_dir/installed_summary"
-    pkg_bin_summary -fPKGNAME,PKGPATH,COMMENT,automatic,DEPENDS > "$installed_summary"
+    pkg_bin_summary -fPKGNAME,PKGPATH,COMMENT,automatic,CONFLICTS,DEPENDS \
+	> "$installed_summary"
 
     if test $# -eq 0; then
 	echo 'Not implemented yet' 1>&2
@@ -353,7 +354,7 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
 #    verbose "Getting installed packages..."
 
     pkg_cmp_summary "$installed_summary" "$plan_summary" |
-    grep -v '^=' > "$cmp_summary"
+    grep -v '^=' > "$cmp_summary" || true
 
     # note about our upgrade plan
     printf '%s\n' '---------------------- UPDATE PLAN -------------------------'
@@ -385,6 +386,15 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     echo 'The following packages will be installed'
     show_summary "$inst_summary"
 
+    conflicts_msg="$tmp_dir/conflicts"
+    if ! pkg_lint_summary -c "$inst_summary" "$inst_auto_summary" \
+	"$installed_summary" > "$conflicts_msg"
+    then
+	echo 'To implement'
+	cat "$conflicts_msg"
+	exit 111
+    fi
+    exit 0
     if ! yesno 'Proceed'; then
 	exit 0
     fi
