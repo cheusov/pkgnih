@@ -364,8 +364,6 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     rem_summary="$tmp_dir/rem_summary"
     pkg_grep_summary -t strlist PKGBASE "$rem_pkgs" \
 	< "$installed_summary" > "$rem_summary"
-    echo 'The following packages will be removed'
-    show_summary "$rem_summary"
 
     inst_pkgs=`awk '$1 ~ /^[+<>]$/ {print $2}' "$cmp_summary"`
     inst_pkgs=`echo $inst_pkgs`
@@ -377,24 +375,32 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     inst_auto_summary="$tmp_dir/inst_auto_summary"
     pkg_grep_summary -t strlist PKGBASE "$inst_pkgs" < "$plan_summary" |
     pkg_grep_summary -t strlist PKGNAME "$auto_pkgs" > "$inst_auto_summary"
-    echo 'The following packages will be installed as dependencies'
-    show_summary "$inst_auto_summary"
 
     inst_summary="$tmp_dir/inst_summary"
     pkg_grep_summary -t strlist PKGBASE "$inst_pkgs" < "$plan_summary" |
     pkg_grep_summary -v -t strlist PKGNAME "$auto_pkgs" > "$inst_summary"
-    echo 'The following packages will be installed'
-    show_summary "$inst_summary"
 
     conflicts_msg="$tmp_dir/conflicts"
     if ! pkg_lint_summary -c "$inst_summary" "$inst_auto_summary" \
 	"$installed_summary" > "$conflicts_msg"
     then
-	echo 'To implement'
-	cat "$conflicts_msg"
-	exit 111
+	extra_rem_pkgs="$tmp_dir/extra_rem"
+	extra_rem_summary="$tmp_dir/extra_rem_summary"
+	awk '$1 == "c:" {print $5; print $8}' "$conflicts_msg" |
+	sort -u > "$extra_rem_pkgs"
+	pkg_grep_summary -t strfile PKGNAME "$extra_rem_pkgs" \
+	    < "$installed_summary" > "$extra_rem_summary"
     fi
-    exit 0
+
+    echo 'The following packages will be removed'
+    show_summary "$rem_summary"
+#    echo 'The following packages will be removed too'
+#    show_summary "$extra_rem_summary"
+    echo 'The following packages will be installed'
+    show_summary "$inst_summary"
+    echo 'The following packages will be installed as dependencies'
+    show_summary "$inst_auto_summary"
+
     if ! yesno 'Proceed'; then
 	exit 0
     fi
@@ -403,19 +409,19 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     sed -n 's/^PKGNAME=//p' "$inst_summary" "$inst_auto_summary" |
     download_pkgs
 
-    if test -s "$rem_summary"; then
-	sed -n 's/^PKGNAME=//p' "$rem_summary" |
+    if test -s "$rem_summary" -o -s "$extra_rem_summary"; then
+	sed -n 's/^PKGNAME=//p' "$rem_summary" "$extra_rem_summary" |
 	xargs $PKG_DELETE_CMD -f $pkg_opts
     fi
 
     pkg_summary2deps -ndtr "$plan_summary" | tsort |
     while read pkg; do
 	if pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_auto_summary" > /dev/null; then
-	    if ! pkg_add $pkg_opts -fUA "$PACKAGES/All/$pkg.tgz"; then
+	    if ! pkg_add $pkg_opts -UA "$PACKAGES/All/$pkg.tgz"; then
 		cleanup_db; exit 1
 	    fi
 	elif pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_summary" > /dev/null; then
-	    if ! pkg_add $pkg_opts -fU "$PACKAGES/All/$pkg.tgz"; then
+	    if ! pkg_add $pkg_opts -U "$PACKAGES/All/$pkg.tgz"; then
 		cleanup_db; exit 1
 	    fi
 	fi

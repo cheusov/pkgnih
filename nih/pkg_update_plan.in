@@ -282,16 +282,16 @@ BEGIN {
 
 		generate_plan(planfn)
 		cmd = "pkg_lint_summary -dcu " planfn " > " errfn
-		ex = system(cmd)
-		if (!ex)
+		if (!system(cmd))
 			break
 
+		ex = 0
 		while (xgetline0(errfn)){
 			if ($1 == "d:" && $2 == "not_found"){
 				reqd = pkgname2pkgbase($3)
-				if (! (reqd in inst_base2path))
+				if (! (reqd in inst_base2path)){
 					add_auto_pkgs [reqd] = 0
-				else{
+				}else{
 					reqd_path = inst_base2path [reqd]
 					if (inst_base2auto [reqd])
 						add_auto_pkgs [reqd_path] = 0
