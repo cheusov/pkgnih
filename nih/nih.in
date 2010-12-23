@@ -383,12 +383,13 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     pkg_grep_summary -v -t strlist PKGNAME "$auto_pkgs" > "$inst_summary"
 
     conflicts_msg="$tmp_dir/conflicts"
-    if ! pkg_lint_summary -c "$inst_summary" "$inst_auto_summary" \
+    if ! pkg_lint_summary -cd "$inst_summary" "$inst_auto_summary" \
 	"$installed_summary" > "$conflicts_msg"
     then
 	extra_rem_pkgs="$tmp_dir/extra_rem"
 	extra_rem_summary="$tmp_dir/extra_rem_summary"
-	awk '$1 == "c:" {print $5; print $8}' "$conflicts_msg" |
+	awk '$1 == "c:" {print $5; print $8}
+	     $1 == "d:" {print $6}' "$conflicts_msg" |
 	sort -u > "$extra_rem_pkgs"
 	pkg_grep_summary -t strfile PKGNAME "$extra_rem_pkgs" \
 	    < "$installed_summary" > "$extra_rem_summary"
