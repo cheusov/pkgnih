@@ -618,8 +618,9 @@ nih search [options] [arguments]
 
    option:
       -h    display this help message
-      -b    search pkg_summary.txt (the default)
+      -b    search in pkg_summary.txt (the default)
       -o    search using pkg_online
+      -I    search in installed packages
       -s    output search strategies
       -f    output search fields
       -<X>  all other options are passed directly to
@@ -631,15 +632,20 @@ if test "$1" = search; then
     shift
     export PKG_DIGGER_SUMMARY="$PKG_SUMMARY"
 
-    while getopts hbosf139irq f; do
+    while getopts hboIsf139irq f; do
 	case "$f" in
 	    '?')
 		echo "Unknown suboption $f for command 'leaf'"
 		exit 1;;
 	    b)
-		unset PKG_DIGGER_BACKEND || true;;
+		unset PKG_DIGGER_BACKEND || true
+		unset in_installed || true;;
 	    o)
-		export PKG_DIGGER_BACKEND=pkg_online_client;;
+		export PKG_DIGGER_BACKEND=pkg_online_client
+		unset in_installed || true;;
+	    I)
+		unset PKG_DIGGER_BACKEND || true
+		in_installed=1;;
 	    h)
 		usage_search
 		exit 0;;
@@ -648,6 +654,11 @@ if test "$1" = search; then
 	esac
     done
     shift `expr $OPTIND - 1`
+
+    if test -n "$in_installed"; then
+	export PKG_DIGGER_SUMMARY="$tmp_dir/installed_summary"
+	pkg_bin_summary -a automatic > "$PKG_DIGGER_SUMMARY"
+    fi
 
     pkg_digger ${opts+-$opts} "$@"
 
