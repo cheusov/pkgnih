@@ -231,6 +231,17 @@ function generate_plan (output,           tmpfn,ii,s1)
 	s1 = tmpfile()
 	rem_packages_from_summary(inst_summary, s1)
 
+	for (ii in add_pkgs){
+		# add specified packages to inst_summary
+		tmpfn = tmpfile()
+		create_packages_summary(tmpfn, add_pkgs)
+		ensure_pkgs_exist(hash_to_indices(add_pkgs), tmpfn)
+
+		system("cat " tmpfn " >> " s1)
+		rm(tmpfn)
+		break
+	}
+
 	for (ii in add_auto_pkgs){
 		# add specified packages as dependencies to inst_summary
 		tmpfn = tmpfile()
@@ -242,20 +253,10 @@ function generate_plan (output,           tmpfn,ii,s1)
 		break
 	}
 
-	for (ii in add_pkgs){
-		# add specified packages to inst_summary
-		tmpfn = tmpfile()
-		create_packages_summary(tmpfn, add_pkgs)
-		ensure_pkgs_exist(hash_to_indices(add_pkgs), tmpfn)
-
-		system("cat " tmpfn " >> " s1)
-		rm(tmpfn)
-		break
-	}
 	if (failed)
 		exitnow(12)
 
-	cmd = "pkg_summary2leaves -vra " s1 " > " output
+	cmd = "pkg_summary2leaves -vra " s1 " | pkg_uniq_summary > " output
 	system(cmd)
 	rm(s1)
 }
