@@ -55,6 +55,7 @@ Commands:
  nih license         - Working with licenses
  nih list            - List packages
  nih mark            - Mark packages
+ nih deps            - Show dependencies
  nih clean           - Clean-up DESTDIR or packages cache directories
 EOF
 }
@@ -751,6 +752,62 @@ if test "$1" = mark; then
     fi
 
     $PKG_ADMIN_CMD $cmd "$@"
+    exit 0
+fi
+
+######################################################################
+# deps
+usage_deps (){
+    cat <<'EOF'
+nih deps [options] [pkgs...]
+      Output a dependency graph of installed packages.
+
+   option:
+      -h    display this help message
+      -r    output dependencies, by default packages
+            that depend on "pkgs" are output.
+      -l    output list of packages instead of graph
+      -B    output PKGBASE (the default)
+      -P    output PKGPATH
+      -N    output PKGNAME
+EOF
+}
+
+if test "$1" = deps; then
+    shift
+    sb_opts=''
+    pn_opts=''
+    while getopts hrlBNP f; do
+	case "$f" in
+	    '?')
+		echo "Unknown suboption $f for command 'deps'"
+		exit 1;;
+	    h)
+		usage_deps
+		exit 0;;
+	    r)
+		sb_opts="$sb_opts -r";;
+	    l)
+		sb_opts="$sb_opts -n";;
+	    B)
+		pn_opts="$pn_opts -n";;
+	    N)
+		pn_opts="$pn_opts -nr";;
+	    P)
+		pn_opts="$pn_opts -p";;
+	esac
+    done
+    shift `expr $OPTIND - 1`
+
+    pn_opts=${pn_opts:--n}
+
+    pkg_bin_summary -fPKGNAME,PKGPATH,DEPENDS |
+    pkg_summary2deps -d $pn_opts |
+    if test $# -eq 0; then
+	sort -u
+    else
+	pkg_subgraph_deps $sb_opts -p "$*" | sort -u
+    fi
     exit 0
 fi
 
