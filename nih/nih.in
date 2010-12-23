@@ -167,7 +167,7 @@ show_packages (){
 }
 
 cleanup_db (){
-    echo 'Update PKGDB' 1>&2
+    echo 'Updating pkgdb...' 1>&2
     $PKG_ADMIN_CMD rebuild-tree
 }
 
