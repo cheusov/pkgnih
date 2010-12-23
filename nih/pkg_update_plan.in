@@ -271,6 +271,20 @@ function show_progress (){
 	}
 }
 
+function update_hashes (reqd,               reqd_path) {
+	rem_pkgs [reqd] = 0
+	if (! (reqd in inst_base2path)){
+		if (!(reqd in add_pkgs))
+			++add_auto_pkgs [reqd]
+	}else{
+		reqd_path = inst_base2path [reqd]
+		if (inst_base2auto [reqd] && !(reqd_path in add_pkgs))
+			++add_auto_pkgs [reqd_path]
+		else
+			++add_pkgs [reqd_path]
+	}
+}
+
 BEGIN {
 	planfn = tmpfile()
 	errfn  = tmpfile()
@@ -288,17 +302,8 @@ BEGIN {
 		ex = 0
 		while (xgetline0(errfn)){
 			if ($1 == "d:" && $2 == "not_found"){
-				reqd = pkgname2pkgbase($3)
-				if (! (reqd in inst_base2path)){
-					add_auto_pkgs [reqd] = 0
-				}else{
-					reqd_path = inst_base2path [reqd]
-					if (inst_base2auto [reqd])
-						add_auto_pkgs [reqd_path] = 0
-					else
-						add_pkgs [reqd_path] = 0
-				}
-				rem_pkgs [reqd] = 0
+				update_hashes(pkgname2pkgbase($3))
+				update_hashes(pkgname2pkgbase($6))
 			}else{
 				ex = 1
 				break
@@ -321,6 +326,9 @@ BEGIN {
 
 	if (ex){
 		system("cat " errfn)
+		if (verbose_mode > 1){
+			system("cat " planfn " 1>&2")
+		}
 		exitnow(1)
 	}else{
 		exitnow(system("cat " planfn))
