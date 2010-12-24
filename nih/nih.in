@@ -293,8 +293,6 @@ EOF
 	exit 1
     fi
 
-    echo done
-
     exit 0
 fi
 
@@ -318,12 +316,25 @@ fi
 # install | upgrade
 usage_install (){
     cat <<'EOF'
-nih install|upgrade <PKGBASEs or PKGPATHs>
+nih install|upgrade <packages>
       Install or upgrade specified packages.
+
    options:
       -h     display this help message
       -n     don't actually install a package, just report the steps that
              would be taken if it were.
+
+Here <packages> are either PKGBASEs, PKGNAMEs or PKGPATHs, optionally
+prepanded with `+' (package will be marked as installed as a dependency)
+or `-' (package will be removed). If neither `+' nor `-' were specified
+packages will be marked as installed by user. The marker `-' may be useful
+for resolving conflicts between installed and new packages.
+
+Examples:
+   nih install mawk lang/gawk
+   nih install perl -p5-Digest
+   nih install +GConf +xproto
+   nih install -- -gmake -autoconf -automake -libtool-base
 EOF
 }
 
@@ -353,7 +364,6 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     while getopts hn f; do
 	case "$f" in
 	    '?')
-		echo "Unknown suboption $f for command 'install'"
 		exit 1;;
 	    n)
 		pkg_opts='-n';;
