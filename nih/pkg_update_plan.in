@@ -296,7 +296,7 @@ BEGIN {
 		show_progress()
 
 		generate_plan(planfn)
-		cmd = "pkg_lint_summary -dcu " planfn " > " errfn
+		cmd = "pkg_lint_summary -dcul " planfn " > " errfn
 		if (!system(cmd))
 			break
 
