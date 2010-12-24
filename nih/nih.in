@@ -32,7 +32,8 @@ export LC_ALL=C
 
 usage (){
     cat 1>&2 <<'EOF'
-Usage: pkgnih [global options] command [command options] [command args]
+Usage:
+  pkgnih [global options] command [command options] [--] [command args]
 
 Global options:
  nih -h              - Display help message
@@ -107,6 +108,8 @@ if test $# -eq 0; then
 fi
 
 
+######################################################################
+######################################################################
 ######################################################################
 # functions
 format (){
@@ -196,12 +199,16 @@ verbose (){
 }
 
 ######################################################################
+######################################################################
+######################################################################
 # help
 if test "$1" = help; then
     usage
     exit 0
 fi
 
+######################################################################
+######################################################################
 ######################################################################
 # refresh
 usage_refresh (){
@@ -221,20 +228,43 @@ nih refresh [options]
 EOF
 }
 
-if test "$1" = refresh; then
-    if test -n "$PKG_SUMMARY"; then
-	cat 1>&2 <<EOF
-Variable PKG_SUMMARY is set in configuration file.
-Nothing to do.
-EOF
-	exit 1
+fetch_summary_file (){
+    # $1 - extension
+    echo "Downloading pkg_summary.$1..."
+    if test -f pkg_summary.$1; then
+	mv pkg_summary.$1 pkg_summary.$1.old
     fi
+    fetch "$PKG_SUMMARY_URL/All/pkg_summary.$1"
+    case "$1" in
+	gz)  gzip -dc  pkg_summary.gz  > pkg_summary.txt.tmp || return 1;;
+	bz2) bzip2 -dc pkg_summary.bz2 > pkg_summary.txt.tmp || return 1;;
+	*)   echo 'Unknown ext'; exit 1;;
+    esac
+    mv pkg_summary.txt.tmp pkg_summary.txt
+}
 
+fetch_sha512_file (){
+    # $1 - extension
+    echo "Downloading SHA512.$1..."
+    if test -f SHA512.$1; then
+	mv SHA512.$1 SHA512.$1.old
+    fi
+    fetch "$PKG_SUMMARY_URL/SHA512.$1"
+    echo done
+
+    case "$1" in
+	gz)   gzip  -dc SHA512.$1 > SHA512.txt.tmp || return 1;;
+	bz2)  bzip2 -dc SHA512.$1 > SHA512.txt.tmp || return 1;;
+	*)   echo 'Unknown ext'; exit 1;;
+    esac
+    mv SHA512.txt.tmp SHA512.txt
+}
+
+if test "$1" = refresh; then
     shift
     while getopts h f; do
 	case "$f" in
 	    '?')
-		echo "Unknown suboption $f for command 'refresh'"
 		exit 1;;
 	    h)
 		usage_refresh
@@ -243,24 +273,27 @@ EOF
     done
     shift `expr $OPTIND - 1`
 
+    if test -n "$PKG_SUMMARY"; then
+	cat 1>&2 <<EOF
+Variable PKG_SUMMARY is set in configuration file.
+Nothing to do.
+EOF
+	exit 1
+    fi
+
     cd "$confdir"
 
     fetch=""
-    echo 'Downloading pkg_summary.bz2...'
-    mv pkg_summary.bz2 pkg_summary.bz2.old
-    fetch "$PKG_SUMMARY_URL/All/pkg_summary.bz2"
+
+    if ! fetch_summary_file bz2 && ! fetch_summary_file gz; then
+	exit 1
+    fi
+
+    if ! fetch_sha512_file bz2 && ! fetch_sha512_file gz; then
+	exit 1
+    fi
+
     echo done
-
-    echo 'Downloading SHA512.bz2...'
-    mv SHA512.bz2 SHA512.bz2.old
-    fetch "$PKG_SUMMARY_URL/SHA512.bz2"
-    echo done
-
-    bzip2 -dc pkg_summary.bz2 > pkg_summary.txt.tmp
-    mv pkg_summary.txt.tmp pkg_summary.txt
-
-    bzip2 -dc SHA512.bz2 > SHA512.txt.tmp
-    mv SHA512.txt.tmp SHA512.txt
 
     exit 0
 fi
@@ -279,6 +312,8 @@ EOF
     exit 1
 fi
 
+######################################################################
+######################################################################
 ######################################################################
 # install | upgrade
 usage_install (){
@@ -441,6 +476,8 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
 fi
 
 ######################################################################
+######################################################################
+######################################################################
 # uninstall | remove | delete
 usage_uninstall (){
     cat <<'EOF'
@@ -519,6 +556,8 @@ EOF
 fi
 
 ######################################################################
+######################################################################
+######################################################################
 # verify
 usage_verify (){
     cat <<'EOF'
@@ -563,6 +602,8 @@ if test "$1" = verify; then
 fi
 
 ######################################################################
+######################################################################
+######################################################################
 # status
 usage_status (){
     cat <<'EOF'
@@ -605,11 +646,15 @@ if test "$1" = status; then
 fi
 
 ######################################################################
+######################################################################
+######################################################################
 # audit
 if test "$1" = audit; then
     exit 0
 fi
 
+######################################################################
+######################################################################
 ######################################################################
 # search
 usage_search (){
@@ -667,6 +712,8 @@ if test "$1" = search; then
 fi
 
 ######################################################################
+######################################################################
+######################################################################
 # leaf
 usage_leaf (){
     cat <<'EOF'
@@ -706,11 +753,15 @@ if test "$1" = leaf; then
 fi
 
 ######################################################################
+######################################################################
+######################################################################
 # list
 if test "$1" = list; then
     exit 0
 fi
 
+######################################################################
+######################################################################
 ######################################################################
 # mark
 usage_mark (){
@@ -768,6 +819,8 @@ if test "$1" = mark; then
 fi
 
 ######################################################################
+######################################################################
+######################################################################
 # deps
 usage_deps (){
     cat <<'EOF'
@@ -824,11 +877,15 @@ if test "$1" = deps; then
 fi
 
 ######################################################################
+######################################################################
+######################################################################
 # license
 if test "$1" = license; then
     exit 0
 fi
 
+######################################################################
+######################################################################
 ######################################################################
 # <bad> command
 echo "Unknown command '$1', see nih -h for more information" 1>&2
