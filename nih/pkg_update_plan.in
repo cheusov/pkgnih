@@ -321,6 +321,7 @@ function update_hashes (reqd,               reqd_path) {
 BEGIN {
 	planfn = tmpfile()
 	errfn  = tmpfile()
+	errfn2 = tmpfile()
 
 	old_imghash = get_imghash()
 
@@ -334,18 +335,40 @@ BEGIN {
 
 		ex = 0
 		while (xgetline0(errfn)){
-			pkgbase = pkgname2pkgbase($6)
-			depbase = pkgname2pkgbase($3)
-			if ($1 == "d:" && $2 == "not_found" &&
-				((pkgbase in add_pkgs) || (pkgbase in add_auto_pkgs)))
-			{
-				update_hashes(depbase)
+			if ($1 == "d:" && $2 == "not_found"){
+				pkgbase = pkgname2pkgbase($6)
+				depbase = pkgname2pkgbase($3)
+
+				if ((pkgbase in add_pkgs) || (pkgbase in add_auto_pkgs)){
+					update_hashes(depbase)
+				}else if ((depbase in add_pkgs) || (depbase in add_auto_pkgs)){
+					update_hashes(pkgbase)
+				}else{
+					ex = 1
+				}
+			}else if ($1 == "c:" && $2 == "conflict"){
+				pkgbase = pkgname2pkgbase($8)
+				cnfbase = pkgname2pkgbase($5)
+				
+				if (((pkgbase in add_pkgs) || (pkgbase in add_auto_pkgs)) &&
+					!(cnfbase in add_pkgs && !(cnfbase in add_auto_pkgs)))
+				{
+					update_hashes(cnfbase)
+#				}else if ((depbase in add_pkgs) || (depbase in add_auto_pkgs)){
+#					update_hashes(pkgbase)
+				}else{
+					ex = 1
+				}
 			}else{
 				ex = 1
-				break
+			}
+
+			if (ex){
+				print $0 > errfn2
 			}
 		}
 		xclose(errfn)
+		close(errfn2)
 
 		if (ex)
 			break
@@ -361,7 +384,7 @@ BEGIN {
 	show_progress()
 
 	if (ex){
-		system("cat " errfn)
+		system("cat " errfn2)
 		if (verbose_mode > 1){
 			system("cat " planfn " 1>&2")
 		}
