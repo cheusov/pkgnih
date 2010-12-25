@@ -66,7 +66,14 @@ BEGIN {
 
 ############################################################
 # preparations
-function process_pkg (pkg){
+function process_pkg (pkg,            base,pref){
+	match(pkg, /^[-+*]/)
+	pref = substr(pkg, 1, RLENGTH)
+	base = substr(pkg, 1 + RLENGTH)
+	if (base in avail_name2base){
+		process_pkg(pref avail_name2base [base])
+	}
+	
 	if (pkg ~ /^-/){
 		rem_pkgs [substr(pkg, 2)] = 0
 	}else if (pkg ~ /^[+*]/){
@@ -75,19 +82,6 @@ function process_pkg (pkg){
 	}else{
 		add_pkgs [pkg] = 0
 		rem_pkgs [pkg] = 0
-	}
-}
-
-BEGIN {
-	update_pkgpath_list = ""
-	if (from_stdin){
-		while (xgetline0()){
-			process_pkg($1)
-		}
-	}else{
-		for (i=3; i < ARGC; ++i){
-			process_pkg(ARGV [i])
-		}
 	}
 }
 
@@ -134,24 +128,36 @@ BEGIN {
 		}
 	}
 	xclose(inst_summary)
+
+	while (xgetline0(avail_summary)){
+		if ($0 ~ /^PKGNAME=/){
+			pkgname = substr($0, 9)
+		}else if ($0 ~ /^PKGPATH=/){
+			pkgpath = substr($0, 9)
+		}else if (NF == 0){
+			pkgbase = pkgname
+			sub(/-[^-]*$/, "", pkgbase)
+			avail_name2base [pkgname] = pkgbase
+#			avail_name2path [pkgname] = pkgpath
+
+			pkgname = pkgpath = ""
+		}
+	}
+	xclose(avail_summary)
 }
 
-# 	while (xgetline0(avail_summary)){
-# 		if ($0 ~ /^PKGNAME=/){
-# 			pkgname = substr($0, 9)
-# 		}else if ($0 ~ /^PKGPATH=/){
-# 			pkgpath = substr($0, 9)
-# 		}else if (NF == 0){
-# 			pkgbase = pkgname
-# 			sub(/-[^-]*$/, "", pkgbase)
-# 			avail_name2base [pkgname] = pkgbase
-# 			avail_name2path [pkgname] = pkgpath
-
-# 			pkgname = pkgpath = ""
-# 		}
-# 	}
-# 	xclose(avail_summary)
-# }
+BEGIN {
+	update_pkgpath_list = ""
+	if (from_stdin){
+		while (xgetline0()){
+			process_pkg($1)
+		}
+	}else{
+		for (i=3; i < ARGC; ++i){
+			process_pkg(ARGV [i])
+		}
+	}
+}
 
 ############################################################
 function grep_package_cmd (package, field){
@@ -215,15 +221,16 @@ function rem_packages_from_summary (input, output,             pkgs,cmd){
 function create_packages_summary (output, hash,                  pkgs,cmd)
 {
 	pkgs = hash_to_indices(hash)
+
+	cmd = grep_package_cmd(pkgs, "PKGNAME") \
+		" < " shquote(avail_summary) " >> " output
+	system(cmd)
+
 	cmd = grep_package_cmd(pkgs, "PKGBASE") \
 		" < " shquote(avail_summary) " > " output
 	system(cmd)
 
 	cmd = grep_package_cmd(pkgs, "PKGPATH") \
-		" < " shquote(avail_summary) " >> " output
-	system(cmd)
-
-	cmd = grep_package_cmd(pkgs, "PKGNAME") \
 		" < " shquote(avail_summary) " >> " output
 	system(cmd)
 }
