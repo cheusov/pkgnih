@@ -214,8 +214,9 @@ fi
 usage_refresh (){
     cat <<'EOF'
 nih refresh [options]
-     Download pkg_summary.bz2 and SHA512.bz2, save them to ~/.nih/, and
-     then unpack them to .txt files.
+
+      Download pkg_summary.bz2 and SHA512.bz2, save them to ~/.nih/, and
+      then unpack them to .txt files.
 
    options:
       -h     display this help message
@@ -316,8 +317,10 @@ fi
 # install | upgrade
 usage_install (){
     cat <<'EOF'
-nih install|upgrade <packages>
-      Install or upgrade specified packages.
+nih upgrade <packages>
+nih install <packages>
+
+      Install or upgrade specified packages. These commands are the same.
 
    options:
       -h     display this help message
@@ -328,13 +331,15 @@ Here <packages> are either PKGBASEs, PKGNAMEs or PKGPATHs, optionally
 prepanded with `+' (package will be marked as installed as a dependency)
 or `-' (package will be removed). If neither `+' nor `-' were specified
 packages will be marked as installed by user. The marker `-' may be useful
-for resolving conflicts between installed and new packages.
+for resolving conflicts between installed and new packages. Automatically
+installed leaf packages will be removed.
 
 Examples:
    nih install mawk lang/gawk
    nih install perl -p5-Digest
    nih install +GConf +xproto
    nih install -- -gmake -autoconf -automake -libtool-base
+   nih install textproc/dict-client -wip/dict-client
 EOF
 }
 
@@ -491,13 +496,20 @@ fi
 # uninstall | remove | delete
 usage_uninstall (){
     cat <<'EOF'
-nih uninstall|delete|remove <PKGBASEs>
+nih uninstall <PKGBASEs>
+nih delete    <PKGBASEs>
+nih remove    <PKGBASEs>
+
       Remove specified packages, dependent packages and automatically installed
-      leaf packages.
+      leaf packages. These three command are the same.
+
    options:
       -h     display this help message
       -n     don't actually deinstall a package, just report the steps that
              would be taken if it were.
+
+Examples:
+   nih uninstall libgnome python26 kdelibs4
 EOF
 }
 
@@ -506,7 +518,6 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
     while getopts hn f; do
 	case "$f" in
 	    '?')
-		echo "Unknown suboption $f for command 'uninstall'"
 		exit 1;;
 	    n)
 		pkg_delete_opts='-n';;
@@ -572,14 +583,21 @@ fi
 usage_verify (){
     cat <<'EOF'
 nih verify [options] [PKGBASEs]
+
       Verify installed or listed packages.
       By default all installed packages are verified.
+
    options:
        -h   display this help message
        -m   check checksums of installed files
        -U   check for REQUIRES/PROVIDES coherence
        -L   check for existence of library files listed in REQUIRES
        -d   check for presence of dependencies
+
+Examples:
+   nih verify -dLU
+   nih verify -m
+   nih verify -m 'lib*' gawk
 EOF
 }
 
@@ -589,7 +607,6 @@ if test "$1" = verify; then
     while getopts hmULdD f; do
 	case "$f" in
 	    '?')
-		echo "Unknown suboption $f for command 'verify'"
 		exit 1;;
 	    h)
 		usage_verify
@@ -618,6 +635,7 @@ fi
 usage_status (){
     cat <<'EOF'
 nih status [options] [PKGBASEs]
+
       Compare installed packages with pkg_summary.txt (default) or
       pkgsrc tree.
 
@@ -629,16 +647,20 @@ nih status [options] [PKGBASEs]
       -u     analyse packages marked as installed by user (the default, see -a)
       -a     analyse all packages (see -u)
       -q     no noisy reminder about output format
+
+Examples:
+   nih status -a
+   nih status -uq
+   nih status -sqr pkglint
 EOF
 }
 
 if test "$1" = status; then
     shift
     opts='b'
-    while getopts hbsruaQ f; do
+    while getopts hbsruaq f; do
 	case "$f" in
 	    '?')
-		echo "Unknown suboption $f for command 'status'"
 		exit 1;;
 	    h)
 		usage_status
@@ -669,18 +691,44 @@ fi
 # search
 usage_search (){
     cat <<'EOF'
-nih search [options] [arguments]
+nih search [options] [args]
+
       Search for packages
 
    option:
       -h    display this help message
+
       -b    search in pkg_summary.txt (the default)
       -o    search using pkg_online
       -I    search in installed packages
+
       -s    output search strategies
       -f    output search fields
-      -<X>  all other options are passed directly to
-            pkg_digger(1), see 'pkg_digger -h'
+      -1    display 1-line information about packages (default)
+      -3    display short information about packages
+      -9    display full information about packages
+      -r    raw output in pkg_summary(5) format
+      -q    quiet mode, do not print "No matches found" to stderr
+
+See pkg_digger(1) for details.
+
+Examples:
+   nih search -h
+   nih search -s
+   nih search -f
+   nih search DEPENDS:substring:libmaa
+   nih search PKGNAME:prefix:dict
+   nih search COMMENT:word:dns PKGPATH:prefix:net
+   nih search c:kw:'dns server'
+   nih search n:p:lua
+   nih search FILE_SIZE:awk:'fvalue+0 > 100000000'
+   nih search -9 lang/mawk
+   nih search -os
+   nih search -of
+   nih search -o oberon
+   nih search -o dns server
+   nih search -o3 dictionary -spell -japanese -chinese -korean
+   nih search -o -q9r spreadsheet
 EOF
 }
 
@@ -688,10 +736,9 @@ if test "$1" = search; then
     shift
     export PKG_DIGGER_SUMMARY="$PKG_SUMMARY"
 
-    while getopts hboIsf139irq f; do
+    while getopts hboIsf139rq f; do
 	case "$f" in
 	    '?')
-		echo "Unknown suboption $f for command 'leaf'"
 		exit 1;;
 	    b)
 		unset PKG_DIGGER_BACKEND || true
@@ -728,15 +775,21 @@ fi
 usage_leaf (){
     cat <<'EOF'
 nih leaf [options]
+
       Output or remove automatically installed leaf packages,
-      by default list of packages is output.
+      by default list of leaves is output.
 
    option:
       -h    display this help message
       -t    output only PKGNAME
       -R    remove automatically installed leaf packages
-      -E    the same as -R but with 'pkg_delete -A'
+      -E    remove automatically installed leaf packages recursively
       -n    pass -n to pkg_delete
+
+Examples:
+   nih leaf -t
+   nih leaf -R
+   nih leaf -En
 EOF
 }
 
@@ -746,7 +799,6 @@ if test "$1" = leaf; then
     while getopts htREn f; do
 	case "$f" in
 	    '?')
-		echo "Unknown suboption $f for command 'leaf'"
 		exit 1;;
 	    h)
 		usage_leaf
@@ -777,12 +829,17 @@ fi
 usage_mark (){
     cat <<'EOF'
 nih mark [options] PKGBASEs
+
       Mark packages
 
    option:
       -h    display this help message
       -u    mark packages as installed by user
       -d    mark packages as dependencies
+
+Examples:
+   nih mark -d libmaa
+   nih mark -u pkg_status
 EOF
 }
 
@@ -792,7 +849,6 @@ if test "$1" = mark; then
     while getopts hud f; do
 	case "$f" in
 	    '?')
-		echo "Unknown suboption $f for command 'mark'"
 		exit 1;;
 	    h)
 		usage_mark
@@ -835,6 +891,7 @@ fi
 usage_deps (){
     cat <<'EOF'
 nih deps [options] [pkgs...]
+
       Output a dependency graph of installed packages.
 
    option:
@@ -845,6 +902,13 @@ nih deps [options] [pkgs...]
       -B    output PKGBASE (the default)
       -P    output PKGPATH
       -N    output PKGNAME
+
+Examples:
+   nih deps
+   nih deps glib2
+   nih deps -r glib2
+   nih deps -lBP 'devel/glib2;glib2' 'devel/libmaa;libmaa'
+   nih deps -P devel/glib2 devel/libmaa
 EOF
 }
 
@@ -855,7 +919,6 @@ if test "$1" = deps; then
     while getopts hrlBNP f; do
 	case "$f" in
 	    '?')
-		echo "Unknown suboption $f for command 'deps'"
 		exit 1;;
 	    h)
 		usage_deps
