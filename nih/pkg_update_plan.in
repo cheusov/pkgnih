@@ -41,6 +41,7 @@
 # OPTIONS:
 #   -h        display this help
 #   -v        verbose mode
+#   -i        obtains packages from stdin
 #.end-str
 
 BEGIN {
@@ -49,31 +50,43 @@ BEGIN {
 		exitnow(0)
 	}
 	verbose_mode = getarg("v")
+	from_stdin   = getarg("i")
 
-	if (ARGC < 3){
+	if (ARGC < 3 - from_stdin){
 		exit 45
 	}
 
 	inst_summary  = ARGV [1]
 	avail_summary = ARGV [2]
+	ARGV [2] = ""
+    ARGV [1] = "-"
 
 	deps_graph = tmpfile()
 }
 
 ############################################################
 # preparations
+function process_pkg (pkg){
+	if (pkg ~ /^-/){
+		rem_pkgs [substr(pkg, 2)] = 0
+	}else if (pkg ~ /^[+*]/){
+		add_auto_pkgs [substr(pkg, 2)] = 0
+		rem_pkgs [substr(pkg, 2)] = 0
+	}else{
+		add_pkgs [pkg] = 0
+		rem_pkgs [pkg] = 0
+	}
+}
+
 BEGIN {
 	update_pkgpath_list = ""
-	for (i=3; i < ARGC; ++i){
-		pkg = ARGV [i] # PKGPATH
-		if (pkg ~ /^-/){
-			rem_pkgs [substr(pkg, 2)] = 0
-		}else if (pkg ~ /^[+*]/){
-			add_auto_pkgs [substr(pkg, 2)] = 0
-			rem_pkgs [substr(pkg, 2)] = 0
-		}else{
-			add_pkgs [pkg] = 0
-			rem_pkgs [pkg] = 0
+	if (from_stdin){
+		while (xgetline0()){
+			process_pkg($1)
+		}
+	}else{
+		for (i=3; i < ARGC; ++i){
+			process_pkg(ARGV [i])
 		}
 	}
 }
@@ -269,6 +282,25 @@ function show_progress (){
 	if (verbose_mode){
 		printf "    R:%d U:%d A:%d\n", length(rem_pkgs), length(add_pkgs),
 			length(add_auto_pkgs) > "/dev/stderr"
+		if (verbose_mode > 1){
+			printf "rem_pkgs:" > "/dev/stderr"
+			for (i in rem_pkgs){
+				printf " %s", i > "/dev/stderr"
+			}
+			printf "\n" > "/dev/stderr"
+
+			printf "add_pkgs:" > "/dev/stderr"
+			for (i in add_pkgs){
+				printf " %s", i > "/dev/stderr"
+			}
+			printf "\n" > "/dev/stderr"
+
+			printf "add_auto_pkgs:" > "/dev/stderr"
+			for (i in add_auto_pkgs){
+				printf " %s", i > "/dev/stderr"
+			}
+			printf "\n" > "/dev/stderr"
+		}
 	}
 }
 
@@ -302,9 +334,12 @@ BEGIN {
 
 		ex = 0
 		while (xgetline0(errfn)){
-			if ($1 == "d:" && $2 == "not_found"){
-				update_hashes(pkgname2pkgbase($3))
-				update_hashes(pkgname2pkgbase($6))
+			pkgbase = pkgname2pkgbase($6)
+			depbase = pkgname2pkgbase($3)
+			if ($1 == "d:" && $2 == "not_found" &&
+				((pkgbase in add_pkgs) || (pkgbase in add_auto_pkgs)))
+			{
+				update_hashes(depbase)
 			}else{
 				ex = 1
 				break

@@ -386,16 +386,28 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     pkg_bin_summary -fPKGNAME,PKGPATH,COMMENT,automatic,CONFLICTS,DEPENDS \
 	> "$installed_summary"
 
+    cmp_summary="$tmp_dir/cmp_summary"
+
+    update_pkgs_fn="$tmp_dir/pkgs_specs.txt"
+    printf '' > "$update_pkgs_fn"
     if test $# -eq 0; then
-	echo 'Not implemented yet' 1>&2
-	exit 1
+	pkg_cmp_summary -pu "$installed_summary" "$PKG_SUMMARY" \
+	    > "$cmp_summary"
+	awk '$1 ~ /^[<!]/ {
+		print "-" $3
+		if ($NF == "U") print $3 "-" $5
+		else print "+" $3 "-" $5
+	}' "$cmp_summary" > "$update_pkgs_fn"
+    else
+	for i; do
+	    printf '%s\n' "$i" >> "$update_pkgs_fn"
+	done
     fi
 
     verbose "Generating the update plan..."
     plan_summary="$tmp_dir/plan_summary"
-    cmp_summary="$tmp_dir/cmp_summary"
-    if $PKG_UPDATE_PLAN_CMD -v "$installed_summary" "$PKG_SUMMARY" \
-	"$@" > "$plan_summary"
+    if $PKG_UPDATE_PLAN_CMD -iv "$installed_summary" "$PKG_SUMMARY" \
+	> "$plan_summary" < "$update_pkgs_fn"
     then
 	:
     else
