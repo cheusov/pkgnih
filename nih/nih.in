@@ -904,9 +904,15 @@ nih deps [options] [pkgs...]
       -B    output PKGBASE (the default)
       -P    output PKGPATH
       -N    output PKGNAME
+      -t    output dependencies in tsort(1) compatible format
+
+If both -P and -N are applied, PKGPATH;PKGNAME is output,
+if both -P and -B are applied, PKGPATH;PKGBASE is output.
 
 Examples:
    nih deps
+   nih deps -P
+   nih deps -PB
    nih deps glib2
    nih deps -r glib2
    nih deps -lBP 'devel/glib2;glib2' 'devel/libmaa;libmaa'
@@ -918,7 +924,7 @@ if test "$1" = deps; then
     shift
     sb_opts=''
     pn_opts=''
-    while getopts hrlBNP f; do
+    while getopts hrlBNPt f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -929,6 +935,8 @@ if test "$1" = deps; then
 		sb_opts="$sb_opts -r";;
 	    l)
 		sb_opts="$sb_opts -n";;
+	    t)
+		pn_opts="$pn_opts -t";;
 	    B)
 		pn_opts="$pn_opts -n";;
 	    N)
