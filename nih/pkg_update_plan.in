@@ -227,7 +227,7 @@ function create_packages_summary (output, hash,                  pkgs,cmd)
 	system(cmd)
 
 	cmd = grep_package_cmd(pkgs, "PKGBASE") \
-		" < " shquote(avail_summary) " > " output
+		" < " shquote(avail_summary) " >> " output
 	system(cmd)
 
 	cmd = grep_package_cmd(pkgs, "PKGPATH") \
@@ -276,7 +276,8 @@ function generate_plan (output,           tmpfn,ii,s1)
 	if (failed)
 		exitnow(12)
 
-	cmd = "pkg_summary2leaves -vra " s1 " | pkg_uniq_summary > " output
+	cmd = "pkg_uniq_summary -n " s1 " > " output ".tmp"
+	cmd = cmd "; pkg_summary2leaves -vra " output ".tmp > " output
 	system(cmd)
 	rm(s1)
 }
