@@ -355,12 +355,16 @@ download_pkgs (){
     )
 }
 
-grep_line (){
-    # $1 - line
-    # $2.. - files
-    line="$1"
-    shift
-    awk -v line="$line" '$0 == line {print $0; exit 0} END {exit 1}' "$@"
+grep_lines (){
+    # $1 - file with lines
+    awk 'FILENAME != "-" { hash [$0] = 0; next }
+	($0 in hash) {print $0 }' "$1" -
+}
+
+rev_lines (){
+    # $@ - files
+    awk '{ line [NR] = $0 }
+    END { for (i=NR; i >= 1; --i) print line [i] }' "$@"
 }
 
 if test "_$1" = _install -o "_$1" = _upgrade; then
@@ -404,6 +408,7 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
 	done
     fi
 
+    ######################### update plan ############################
     verbose "Generating the update plan..."
     plan_summary="$tmp_dir/plan_summary"
     if $PKG_UPDATE_PLAN_CMD -iv "$installed_summary" "$PKG_SUMMARY" \
@@ -411,16 +416,13 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     then
 	:
     else
-#	echo 'Something goes wrong' 1>&2
 	cat "$plan_summary" 1>&2
 	exit 1
     fi
-#    verbose "Getting installed packages..."
 
     pkg_cmp_summary "$installed_summary" "$plan_summary" |
     grep -v '^=' > "$cmp_summary" || true
 
-    # note about our upgrade plan
     printf '%s\n' '---------------------- UPDATE PLAN -------------------------'
 
     rem_pkgs=`awk '$1 == "-" {print $2}' "$cmp_summary"`
@@ -445,11 +447,11 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     pkg_grep_summary -v -t strlist PKGNAME "$auto_pkgs" > "$inst_summary"
 
     conflicts_msg="$tmp_dir/conflicts"
+    extra_rem_pkgs="$tmp_dir/extra_rem"
+    extra_rem_summary="$tmp_dir/extra_rem_summary"
     if ! pkg_lint_summary -cd "$inst_summary" "$inst_auto_summary" \
 	"$installed_summary" > "$conflicts_msg"
     then
-	extra_rem_pkgs="$tmp_dir/extra_rem"
-	extra_rem_summary="$tmp_dir/extra_rem_summary"
 	awk '$1 == "c:" {print $5; print $8}
 	     $1 == "d:" {print $6}' "$conflicts_msg" |
 	sort -u > "$extra_rem_pkgs"
@@ -472,12 +474,15 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
 	exit 0
     fi
 
-    ######################## installing ###########################
+    ########################## installing ############################
     sed -n 's/^PKGNAME=//p' "$inst_summary" "$inst_auto_summary" |
     download_pkgs
 
     if test -s "$rem_summary" -o -s "$extra_rem_summary"; then
-	sed -n 's/^PKGNAME=//p' "$rem_summary" "$extra_rem_summary" |
+	sed -n 's/^PKGNAME=//p' "$rem_summary" "$extra_rem_summary" \
+	    > "$extra_rem_pkgs"
+	pkg_summary2deps -drt "$installed_summary" | tsort |
+	grep_lines "$extra_rem_pkgs" - | rev_lines |
 	while read pkg; do
 	    echo "Removing package $pkg..." 1>&2
 	    $PKG_DELETE_CMD -f $pkg_opts "$pkg"
