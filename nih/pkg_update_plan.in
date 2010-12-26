@@ -59,7 +59,7 @@ BEGIN {
 	inst_summary  = ARGV [1]
 	avail_summary = ARGV [2]
 	ARGV [2] = ""
-    ARGV [1] = "-"
+	ARGV [1] = "-"
 
 	deps_graph = tmpfile()
 }
