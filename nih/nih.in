@@ -411,8 +411,10 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     ######################### update plan ############################
     verbose "Generating the update plan..."
     plan_summary="$tmp_dir/plan_summary"
-    if $PKG_UPDATE_PLAN_CMD -iv "$installed_summary" "$PKG_SUMMARY" \
-	> "$plan_summary" < "$update_pkgs_fn"
+    printf '' > "$plan_summary"
+    if test -s "$update_pkgs_fn" &&
+	$PKG_UPDATE_PLAN_CMD -iv "$installed_summary" "$PKG_SUMMARY" \
+	    > "$plan_summary" < "$update_pkgs_fn"
     then
 	:
     else
