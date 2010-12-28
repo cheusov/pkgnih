@@ -1,4 +1,3 @@
-LIBEXECDIR ?=		${PREFIX}/libexec/nih
 EGDIR ?=		${PREFIX}/share/nih
 
 PACKAGES ?=		/usr/pkgsrc/packages
@@ -15,7 +14,6 @@ INTEXTS_REPLS +=	PACKAGES       ${PACKAGES}
 
 INSCRIPTS =		nih pkg_update_plan
 SCRIPTS =		${INSCRIPTS}
-SCRIPTSDIR_pkg_update_plan = ${LIBEXECDIR}
 
 FILES =			nih.conf
 FILESDIR_nih.conf=	${EGDIR}
