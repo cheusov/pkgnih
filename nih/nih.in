@@ -452,6 +452,7 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     conflicts_msg="$tmp_dir/conflicts"
     extra_rem_pkgs="$tmp_dir/extra_rem"
     extra_rem_summary="$tmp_dir/extra_rem_summary"
+    printf '' > "$extra_rem_summary"
     if ! pkg_lint_summary -cd "$inst_summary" "$inst_auto_summary" \
 	"$installed_summary" > "$conflicts_msg"
     then

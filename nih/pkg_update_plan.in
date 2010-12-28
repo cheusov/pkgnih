@@ -101,6 +101,9 @@ function process_pkg (pkg,            base,pref){
 	if (ex)
 		return
 
+	base = pair
+	sub(/^.*,/, "", base)
+
 	if (pref == "?"){
 		if (!(pair in inst_pair2auto) || inst_pair2auto [pair])
 			pref = "+"
