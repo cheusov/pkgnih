@@ -312,9 +312,14 @@ fi
 
 mkdir -p "$confdir"
 
-refreshed_summary="$confdir/refreshed_summary.txt"
-pkg_refresh_summary "$PKG_SUMMARY" > "$refreshed_summary"
-PKG_SUMMARY="$refreshed_summary"
+refresh_summary (){
+    tiny_summary="$tmp_dir/tiny_summary"
+    grep -E '^$|^(PKGNAME=|PKGPATH=|COMMENT=|automatic=|CONFLICTS=|DEPENDS=)' \
+	"$PKG_SUMMARY" > "$tiny_summary"
+    pkg_refresh_summary "$tiny_summary" > "$tiny_summary.tmp"
+    mv "$tiny_summary.tmp" "$tiny_summary"
+    export PKG_SUMMARY="$tiny_summary"
+}
 
 ######################################################################
 ######################################################################
@@ -375,6 +380,7 @@ rev_lines (){
 if test "_$1" = _install -o "_$1" = _update; then
     cmd="$1"
     shift
+
     while getopts hn f; do
 	case "$f" in
 	    '?')
@@ -389,6 +395,8 @@ if test "_$1" = _install -o "_$1" = _update; then
 	esac
     done
     shift `expr $OPTIND - 1`
+
+    refresh_summary
 
     verbose "Getting installed packages..."
     installed_summary="$tmp_dir/installed_summary"
@@ -673,7 +681,8 @@ if test "$1" = verify; then
 	exit 1
     fi
 
-    export PKG_SUMMARY
+    refresh_summary
+
     pkg_status "-$opts" "$@"
 
     exit 0
@@ -726,7 +735,8 @@ if test "$1" = status; then
     done
     shift `expr $OPTIND - 1`
 
-    export PKG_SUMMARY
+    refresh_summary
+
     pkg_status "-$opts" "$@"
 
     exit 0
