@@ -297,7 +297,7 @@ EOF
 fi
 
 ######################################################################
-# ensure that pkg_summary.txt exists
+# ensure that pkg_summary.txt exists and refresh it
 if test -z "$PKG_SUMMARY"; then
     PKG_SUMMARY=$confdir/pkg_summary.txt
 fi
@@ -309,6 +309,12 @@ Perhaps you need to run 'nih refresh'
 EOF
     exit 1
 fi
+
+mkdir -p "$confdir"
+
+refreshed_summary="$confdir/refreshed_summary.txt"
+pkg_refresh_summary "$PKG_SUMMARY" > "$refreshed_summary"
+PKG_SUMMARY="$refreshed_summary"
 
 ######################################################################
 ######################################################################

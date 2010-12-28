@@ -271,11 +271,12 @@ function generate_plan (output,           tmpfn,ii,s1)
 		break
 	}
 
-	cmd = "pkg_uniq_summary " s1 " > " s1 ".tmp; " \
-		"pkg_summary2leaves -vra " s1 ".tmp > " output
+#	cmd = "pkg_uniq_summary " s1 " > " s1 ".tmp; " \
+#		"pkg_summary2leaves -vra " s1 ".tmp > " output
+	cmd = "pkg_summary2leaves -vra " s1 " > " output
 	system(cmd)
 	rm(s1)
-	rm(s1 ".tmp")
+#	rm(s1 ".tmp")
 }
 
 function get_imghash (){
