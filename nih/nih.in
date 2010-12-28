@@ -408,6 +408,7 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
 	done
     fi
 
+    ##################################################################
     ######################### update plan ############################
     verbose "Generating the update plan..."
     plan_summary="$tmp_dir/plan_summary"
@@ -474,6 +475,7 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
 	exit 0
     fi
 
+    ##################################################################
     ########################## installing ############################
     sed -n 's/^PKGNAME=//p' "$inst_summary" "$inst_auto_summary" |
     download_pkgs
@@ -503,7 +505,31 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
 	    fi
 	fi
     done
+
     cleanup_db
+
+    ##################################################################
+    ###### Marking packages that were not installed or updated #######
+    awk -v auto=0 '
+	FILENAME != "-" && $0 ~ /^PKGNAME=/ {pkgname = substr($0, 9)}
+	FILENAME != "-" && $0 ~ /^automatic/ {auto = 1}
+	FILENAME != "-" && NF == 0 {hash_o [pkgname] = auto; auto = 0}
+	FILENAME == "-" && $0 ~ /^PKGNAME=/ {pkgname = substr($0, 9)}
+	FILENAME == "-" && $0 ~ /^automatic/ {auto = 1}
+	FILENAME == "-" && NF == 0 {hash_n [pkgname] = auto; auto = 0}
+	END {for (i in hash_n){
+	    if ((i in hash_o) && hash_o [i] != hash_n [i])
+		print i, hash_n [i]
+	}}' "$installed_summary" - < "$plan_summary" |
+    while read pkg m; do
+	if test "$m" -eq 0; then
+	    echo "Marking $pkg as installed by user"
+	    $PKG_ADMIN_CMD unset automatic "$pkg"
+	else
+	    echo "Marking $pkg as installed as a dependency"
+	    $PKG_ADMIN_CMD set automatic=yes "$pkg"
+	fi
+    done
     exit 0
 fi
 
