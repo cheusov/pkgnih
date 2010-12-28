@@ -271,9 +271,11 @@ function generate_plan (output,           tmpfn,ii,s1)
 		break
 	}
 
-	cmd = "pkg_summary2leaves -vra " s1 " > " output
+	cmd = "pkg_uniq_summary " s1 " > " s1 ".tmp; " \
+		"pkg_summary2leaves -vra " s1 ".tmp > " output
 	system(cmd)
 	rm(s1)
+	rm(s1 ".tmp")
 }
 
 function get_imghash (){
@@ -315,6 +317,10 @@ BEGIN {
 
 	while (1){
 		show_progress()
+
+		for (i in add_pkgs){
+			assert(!(i in add_auto_pkg))
+		}
 
 		generate_plan(planfn)
 		cmd = "pkg_lint_summary -dcul " planfn " > " errfn
