@@ -38,11 +38,17 @@
 #use "pkgsrc-dewey.awk"
 
 #.begin-str help
-# Usage: pkg_update_plan <inst_summary> <avail_summary> PKGPATHs...
+# pkg_update_plan tries to resolve dependencies and conflicts and
+#    outputs a summary of packages to be on the system after update.
+# Usage: pkg_update_plan <inst_summary> <avail_summary> packages...
 # OPTIONS:
 #   -h        display this help
 #   -v        verbose mode
-#   -i        obtains packages from stdin
+#   -i        obtains packages specifications from stdin
+# <packages> may be either PKGBASEs, PKGNAMEs or PKGPATHs,
+# optionally prepanded by `-' (marked for removal),
+# `+' or `*' (auto-removable), or `?' (auto-removable flag will not be changed).
+# Packages without prefix will be marked as installed by user.
 #.end-str
 
 BEGIN {
@@ -256,7 +262,7 @@ function generate_plan (output,           tmpfn,ii,s1)
 	}
 
 	for (ii in add_auto_pkgs){
-		# add specified packages as dependencies to inst_summary
+		# add specified packages as auto-removable to inst_summary
 		tmpfn = tmpfile()
 		create_packages_summary(tmpfn, add_auto_pkgs)
 
