@@ -35,6 +35,7 @@
 #use "xclose.awk"
 #use "xsystem.awk"
 #use "psu_funcs.awk"
+#use "pkgsrc-dewey.awk"
 
 #.begin-str help
 # Usage: pkg_update_plan <inst_summary> <avail_summary> PKGPATHs...
@@ -60,50 +61,67 @@ BEGIN {
 	avail_summary = ARGV [2]
 	ARGV [2] = ""
 	ARGV [1] = "-"
-
-	deps_graph = tmpfile()
 }
 
 ############################################################
 # preparations
 function process_pkg (pkg,            base,pref){
-	match(pkg, /^[-+*]/)
+	match(pkg, /^[-+*?]/)
 	pref = substr(pkg, 1, RLENGTH)
 	base = substr(pkg, 1 + RLENGTH)
-	if (base in avail_name2base){
-		process_pkg(pref avail_name2base [base])
+
+	if (pref == "*"){
+		pref = "+"
 	}
-	
-	if (pkg ~ /^-/){
-		rem_pkgs [substr(pkg, 2)] = 0
-	}else if (pkg ~ /^[+*]/){
-		add_auto_pkgs [substr(pkg, 2)] = 0
-		rem_pkgs [substr(pkg, 2)] = 0
+
+	if (pref == "-"){
+		if (base in inst_base2pair){
+			pair = inst_base2pair [base]
+		}else if (base in inst_name2pair){
+			pair = inst_name2pair [base]
+		}else if (base in inst_path2pair){
+			pair = inst_path2pair [base]
+		}else if (!index(base, ",")){
+			print pkg " cannot be found" > "/dev/stderr"
+			ex = 1
+		}
 	}else{
-		add_pkgs [pkg] = 0
-		rem_pkgs [pkg] = 0
+		if (base in avail_base2pair){
+			pair = avail_base2pair [base]
+		}else if (base in avail_name2pair){
+			pair = avail_name2pair [base]
+		}else if (base in avail_path2pair){
+			pair = avail_path2pair [base]
+		}else if (!index(base, ",")){
+			print pkg " cannot be found" > "/dev/stderr"
+			ex = 1
+		}
+	}
+
+	if (ex)
+		return
+
+	if (pref == "?"){
+		if (!(pair in inst_pair2auto) || inst_pair2auto [pair])
+			pref = "+"
+		else
+			pref = ""
+	}
+
+	if (pref == "-"){
+		rem_pkgs [pair] = 0
+	}else if (pref == "+"){
+		delete add_pkgs [pair]
+		add_auto_pkgs [pair] = 0
+		rem_pkgs [pair] = 0
+		add_base [base] = 0
+	}else{
+		delete add_auto_pkgs [pair]
+		add_pkgs [pair] = 0
+		rem_pkgs [pair] = 0
+		add_base [base] = 0
 	}
 }
-
-############################################################
-# converting PKGPATHs of upgraded packages to PKGNAMEs
-# BEGIN {
-# 	# updatable PKGPATH to PKGNAME
-# 	pipe = "pkg_grep_summary -t strlist PKGPATH '" \
-# 		update_pkgpath_list "' < " shquote(avail_summary)
-# 	while ((pipe | getline) > 0){
-# 		if ($0 ~ /^PKGNAME=/){
-# 			pkgname = substr($0, 9)
-# 		}else if ($0 ~ /^PKGPATH=/){
-# 			pkgpath = substr($0, 9)
-# 		}else if (NF == 0){
-# #			print pkgpath, pkgname
-# 			update_pkgpath2pkgname [pkgpath] = pkgname
-# 			pkgpath = pkgname = ""
-# 		}
-# 	}
-# 	xclose(pipe)
-# }
 
 ############################################################
 # reading and analysing installed and available summaries
@@ -119,9 +137,12 @@ BEGIN {
 		}else if (NF == 0){
 			pkgbase = pkgname
 			sub(/-[^-]*$/, "", pkgbase)
-#			inst_base2name [pkgbase] = pkgname
-			inst_base2auto [pkgbase] = auto
-			inst_base2path [pkgbase] = pkgpath
+			pkgpair = (pkgpath "," pkgbase)
+
+			inst_name2pair [pkgname] = pkgpair
+			inst_base2pair [pkgbase] = pkgpair
+			inst_path2pair [pkgpath] = pkgpair
+			inst_pair2auto [pkgpair] = auto
 
 			pkgname = pkgpath = ""
 			auto = 0
@@ -137,8 +158,18 @@ BEGIN {
 		}else if (NF == 0){
 			pkgbase = pkgname
 			sub(/-[^-]*$/, "", pkgbase)
-			avail_name2base [pkgname] = pkgbase
-#			avail_name2path [pkgname] = pkgpath
+			pkgpair = (pkgpath "," pkgbase)
+
+			if (pkgbase in inst_base2pair){
+				if (inst_base2pair [pkgbase] == pkgpair)
+					avail_base2pair [pkgbase] = pkgpair
+			}else if (! (pkgbase in avail_base2pair) ||
+					  pkgname_gt_pkgname(pkgname, avail_base2name [pkgbase]))
+			{
+				avail_base2pair [pkgbase] = pkgpair
+			}
+			avail_name2pair [pkgname] = pkgpair
+			avail_path2pair [pkgpath] = pkgpair
 
 			pkgname = pkgpath = ""
 		}
@@ -153,10 +184,16 @@ BEGIN {
 			process_pkg($1)
 		}
 	}else{
-		for (i=3; i < ARGC; ++i){
+		for (i=(ARGV [3] == "--" ? 4 : 3); i < ARGC; ++i){
 			process_pkg(ARGV [i])
 		}
 	}
+
+	if (ex)
+		exitnow(ex)
+
+#	show_progress()
+#	exit 13
 }
 
 ############################################################
@@ -169,69 +206,23 @@ function rm (file){
 	xsystem("rm " shquote(file))
 }
 
-function ensure_pkgs_exist (pkgs, filename,                i,arr,hash,cnt,name){
-	cnt = split(pkgs, arr)
-	for (i=1; i <= cnt; ++i){
-		hash [arr [i]] = 0
-	}
-
-	while (xgetline0(filename)){
-		if (/^PKGNAME=/){
-			name = substr($0, 9)
-			delete hash [name]
-			sub(/-[^-]*$/, "", name)
-			delete hash [name]
-		}else if (/^PKGPATH=/){
-			name = substr($0, 9)
-			delete hash [name]
-		}
-	}
-	xclose(filename)
- 
-	for (i in hash){
-		if (!failed)
-			print "The following packages cannot be found" > "/dev/stderr"
-		break
-	}
-	for (i in hash){
-		print "   " i > "/dev/stderr"
-	}
-	for (i in hash){
-		failed = 1
-		break
-	}
-}
-
 function rem_packages_from_summary (input, output,             pkgs,cmd){
 	pkgs = hash_to_indices(rem_pkgs)
 
-	if (pkgs != ""){
-		# remove specified packages from inst_summary
-		cmd = "pkg_grep_summary -v -t strlist PKGPATH '" pkgs "' < " \
-			shquote(input) \
-			" | pkg_grep_summary -v -t strlist PKGNAME '" pkgs "'" \
-			" | pkg_grep_summary -v -t strlist PKGBASE '" pkgs "'" \
-			" > " output
-		system(cmd)
-	}else{
-		system("cp " shquote(input) " " output)
-	}
+	assert(pkgs != "")
+
+	# remove specified packages from inst_summary
+	cmd = "pkg_grep_summary -v -t strlist PKGPAIR '" pkgs "' < " \
+		shquote(input) " > " output
+	system(cmd)
 }
 
 function create_packages_summary (output, hash,                  pkgs,cmd)
 {
 	pkgs = hash_to_indices(hash)
 
-	cmd = grep_package_cmd(pkgs, "PKGNAME") \
-		" < " shquote(avail_summary) " >> " output
-	system(cmd)
-
-	cmd = grep_package_cmd(pkgs, "PKGBASE") \
-		" < " shquote(avail_summary) " >> " output
-	system(cmd)
-
-	cmd = grep_package_cmd(pkgs, "PKGPATH") \
-		" < " shquote(avail_summary) " >> " output
+	cmd = grep_package_cmd(pkgs, "PKGPAIR") \
+		" < " shquote(avail_summary) " > " output
 	system(cmd)
 }
 
@@ -255,7 +246,6 @@ function generate_plan (output,           tmpfn,ii,s1)
 		# add specified packages to inst_summary
 		tmpfn = tmpfile()
 		create_packages_summary(tmpfn, add_pkgs)
-		ensure_pkgs_exist(hash_to_indices(add_pkgs), tmpfn)
 
 		system("cat " tmpfn " >> " s1)
 		rm(tmpfn)
@@ -266,18 +256,13 @@ function generate_plan (output,           tmpfn,ii,s1)
 		# add specified packages as dependencies to inst_summary
 		tmpfn = tmpfile()
 		create_packages_summary(tmpfn, add_auto_pkgs)
-		ensure_pkgs_exist(hash_to_indices(add_auto_pkgs), tmpfn)
 
 		system("awk 'NF == 0 {print \"automatic=yes\"} {print}' " tmpfn " >> " s1)
 		rm(tmpfn)
 		break
 	}
 
-	if (failed)
-		exitnow(12)
-
-	cmd = "pkg_uniq_summary -n " s1 " > " output ".tmp"
-	cmd = cmd "; pkg_summary2leaves -vra " output ".tmp > " output
+	cmd = "pkg_summary2leaves -vra " s1 " > " output
 	system(cmd)
 	rm(s1)
 }
@@ -312,20 +297,6 @@ function show_progress (){
 	}
 }
 
-function update_hashes (reqd,               reqd_path) {
-	rem_pkgs [reqd] = 0
-	if (! (reqd in inst_base2path)){
-		if (!(reqd in add_pkgs))
-			++add_auto_pkgs [reqd]
-	}else{
-		reqd_path = inst_base2path [reqd]
-		if (inst_base2auto [reqd] && !(reqd_path in add_pkgs))
-			++add_auto_pkgs [reqd_path]
-		else
-			++add_pkgs [reqd_path]
-	}
-}
-
 BEGIN {
 	planfn = tmpfile()
 	errfn  = tmpfile()
@@ -343,37 +314,33 @@ BEGIN {
 
 		ex = 0
 		while (xgetline0(errfn)){
+			ex2 = 0
 			if ($1 == "d:" && $2 == "not_found"){
 				pkgbase = pkgname2pkgbase($6)
 				depbase = pkgname2pkgbase($3)
 
-				if ((pkgbase in add_pkgs) || (pkgbase in add_auto_pkgs)){
-					update_hashes(depbase)
-				}else if ((depbase in add_pkgs) || (depbase in add_auto_pkgs)){
-					update_hashes(pkgbase)
+				if (pkgbase in add_base){
+					process_pkg("?" depbase)
+				}else if (depbase in add_base){
+					process_pkg("?" pkgbase)
 				}else{
-					ex = 1
+					ex = ex2 = 1
 				}
 			}else if ($1 == "c:" && $2 == "conflict"){
 				pkgbase = pkgname2pkgbase($8)
 				cnfbase = pkgname2pkgbase($5)
-				
-				if (((pkgbase in add_pkgs) || (pkgbase in add_auto_pkgs)) &&
-					!(cnfbase in add_pkgs && !(cnfbase in add_auto_pkgs)))
-				{
-					update_hashes(cnfbase)
-#				}else if ((depbase in add_pkgs) || (depbase in add_auto_pkgs)){
-#					update_hashes(pkgbase)
+
+				if ((pkgbase in add_base) && !(cnfbase in add_base)){
+					process_pkg(cnfbase)
 				}else{
-					ex = 1
+					ex = ex2 = 1
 				}
 			}else{
-				ex = 1
+				ex = ex2 = 1
 			}
 
-			if (ex){
+			if (ex2)
 				print $0 > errfn2
-			}
 		}
 		xclose(errfn)
 		close(errfn2)
