@@ -712,6 +712,8 @@ if test "$1" = status; then
 	    h)
 		usage_status
 		exit 0;;
+	    a)
+		opts="${opts}aT";;
 	    *)
 		opts="${opts}$f";;
 	esac
