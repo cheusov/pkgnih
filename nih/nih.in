@@ -45,7 +45,7 @@ Commands:
  nih help            - Display help message
  nih refresh         - Download pkg_summary and SHA512 files
  nih install
- nih upgrade         - Install or upgrade packages
+ nih update          - Install or update packages
  nih uninstall
  nih delete
  nih remove          - Uninstall packages
@@ -313,13 +313,13 @@ fi
 ######################################################################
 ######################################################################
 ######################################################################
-# install | upgrade
+# install | update
 usage_install (){
     cat <<'EOF'
-nih upgrade <packages>
+nih update  <packages>
 nih install <packages>
 
-      Install or upgrade specified packages. These commands are the same.
+      Install or update specified packages. These commands are the same.
 
    options:
       -h     display this help message
@@ -366,7 +366,7 @@ rev_lines (){
     END { for (i=NR; i >= 1; --i) print line [i] }' "$@"
 }
 
-if test "_$1" = _install -o "_$1" = _upgrade; then
+if test "_$1" = _install -o "_$1" = _update; then
     cmd="$1"
     shift
     while getopts hn f; do
@@ -470,7 +470,7 @@ if test "_$1" = _install -o "_$1" = _upgrade; then
     fi
     echo 'The following packages will be installed'
     show_summary "$inst_summary"
-    echo 'The following packages will be installed as dependencies'
+    echo 'The following packages will be installed as auto-removable'
     show_summary "$inst_auto_summary"
 
     if ! yesno 'Proceed'; then
@@ -606,7 +606,7 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
     cat "$tmp_dir/4" "$tmp_dir/2" | xargs $PKG_DELETE_CMD $pkg_delete_opts
 
     cat <<'EOF'
-The following packages were installed as dependencies
+The following packages were installed as auto-removed
 and are no longer needed:
 EOF
     pkg_status -l | tee "$tmp_dir/1" | indent -
@@ -882,10 +882,10 @@ nih mark [options] PKGBASEs
    option:
       -h    display this help message
       -u    mark packages as installed by user
-      -d    mark packages as dependencies
+      -a    mark packages as auto-removable
 
 Examples:
-   nih mark -d libmaa
+   nih mark -a libmaa
    nih mark -u pkg_status
 EOF
 }
@@ -893,7 +893,7 @@ EOF
 if test "$1" = mark; then
     shift
     opts='l'
-    while getopts hud f; do
+    while getopts hua f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -902,21 +902,21 @@ if test "$1" = mark; then
 		exit 0;;
 	    u)
 		mode_u=1;;
-	    d)
-		mode_d=1;;
+	    a)
+		mode_a=1;;
 	    *)
 		opts="${opts}$f";;
 	esac
     done
     shift `expr $OPTIND - 1`
 
-    if test "$mode_u$mode_d" = 11; then
+    if test "$mode_u$mode_a" = 11; then
 	echo '-u and -d options are exclusive' 1>&2
 	exit 1
-    elif test -z "$mode_u$mode_d"; then
+    elif test -z "$mode_u$mode_a"; then
 	echo 'Either -u or -d must be applied' 1>&2
 	exit 1
-    elif test -n "$mode_d"; then
+    elif test -n "$mode_a"; then
 	cmd='set automatic=yes'
     else
 	cmd='unset automatic'
