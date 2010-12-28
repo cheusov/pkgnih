@@ -1,0 +1,362 @@
+.\"     $NetBSD$
+.\"
+.\" Copyright (c) 2010 by Aleksey Cheusov (vle@gmx.net)
+.\" This man page contains portions of pkgin.1 by Emile Heitor.
+.\" Absolutely no warranty.
+.\"
+.\" ------------------------------------------------------------------
+.de VB \" Verbatim Begin
+.ft CW
+.nf
+.ne \\$1
+..
+.de VE \" Verbatim End
+.ft R
+.fi
+..
+.\" ------------------------------------------------------------------
+.TH NIH 1 "Dec 28, 2010" "" ""
+.SH NAME
+nih \- package manager for pkgsrc
+.SH SYNOPSIS
+.BI nih " [options] " <command> " [command options] [--] [args...]" 
+.br
+.BI "nih <command>" " -h"
+.SH DESCRIPTION
+The
+.B nih
+is a command-line tool for managing pkgsrc packages. It relies on pkg_summary(5)
+for installation, removal and update of packages and associated
+dependencies, using remote or local repository.
+.SH OPTIONS
+.TP
+.B "-h"
+Display help message.
+.TP
+.B "-V"
+Display nih version.
+.TP
+.B "-y"
+Answer 'Yes' to all questions.
+.SH COMMANDS
+The following commands are provided.
+.TP
+.B  help
+Display help message
+.TP
+.B  refresh
+Download pkg_summary(5) and SHA512 files from remote repository and
+unpack them to ~/.nih/. URL for these files is specified in
+PKG_SUMMARY_URL configuration variable.
+.RS
+.B "nih refresh"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.RE
+.TP
+.B  search
+Search for packages in pkg_summary(5), online database or in installed packages.
+For details see pkg_digger(1).
+.RS
+.B "nih search"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -b
+Search in pkg_summary.txt (the default).
+.TP
+.B -o
+Search using pkg_online provided by wip/pkg_online-client package.
+.TP
+.B -I
+Search in installed packages.
+.TP
+.B -s
+Output search strategies.
+.TP
+.B -f
+Output search fields.
+.TP
+.B -1
+Display 1-line information about packages (default).
+.TP
+.B -3
+Display short information about packages.
+.TP
+.B -9
+Display full information about packages.
+.TP
+.B -r
+Raw output in pkg_summary(5) format.
+.TP
+.B -q
+Quiet mode, do not print "No matches found" to stderr.
+.RE
+.RS
+Examples:
+.VB
+   nih search -h
+   nih search -s
+   nih search -f
+   nih search DEPENDS:substring:libmaa
+   nih search PKGNAME:prefix:dict
+   nih search COMMENT:word:dns PKGPATH:prefix:net
+   nih search c:kw:'dns server'
+   nih search n:p:lua
+   nih search FILE_SIZE:awk:'fvalue+0 > 100000000'
+   nih search -9 lang/mawk
+   nih search -os
+   nih search -of
+   nih search -o oberon
+   nih search -o dns server
+   nih search -o3 dictionary -spell -japanese -chinese -korean
+   nih search -o -q9r spreadsheet
+.VE
+.RE
+.TP
+.BR  install " and " update
+Install or update specified packages. They may be specified as
+PKGBASEs, PKGNAMEs or PKGPATHs, optionally prepanded by `-' (marker
+for removal), `+' or `*' (marker for auto-removable), or `?'
+(auto-removable flag will not be changed).  Packages without prefix
+will be marked as installed by user.
+.B nih
+tries to resolve conflicts and to satisfy dependencies automatically,
+If it fails, one can do this manually. By default PKGPATH of installed
+packages remain unchanged, that is if, for example, emacs-21 was installed
+from editors/emacs21, it will not be updated to emacs-23 from editors/emacs23.
+If you want to do this, run the following:
+.VB
+
+   nih install editors/emacs23 -emacs
+
+.VE
+.RS
+.B "nih install"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -n
+Don't actually install/remove a package, just report the steps that
+would be taken if it were.
+.RE
+.RS
+Examples:
+.VB
+   nih install -h
+   nih install mawk lang/gawk
+   nih install perl -p5-Digest
+   nih install editors/emacs20 -emacs
+   nih install +GConf +xproto
+   nih install -- -gmake -autoconf -automake -libtool-base
+   nih install textproc/dict-client -wip/dict-client
+.VE
+.RE
+.TP
+.BR  uninstall ", " delete " and " remove
+Uninstall packages and dependent packages.
+.RS
+.B "nih uninstall"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -n
+Don't actually remove a package, just report the steps that
+would be taken if it were.
+.RE
+.RS
+Examples:
+.VB
+   nih uninstall -h
+   nih remove mawk lang/gawk
+   nih delete perl
+.VE
+.RE
+.TP
+.B  verify
+Verify packages integrity.
+.RS
+.B "nih verify"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -m
+Check checksums of installed files.
+.TP
+.B -U
+Check for REQUIRES/PROVIDES coherence.
+.TP
+.B -L
+Check for existence of library files listed in REQUIRES.
+.TP
+.B -d
+Check for presence of dependencies and their versions.
+.RE
+.RS
+Examples:
+.VB
+   nih verify -dLU
+   nih verify -m
+   nih verify -m 'lib*' gawk
+.VE
+.RE
+.TP
+.B  status
+Compare installed packages and their versions with pkg_summary(5)
+(default) or pkgsrc tree. For details see pkg_status(1).
+.RS
+.B "nih status"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -b
+Compare installed packages against pkg_summary(5) (the default).
+.TP
+.B -s
+Compare installed packages against pkgsrc tree.
+.TP
+.B -r
+Raw output (pkg_summary format).
+.TP
+.B -u
+Analyse packages marked as installed by user (the default, see -a).
+.TP
+.B -a
+Analyse all packages (see -u).
+.TP
+.B -q
+No noisy reminder about output format.
+.RE
+.RS
+Examples:
+.VB
+   nih status -a
+   nih status -uq
+   nih status -sqr pkglint
+.VE
+.RE
+.TP
+.B  audit
+Security audit (not implemented yet).
+.TP
+.B  leaf
+Output or remove auto-removed leaf packages.
+.RS
+.B "nih leaf"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -t
+Output only PKGNAME.
+.TP
+.B -R
+Remove auto-removed leaf packages.
+.TP
+.B -E
+Remove auto-removed leaf packages recursively.
+.TP
+.B -n
+Pass -n to pkg_delete(1).
+.RE
+.RS
+Examples:
+.VB
+   nih leaf -t
+   nih leaf -R
+   nih leaf -En
+.VE
+.RE
+.TP
+.B  license
+(not implemented yet)
+.TP
+.B  list
+(not implemented yet)
+.TP
+.B  mark
+Mark packages as auto-removed or as installed by user.
+.RS
+.B "nih mark"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -u
+Mark packages as installed by user.
+.TP
+.B -a
+Mark packages as auto-removable.
+.RE
+.RS
+Examples:
+.VB
+   nih mark -a libmaa
+   nih mark -u pkg_status
+.VE
+.RE
+.TP
+.B  deps
+      Output a dependency graph of installed packages.
+.RS
+.B "nih deps"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -r
+Output dependencies, by default
+dependent packages are output.
+.TP
+.B -l
+Output list of packages instead of graph
+.TP
+.B -B
+Output PKGBASE (the default)
+.TP
+.B -P
+Output PKGPATH
+.TP
+.B -N
+Output PKGNAME
+.TP
+.B -t
+Output dependencies in tsort(1) compatible format
+.RE
+.RS
+Examples:
+.VB
+   nih deps
+   nih deps -P
+   nih deps -PB
+   nih deps glib2
+   nih deps -r glib2
+   nih deps -lBP 'devel/glib2;glib2' 'devel/libmaa;libmaa'
+   nih deps -P devel/glib2 devel/libmaa
+.VE
+.RE
+.TP
+.B clean
+Clean-up DESTDIR or packages cache directories (not implemented yet)
+.SH SEE ALSO
+.BR pkg_status(1) ,
+.BR pkg_digger(1) ,
+.BR pkg_summary(5) ,
+.B pkg_summary-utils(7)
+.SH AUTHOR
+Aleksey Cheusov <vle@gmx.net>
