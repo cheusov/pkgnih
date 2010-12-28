@@ -691,6 +691,8 @@ nih status [options] [PKGBASEs]
       -r     raw output (pkg_summary format)
       -u     analyse packages marked as installed by user (the default, see -a)
       -a     analyse all packages (see -u)
+      -A     by default up-to-date packages are skipped,
+             with -A they are output too
       -q     no noisy reminder about output format
 
 Examples:
@@ -703,7 +705,7 @@ EOF
 if test "$1" = status; then
     shift
     opts='b'
-    while getopts hbsruaq f; do
+    while getopts hbsruaqA f; do
 	case "$f" in
 	    '?')
 		exit 1;;
