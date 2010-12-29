@@ -337,9 +337,9 @@ BEGIN {
 				depbase = pkgname2pkgbase($3)
 
 				if (pkgbase in add_base){
-					process_pkg("?" depbase)
+					addme [depbase] = 0
 				}else if (depbase in add_base){
-					process_pkg("?" pkgbase)
+					addme [pkgbase] = 0
 				}else{
 					ex = ex2 = 1
 				}
@@ -348,7 +348,7 @@ BEGIN {
 				cnfbase = pkgname2pkgbase($5)
 
 				if ((pkgbase in add_base) && !(cnfbase in add_base)){
-					process_pkg(cnfbase)
+					addme [cnfbase] = 0
 				}else{
 					ex = ex2 = 1
 				}
@@ -364,6 +364,10 @@ BEGIN {
 
 		if (ex)
 			break
+
+		for (pkg in addme)
+			process_pkg("?" pkg)
+		delete addme
 
 		new_imghash = get_imghash()
 		if (old_imghash == new_imghash){
