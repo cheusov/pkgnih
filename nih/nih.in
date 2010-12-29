@@ -314,10 +314,12 @@ mkdir -p "$confdir"
 
 refresh_summary (){
     tiny_summary="$tmp_dir/tiny_summary"
+#    tiny_summary="$confdir/tiny_summary"
     grep -E '^$|^(PKGNAME=|PKGPATH=|COMMENT=|automatic=|CONFLICTS=|DEPENDS=)' \
 	"$PKG_SUMMARY" > "$tiny_summary"
     pkg_refresh_summary "$tiny_summary" > "$tiny_summary.tmp"
     mv "$tiny_summary.tmp" "$tiny_summary"
+#    pkg_refresh_summary "$PKG_SUMMARY" > "$tiny_summary"
     export PKG_SUMMARY="$tiny_summary"
 }
 
@@ -447,7 +449,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     pkg_grep_summary -t strlist PKGBASE "$rem_pkgs" \
 	< "$installed_summary" > "$rem_summary"
 
-    inst_pkgs=`awk '$1 ~ /^[+<>]$/ {print $2}' "$cmp_summary"`
+    inst_pkgs=`awk '$1 ~ /^[+<>!]$/ {print $2}' "$cmp_summary"`
     inst_pkgs=`echo $inst_pkgs`
 
     auto_pkgs=`pkg_grep_summary -v -e automatic < "$plan_summary" |
@@ -647,14 +649,14 @@ nih verify [options] [PKGBASEs]
       By default all installed packages are verified.
 
    options:
-       -h   display this help message
-       -m   check checksums of installed files
-       -U   check for REQUIRES/PROVIDES coherence
-       -L   check for existence of library files listed in REQUIRES
-       -d   check for presence of dependencies
-
+       -h     display this help message
+       -m     check the checksums of installed files
+       -l|-U  check the REQUIRES/PROVIDES coherence
+       -L     check the existence of library files listed in REQUIRES
+       -d     check the presence of dependencies
+       -c     check the conflicts
 Examples:
-   nih verify -dLU
+   nih verify -dclL
    nih verify -m
    nih verify -m 'lib*' gawk
 EOF
@@ -663,13 +665,15 @@ EOF
 if test "$1" = verify; then
     shift
     opts='k'
-    while getopts hmULdD f; do
+    while getopts hmUlLdc f; do
 	case "$f" in
 	    '?')
 		exit 1;;
 	    h)
 		usage_verify
 		exit 0;;
+	    l)
+		opts="${opts}U";;
 	    *)
 		opts="${opts}$f";;
 	esac
@@ -959,7 +963,7 @@ usage_deps (){
     cat <<'EOF'
 nih deps [options] [pkgs...]
 
-      Output a dependency graph of installed packages.
+      Output a dependency graph of installed packages or remote summary.
 
    option:
       -h    display this help message
@@ -970,7 +974,7 @@ nih deps [options] [pkgs...]
       -P    output PKGPATH
       -N    output PKGNAME
       -t    output dependencies in tsort(1) compatible format
-
+      -z    analyse pkg_summary(5)
 If both -P and -N are applied, PKGPATH;PKGNAME is output,
 if both -P and -B are applied, PKGPATH;PKGBASE is output.
 
@@ -980,6 +984,7 @@ Examples:
    nih deps -PB
    nih deps glib2
    nih deps -r glib2
+   nih deps -rz ikiwiki
    nih deps -lBP 'devel/glib2;glib2' 'devel/libmaa;libmaa'
    nih deps -P devel/glib2 devel/libmaa
 EOF
@@ -989,7 +994,7 @@ if test "$1" = deps; then
     shift
     sb_opts=''
     pn_opts=''
-    while getopts hrlBNPt f; do
+    while getopts hrlBNPtz f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1008,13 +1013,19 @@ if test "$1" = deps; then
 		pn_opts="$pn_opts -nr";;
 	    P)
 		pn_opts="$pn_opts -p";;
+	    z)
+		remote_summary=1;;
 	esac
     done
     shift `expr $OPTIND - 1`
 
     pn_opts=${pn_opts:--n}
 
-    pkg_bin_summary -fPKGNAME,PKGPATH,DEPENDS |
+    if test -z "$remote_summary"; then
+	pkg_bin_summary -fPKGNAME,PKGPATH,DEPENDS
+    else
+	cat "$PKG_SUMMARY"
+    fi |
     pkg_summary2deps -d $pn_opts |
     if test $# -eq 0; then
 	sort -u
