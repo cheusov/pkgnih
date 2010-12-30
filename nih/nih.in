@@ -339,6 +339,7 @@ nih install <packages>
       -h     display this help message
       -n     don't actually install a package, just report the steps that
              would be taken if it were.
+      -d     download binaries only, do not update installed packages
 
 Here <packages> are either PKGBASEs, PKGNAMEs or PKGPATHs, optionally
 prepanded with `+' (package will be marked as installed as a dependency)
@@ -348,8 +349,10 @@ for resolving conflicts between installed and new packages. Automatically
 installed leaf packages will be removed.
 
 Examples:
+   nih update
+   nih update -d
    nih install mawk lang/gawk
-   nih install perl -p5-Digest
+   nih install perl
    nih install +GConf +xproto
    nih install -- -gmake -autoconf -automake -libtool-base
    nih install textproc/dict-client -wip/dict-client
@@ -402,7 +405,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     cmd="$1"
     shift
 
-    while getopts hn f; do
+    while getopts hnd f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -411,6 +414,8 @@ if test "_$1" = _install -o "_$1" = _update; then
 	    h)
 		usage_install
 		exit 0;;
+	    d)
+		download_only=1;;
 	    *)
 		opts="${opts}$f";;
 	esac
@@ -516,6 +521,10 @@ if test "_$1" = _install -o "_$1" = _update; then
     ########################## installing ############################
     sed -n 's/^PKGNAME=//p' "$inst_summary" "$inst_auto_summary" |
     download_pkgs
+
+    if test -n "$download_only"; then
+	exit 0
+    fi
 
     if test -s "$rem_summary" -o -s "$extra_rem_summary"; then
 	sed -n 's/^PKGNAME=//p' "$rem_summary" "$extra_rem_summary" \
