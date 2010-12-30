@@ -299,6 +299,7 @@ fi
 ######################################################################
 # ensure that pkg_summary.txt exists and refresh it
 if test -z "$PKG_SUMMARY"; then
+    cksums=1 # checksums will be checked according to SHA512.txt
     PKG_SUMMARY=$confdir/pkg_summary.txt
 fi
 
@@ -355,13 +356,31 @@ Examples:
 EOF
 }
 
+check_cksums (){
+    # $1 - foobar-1.2.3.tgz
+    if test -z "$cksums"; then
+	return
+    fi
+
+    expected_sha512=`awk -v p="(All/$1)" '$2 == p {print $4}' $confdir/SHA512.txt`
+    curr_sha512=`digest sha512 "$1" | awk '{print $4}'`
+    if test "$expected_sha512" = "$curr_sha512"; then
+	return 0
+    else
+	echo "$1 is corrupted"
+	return 1
+    fi
+}
+
 download_pkgs (){
     (
 	cd "$PACKAGES/All"
 	while read pkg; do
-	    if ! test -f "$pkg.tgz"; then
+	    if ! test -f "$pkg.tgz" || ! check_cksums "$pkg.tgz"; then
 		echo "Downloading package $pkg..."
 		fetch "$PKG_SUMMARY_URL/All/$pkg.tgz"
+		# ensure that downloaded file is correct
+		check_cksums "$pkg.tgz"
 	    fi
 	done
     )
