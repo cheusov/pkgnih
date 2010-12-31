@@ -341,8 +341,10 @@ BEGIN {
 		while (xgetline0(errfn)){
 			ex2 = 0
 			if ($1 == "d:" && $2 == "not_found"){
+				dep1 = $3
+				sub(/[|].*$/, "", dep1)
 				pkgbase = pkgname2pkgbase($6)
-				depbase = pkgname2pkgbase($3)
+				depbase = pkgname2pkgbase(dep1)
 
 				if (pkgbase in add_base){
 					addme [depbase] = 0
