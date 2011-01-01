@@ -45,10 +45,10 @@ Commands:
  nih help            - Display help message
  nih refresh         - Download pkg_summary and SHA512 files
  nih install
- nih update          - Install or update packages
+   nih update        - Install or update packages
  nih uninstall
- nih delete
- nih remove          - Uninstall packages
+   nih delete
+   nih remove        - Uninstall packages
  nih verify          - Verify packages integrity
  nih status          - Show the status of installed packages
  nih audit           - Security audit

@@ -27,7 +27,7 @@ The
 .B nih
 is a command-line tool for managing pkgsrc packages. It relies on pkg_summary(5)
 for installation, removal and update of packages and associated
-dependencies, using remote or local repository.
+dependencies using remote or local repository.
 .SH OPTIONS
 .TP
 .B "-h"
@@ -160,6 +160,7 @@ Examples:
    nih -y update -d openoffice2 firefox midori
    nih install mawk lang/gawk
    nih install perl
+   nih install libao-alsa -libao-oss
    nih install editors/emacs20 -emacs
    nih install +GConf +xproto
    nih install -- -gmake -autoconf -automake -libtool-base
