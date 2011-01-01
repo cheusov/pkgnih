@@ -69,6 +69,7 @@ PKG_INFO_CMD=${PKG_INFO_CMD-@PKG_INFO_CMD@}
 PKG_ADMIN_CMD=${PKG_ADMIN_CMD-@PKG_ADMIN_CMD@}
 PKG_DELETE_CMD=${PKG_DELETE_CMD-@PKG_DELETE_CMD@}
 PKG_UPDATE_PLAN_CMD=${PKG_UPDATE_PLAN_CMD-pkg_update_plan}
+SUFX=${SUFX-.tgz}
 
 # loading config files
 if test -r "$sysconfdir/config"; then
@@ -376,11 +377,11 @@ download_pkgs (){
     (
 	cd "$CACHEDIR/All"
 	while read pkg; do
-	    if ! test -f "$pkg.tgz" || ! check_cksums "$pkg.tgz"; then
+	    if ! test -f "$pkg$SUFX" || ! check_cksums "$pkg$SUFX"; then
 		echo "Downloading package $pkg..."
-		fetch "$PKG_SUMMARY_URL/All/$pkg.tgz"
+		fetch "$PKG_SUMMARY_URL/All/$pkg$SUFX"
 		# ensure that downloaded file is correct
-		check_cksums "$pkg.tgz"
+		check_cksums "$pkg$SUFX"
 	    fi
 	done
     )
@@ -538,12 +539,12 @@ if test "_$1" = _install -o "_$1" = _update; then
     while read pkg; do
 	if pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_auto_summary" > /dev/null; then
 	    echo "Installing package $pkg as a dependency..." 1>&2
-	    if ! pkg_add $pkg_opts -UA "$CACHEDIR/All/$pkg.tgz"; then
+	    if ! pkg_add $pkg_opts -UA "$CACHEDIR/All/$pkg$SUFX"; then
 		cleanup_db; exit 1
 	    fi
 	elif pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_summary" > /dev/null; then
 	    echo "Installing package $pkg..." 1>&2
-	    if ! pkg_add $pkg_opts -U "$CACHEDIR/All/$pkg.tgz"; then
+	    if ! pkg_add $pkg_opts -U "$CACHEDIR/All/$pkg$SUFX"; then
 		cleanup_db; exit 1
 	    fi
 	fi
@@ -1118,11 +1119,11 @@ if test "$1" = clean-cache; then
     if test -n "$rem_all"; then
 	printf '' > "$installed"
     else
-	pkg_info -Xa | awk '/^PKGNAME=/ {print substr($0, 9) ".tgz"}' |
+	pkg_info -Xa | awk -v SUFX="$SUFX" '/^PKGNAME=/ {print substr($0, 9) SUFX}' |
 	sort -u > "$installed"
     fi
 
-    ls -1 *.tgz | sort > "$present"
+    eval "ls -1 *$SUFX" | sort > "$present"
 
     echo 'The following files will be deleted'
     comm -13 "$installed" "$present" > "$del"
