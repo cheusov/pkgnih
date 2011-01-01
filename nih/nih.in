@@ -1083,16 +1083,18 @@ nih clean-cache [options] [pkgs...]
    option:
       -h    display this help message
       -n    output files to be deleted
+      -a    remove all binaries
 
 Examples:
    nih clean-cache
    nih clean-cache -n
+   nih clean-cache -a
 EOF
 }
 
 if test "$1" = clean-cache; then
     shift
-    while getopts hn f; do
+    while getopts hna f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1101,6 +1103,8 @@ if test "$1" = clean-cache; then
 		exit 0;;
 	    n)
 		noop=1;;
+	    a)
+		rem_all=1;;
 	esac
     done
     shift `expr $OPTIND - 1`
@@ -1111,8 +1115,12 @@ if test "$1" = clean-cache; then
     installed=$tmp_dir/installed
     del=$tmp_dir/del
 
-    pkg_info -Xa | awk '/^PKGNAME=/ {print substr($0, 9) ".tgz"}' |
-    sort -u > "$installed"
+    if test -n "$rem_all"; then
+	printf '' > "$installed"
+    else
+	pkg_info -Xa | awk '/^PKGNAME=/ {print substr($0, 9) ".tgz"}' |
+	sort -u > "$installed"
+    fi
 
     ls -1 *.tgz | sort > "$present"
 

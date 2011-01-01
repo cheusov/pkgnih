@@ -347,19 +347,19 @@ Output dependencies, by default
 dependent packages are output.
 .TP
 .B -l
-Output list of packages instead of graph
+Output list of packages instead of graph.
 .TP
 .B -B
-Output PKGBASE (the default)
+Output PKGBASE (the default).
 .TP
 .B -P
-Output PKGPATH
+Output PKGPATH.
 .TP
 .B -N
-Output PKGNAME
+Output PKGNAME.
 .TP
 .B -t
-Output dependencies in tsort(1) compatible format
+Output dependencies in tsort(1) compatible format.
 .RE
 .P
 .RS
@@ -375,8 +375,23 @@ Examples:
 .VE
 .RE
 .TP
-.B clean
-Clean-up DESTDIR or packages cache directories (not implemented yet)
+.B clean-cache
+Clean-up CACHEDIR directory. By default all binaries
+except those of installed packages are removed.
+.P
+.RS
+.B "nih clean-cache"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -n
+Output files to be removed, do not delete them.
+.TP
+.B -a
+Remove all binaries.
+.RE
 .SH SEE ALSO
 .BR pkg_status(1) ,
 .BR pkg_digger(1) ,
