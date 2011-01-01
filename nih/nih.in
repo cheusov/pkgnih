@@ -57,14 +57,14 @@ Commands:
  nih list            - List packages
  nih mark            - Mark packages
  nih deps            - Show dependencies
- nih clean           - Clean-up DESTDIR or packages cache directories
+ nih clean-cache     - Clean-up cache directory with binaries
 EOF
 }
 
 sysconfdir=${NIH_SYSCONFDIR-@sysconfdir@}/nih
 confdir=$HOME/.nih
 
-CACHEDIR=${CACHEDIR-@PACKAGES@}
+CACHEDIR=${CACHEDIR-@CACHEDIR@}
 PKG_INFO_CMD=${PKG_INFO_CMD-@PKG_INFO_CMD@}
 PKG_ADMIN_CMD=${PKG_ADMIN_CMD-@PKG_ADMIN_CMD@}
 PKG_DELETE_CMD=${PKG_DELETE_CMD-@PKG_DELETE_CMD@}
@@ -374,7 +374,7 @@ check_cksums (){
 
 download_pkgs (){
     (
-	cd "$PACKAGES/All"
+	cd "$CACHEDIR/All"
 	while read pkg; do
 	    if ! test -f "$pkg.tgz" || ! check_cksums "$pkg.tgz"; then
 		echo "Downloading package $pkg..."
@@ -538,12 +538,12 @@ if test "_$1" = _install -o "_$1" = _update; then
     while read pkg; do
 	if pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_auto_summary" > /dev/null; then
 	    echo "Installing package $pkg as a dependency..." 1>&2
-	    if ! pkg_add $pkg_opts -UA "$PACKAGES/All/$pkg.tgz"; then
+	    if ! pkg_add $pkg_opts -UA "$CACHEDIR/All/$pkg.tgz"; then
 		cleanup_db; exit 1
 	    fi
 	elif pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_summary" > /dev/null; then
 	    echo "Installing package $pkg..." 1>&2
-	    if ! pkg_add $pkg_opts -U "$PACKAGES/All/$pkg.tgz"; then
+	    if ! pkg_add $pkg_opts -U "$CACHEDIR/All/$pkg.tgz"; then
 		cleanup_db; exit 1
 	    fi
 	fi
@@ -1073,9 +1073,59 @@ fi
 ######################################################################
 ######################################################################
 # clean
-if test "$1" = clean; then
-    echo 'Not implemented yet' 1>&2
-    exit 1
+usage_clean_cache (){
+    cat <<'EOF'
+nih clean-cache [options] [pkgs...]
+
+      Delete binaries in cache directory. By default all binaries
+      except those of installed packages are removed.
+
+   option:
+      -h    display this help message
+      -n    output files to be deleted
+
+Examples:
+   nih clean-cache
+   nih clean-cache -n
+EOF
+}
+
+if test "$1" = clean-cache; then
+    shift
+    while getopts hn f; do
+	case "$f" in
+	    '?')
+		exit 1;;
+	    h)
+		usage_clean_cache
+		exit 0;;
+	    n)
+		noop=1;;
+	esac
+    done
+    shift `expr $OPTIND - 1`
+
+    cd $CACHEDIR/All
+
+    present=$tmp_dir/present
+    installed=$tmp_dir/installed
+    del=$tmp_dir/del
+
+    pkg_info -Xa | awk '/^PKGNAME=/ {print substr($0, 9) ".tgz"}' |
+    sort -u > "$installed"
+
+    ls -1 *.tgz | sort > "$present"
+
+    echo 'The following files will be deleted'
+    comm -13 "$installed" "$present" > "$del"
+    indent "$del"
+    if test -n "$noop" || ! yesno 'Proceed'; then
+	exit 0
+    fi
+
+    xargs rm -f < "$del"
+
+    exit 0
 fi
 
 ######################################################################
