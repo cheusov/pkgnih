@@ -1,4 +1,5 @@
-SUBPRJ =	nih
+SUBPRJ =	nih doc
+SUBPRJ_DFLT =	nih
 
 BIRTHDATE=	2010-11-13
 
