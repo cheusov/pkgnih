@@ -447,15 +447,17 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     ##################################################################
     ######################### update plan ############################
-    verbose "Generating the update plan..."
+    verbose "Generating update plan..."
     plan_summary="$tmp_dir/plan_summary"
     printf '' > "$plan_summary"
-    if test -s "$update_pkgs_fn" &&
-	$PKG_UPDATE_PLAN_CMD -iv "$installed_summary" "$PKG_SUMMARY" \
+    if ! test -s "$update_pkgs_fn"; then
+	echo 'Nothing to do'
+	exit 0
+    fi
+
+    if ! $PKG_UPDATE_PLAN_CMD -iv "$installed_summary" "$PKG_SUMMARY" \
 	    > "$plan_summary" < "$update_pkgs_fn"
     then
-	:
-    else
 	cat "$plan_summary" 1>&2
 	exit 1
     fi
