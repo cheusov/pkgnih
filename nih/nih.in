@@ -316,7 +316,7 @@ refresh_summary (){
     tiny_summary="$tmp_dir/tiny_summary"
 #    tiny_summary="$confdir/tiny_summary"
     grep -E '^$|^(PKGNAME=|PKGPATH=|COMMENT=|automatic=|CONFLICTS=|DEPENDS=)' \
-	"$PKG_SUMMARY" > "$tiny_summary"
+	"$PKG_SUMMARY" > "$tiny_summary" || true
     pkg_refresh_summary "$tiny_summary" > "$tiny_summary.tmp"
     mv "$tiny_summary.tmp" "$tiny_summary"
 #    pkg_refresh_summary "$PKG_SUMMARY" > "$tiny_summary"
