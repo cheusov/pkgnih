@@ -1,6 +1,6 @@
 EGDIR ?=		${PREFIX}/share/nih
 
-PACKAGES ?=		/usr/pkgsrc/packages
+CACHEDIR ?=		/usr/pkgsrc/packages
 
 PKG_INFO ?=		${SBINDIR}/pkg_info
 PKG_ADMIN ?=		${SBINDIR}/pkg_admin
@@ -10,7 +10,7 @@ INTEXTS_REPLS +=	PKG_INFO_CMD   ${PKG_INFO}
 INTEXTS_REPLS +=	PKG_ADMIN_CMD  ${PKG_ADMIN}
 INTEXTS_REPLS +=	PKG_DELETE_CMD ${PKG_DELETE}
 
-INTEXTS_REPLS +=	PACKAGES       ${PACKAGES}
+INTEXTS_REPLS +=	CACHEDIR       ${CACHEDIR}
 
 INSCRIPTS =		nih pkg_update_plan
 SCRIPTS =		${INSCRIPTS}

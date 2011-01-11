@@ -109,6 +109,7 @@ function process_pkg (pkg,            base,pref){
 
 	base = pair
 	sub(/^.*,/, "", base)
+	base = pkgname2pkgbase(base)
 
 	if (pref == "?"){
 		if (!(pair in inst_pair2auto) || inst_pair2auto [pair])
@@ -146,13 +147,12 @@ BEGIN {
 		}else if (NF == 0){
 			pkgbase = pkgname
 			sub(/-[^-]*$/, "", pkgbase)
-			pkgpair = (pkgpath "," pkgbase)
+			pkgpair = (pkgpath "," pkgname)
 
 			inst_name2pair [pkgname] = pkgpair
 			inst_base2pair [pkgbase] = pkgpair
 			inst_path2pair [pkgpath] = pkgpair
 			inst_pair2auto [pkgpair] = auto
-
 			pkgname = pkgpath = ""
 			auto = 0
 		}
@@ -167,10 +167,12 @@ BEGIN {
 		}else if (NF == 0){
 			pkgbase = pkgname
 			sub(/-[^-]*$/, "", pkgbase)
-			pkgpair = (pkgpath "," pkgbase)
+			pkgpair = (pkgpath "," pkgname)
 
 			if (pkgbase in inst_base2pair){
-				if (inst_base2pair [pkgbase] == pkgpair)
+				currpath = inst_base2pair [pkgbase]
+				sub(/,.*/, "", currpath)
+				if (currpath == pkgpath)
 					avail_base2pair [pkgbase] = pkgpair
 			}else if (! (pkgbase in avail_base2pair) ||
 					  pkgname_gt_pkgname(pkgname, avail_base2name [pkgbase]))
@@ -221,7 +223,7 @@ function rem_packages_from_summary (input, output,             pkgs,cmd){
 	assert(pkgs != "")
 
 	# remove specified packages from inst_summary
-	cmd = "pkg_grep_summary -v -t strlist PKGPAIR '" pkgs "' < " \
+	cmd = "pkg_grep_summary -v -t strlist PKGPANA '" pkgs "' < " \
 		shquote(input) " > " output
 	system(cmd)
 }
@@ -230,7 +232,7 @@ function create_packages_summary (output, hash,                  pkgs,cmd)
 {
 	pkgs = hash_to_indices(hash)
 
-	cmd = grep_package_cmd(pkgs, "PKGPAIR") \
+	cmd = grep_package_cmd(pkgs, "PKGPANA") \
 		" < " shquote(avail_summary) " > " output
 	system(cmd)
 }
@@ -305,6 +307,12 @@ function show_progress (){
 				printf " %s", i > "/dev/stderr"
 			}
 			printf "\n" > "/dev/stderr"
+
+			printf "add_base:" > "/dev/stderr"
+			for (i in add_base){
+				printf " %s", i > "/dev/stderr"
+			}
+			printf "\n" > "/dev/stderr"
 		}
 	}
 }
@@ -333,8 +341,10 @@ BEGIN {
 		while (xgetline0(errfn)){
 			ex2 = 0
 			if ($1 == "d:" && $2 == "not_found"){
+				dep1 = $3
+				sub(/[|].*$/, "", dep1)
 				pkgbase = pkgname2pkgbase($6)
-				depbase = pkgname2pkgbase($3)
+				depbase = pkgname2pkgbase(dep1)
 
 				if (pkgbase in add_base){
 					addme [depbase] = 0

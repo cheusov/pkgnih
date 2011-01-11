@@ -27,7 +27,7 @@ The
 .B nih
 is a command-line tool for managing pkgsrc packages. It relies on pkg_summary(5)
 for installation, removal and update of packages and associated
-dependencies, using remote or local repository.
+dependencies using remote or local repository.
 .SH OPTIONS
 .TP
 .B "-h"
@@ -48,6 +48,7 @@ Display help message
 Download pkg_summary(5) and SHA512 files from remote repository and
 unpack them to ~/.nih/. URL for these files is specified in
 PKG_SUMMARY_URL configuration variable.
+.P
 .RS
 .B "nih refresh"
 accepts the following options:
@@ -59,6 +60,7 @@ Display help message.
 .B  search
 Search for packages in pkg_summary(5), online database or in installed packages.
 For details see pkg_digger(1).
+.P
 .RS
 .B "nih search"
 accepts the following options:
@@ -96,6 +98,7 @@ Raw output in pkg_summary(5) format.
 .B -q
 Quiet mode, do not print "No matches found" to stderr.
 .RE
+.P
 .RS
 Examples:
 .VB
@@ -131,10 +134,9 @@ packages remain unchanged, that is if, for example, emacs-21 was installed
 from editors/emacs21, it will not be updated to emacs-23 from editors/emacs23.
 If you want to do this, run the following:
 .VB
-
    nih install editors/emacs23 -emacs
-
 .VE
+.P
 .RS
 .B "nih install"
 accepts the following options:
@@ -145,13 +147,20 @@ Display help message.
 .B -n
 Don't actually install/remove a package, just report the steps that
 would be taken if it were.
+.TP
+.B -d
+Do not update installed packages, download binaries only.
 .RE
+.P
 .RS
 Examples:
 .VB
    nih install -h
+   nih update
+   nih -y update -d openoffice2 firefox midori
    nih install mawk lang/gawk
-   nih install perl -p5-Digest
+   nih install perl
+   nih install libao-alsa -libao-oss
    nih install editors/emacs20 -emacs
    nih install +GConf +xproto
    nih install -- -gmake -autoconf -automake -libtool-base
@@ -161,6 +170,7 @@ Examples:
 .TP
 .BR  uninstall ", " delete " and " remove
 Uninstall packages and dependent packages.
+.P
 .RS
 .B "nih uninstall"
 accepts the following options:
@@ -172,6 +182,7 @@ Display help message.
 Don't actually remove a package, just report the steps that
 would be taken if it were.
 .RE
+.P
 .RS
 Examples:
 .VB
@@ -183,6 +194,7 @@ Examples:
 .TP
 .B  verify
 Verify packages integrity.
+.P
 .RS
 .B "nih verify"
 accepts the following options:
@@ -202,6 +214,7 @@ Check for existence of library files listed in REQUIRES.
 .B -d
 Check for presence of dependencies and their versions.
 .RE
+.P
 .RS
 Examples:
 .VB
@@ -214,6 +227,7 @@ Examples:
 .B  status
 Compare installed packages and their versions with pkg_summary(5)
 (default) or pkgsrc tree. For details see pkg_status(1).
+.P
 .RS
 .B "nih status"
 accepts the following options:
@@ -243,6 +257,7 @@ with -A they are output too
 .B -q
 No noisy reminder about output format.
 .RE
+.P
 .RS
 Examples:
 .VB
@@ -257,6 +272,7 @@ Security audit (not implemented yet).
 .TP
 .B  leaf
 Output or remove auto-removed leaf packages.
+.P
 .RS
 .B "nih leaf"
 accepts the following options:
@@ -276,6 +292,7 @@ Remove auto-removed leaf packages recursively.
 .B -n
 Pass -n to pkg_delete(1).
 .RE
+.P
 .RS
 Examples:
 .VB
@@ -293,6 +310,7 @@ Examples:
 .TP
 .B  mark
 Mark packages as auto-removed or as installed by user.
+.P
 .RS
 .B "nih mark"
 accepts the following options:
@@ -306,6 +324,7 @@ Mark packages as installed by user.
 .B -a
 Mark packages as auto-removable.
 .RE
+.P
 .RS
 Examples:
 .VB
@@ -316,6 +335,7 @@ Examples:
 .TP
 .B  deps
       Output a dependency graph of installed packages.
+.P
 .RS
 .B "nih deps"
 accepts the following options:
@@ -328,20 +348,21 @@ Output dependencies, by default
 dependent packages are output.
 .TP
 .B -l
-Output list of packages instead of graph
+Output list of packages instead of graph.
 .TP
 .B -B
-Output PKGBASE (the default)
+Output PKGBASE (the default).
 .TP
 .B -P
-Output PKGPATH
+Output PKGPATH.
 .TP
 .B -N
-Output PKGNAME
+Output PKGNAME.
 .TP
 .B -t
-Output dependencies in tsort(1) compatible format
+Output dependencies in tsort(1) compatible format.
 .RE
+.P
 .RS
 Examples:
 .VB
@@ -355,8 +376,23 @@ Examples:
 .VE
 .RE
 .TP
-.B clean
-Clean-up DESTDIR or packages cache directories (not implemented yet)
+.B clean-cache
+Clean-up CACHEDIR directory. By default all binaries
+except those of installed packages are removed.
+.P
+.RS
+.B "nih clean-cache"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -n
+Output files to be removed, do not delete them.
+.TP
+.B -a
+Remove all binaries.
+.RE
 .SH SEE ALSO
 .BR pkg_status(1) ,
 .BR pkg_digger(1) ,

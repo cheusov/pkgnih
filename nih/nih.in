@@ -45,10 +45,10 @@ Commands:
  nih help            - Display help message
  nih refresh         - Download pkg_summary and SHA512 files
  nih install
- nih update          - Install or update packages
+   nih update        - Install or update packages
  nih uninstall
- nih delete
- nih remove          - Uninstall packages
+   nih delete
+   nih remove        - Uninstall packages
  nih verify          - Verify packages integrity
  nih status          - Show the status of installed packages
  nih audit           - Security audit
@@ -57,18 +57,19 @@ Commands:
  nih list            - List packages
  nih mark            - Mark packages
  nih deps            - Show dependencies
- nih clean           - Clean-up DESTDIR or packages cache directories
+ nih clean-cache     - Clean-up cache directory with binaries
 EOF
 }
 
 sysconfdir=${NIH_SYSCONFDIR-@sysconfdir@}/nih
 confdir=$HOME/.nih
 
-PACKAGES=${PACKAGES-@PACKAGES@}
+CACHEDIR=${CACHEDIR-@CACHEDIR@}
 PKG_INFO_CMD=${PKG_INFO_CMD-@PKG_INFO_CMD@}
 PKG_ADMIN_CMD=${PKG_ADMIN_CMD-@PKG_ADMIN_CMD@}
 PKG_DELETE_CMD=${PKG_DELETE_CMD-@PKG_DELETE_CMD@}
 PKG_UPDATE_PLAN_CMD=${PKG_UPDATE_PLAN_CMD-pkg_update_plan}
+SUFX=${SUFX-.tgz}
 
 # loading config files
 if test -r "$sysconfdir/config"; then
@@ -299,6 +300,7 @@ fi
 ######################################################################
 # ensure that pkg_summary.txt exists and refresh it
 if test -z "$PKG_SUMMARY"; then
+    cksums=1 # checksums will be checked according to SHA512.txt
     PKG_SUMMARY=$confdir/pkg_summary.txt
 fi
 
@@ -317,9 +319,6 @@ refresh_summary (){
 #    tiny_summary="$confdir/tiny_summary"
     grep -E '^$|^(PKGNAME=|PKGPATH=|COMMENT=|automatic=|CONFLICTS=|DEPENDS=)' \
 	"$PKG_SUMMARY" > "$tiny_summary" || true
-    pkg_refresh_summary "$tiny_summary" > "$tiny_summary.tmp"
-    mv "$tiny_summary.tmp" "$tiny_summary"
-#    pkg_refresh_summary "$PKG_SUMMARY" > "$tiny_summary"
     export PKG_SUMMARY="$tiny_summary"
 }
 
@@ -338,6 +337,7 @@ nih install <packages>
       -h     display this help message
       -n     don't actually install a package, just report the steps that
              would be taken if it were.
+      -d     download binaries only, do not update installed packages
 
 Here <packages> are either PKGBASEs, PKGNAMEs or PKGPATHs, optionally
 prepanded with `+' (package will be marked as installed as a dependency)
@@ -347,21 +347,41 @@ for resolving conflicts between installed and new packages. Automatically
 installed leaf packages will be removed.
 
 Examples:
+   nih update
+   nih update -d
    nih install mawk lang/gawk
-   nih install perl -p5-Digest
+   nih install perl
    nih install +GConf +xproto
    nih install -- -gmake -autoconf -automake -libtool-base
    nih install textproc/dict-client -wip/dict-client
 EOF
 }
 
+check_cksums (){
+    # $1 - foobar-1.2.3.tgz
+    if test -z "$cksums"; then
+	return
+    fi
+
+    expected_sha512=`awk -v p="(All/$1)" '$2 == p {print $4}' $confdir/SHA512.txt`
+    curr_sha512=`digest sha512 "$1" | awk '{print $4}'`
+    if test "$expected_sha512" = "$curr_sha512"; then
+	return 0
+    else
+	echo "$1 is corrupted"
+	return 1
+    fi
+}
+
 download_pkgs (){
     (
-	cd "$PACKAGES/All"
+	cd "$CACHEDIR/All"
 	while read pkg; do
-	    if ! test -f "$pkg.tgz"; then
+	    if ! test -f "$pkg$SUFX" || ! check_cksums "$pkg$SUFX"; then
 		echo "Downloading package $pkg..."
-		fetch "$PKG_SUMMARY_URL/All/$pkg.tgz"
+		fetch "$PKG_SUMMARY_URL/All/$pkg$SUFX"
+		# ensure that downloaded file is correct
+		check_cksums "$pkg$SUFX"
 	    fi
 	done
     )
@@ -383,7 +403,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     cmd="$1"
     shift
 
-    while getopts hn f; do
+    while getopts hnd f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -392,6 +412,8 @@ if test "_$1" = _install -o "_$1" = _update; then
 	    h)
 		usage_install
 		exit 0;;
+	    d)
+		download_only=1;;
 	    *)
 		opts="${opts}$f";;
 	esac
@@ -425,15 +447,17 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     ##################################################################
     ######################### update plan ############################
-    verbose "Generating the update plan..."
+    verbose "Generating update plan..."
     plan_summary="$tmp_dir/plan_summary"
     printf '' > "$plan_summary"
-    if test -s "$update_pkgs_fn" &&
-	$PKG_UPDATE_PLAN_CMD -iv "$installed_summary" "$PKG_SUMMARY" \
+    if ! test -s "$update_pkgs_fn"; then
+	echo 'Nothing to do'
+	exit 0
+    fi
+
+    if ! $PKG_UPDATE_PLAN_CMD -iv "$installed_summary" "$PKG_SUMMARY" \
 	    > "$plan_summary" < "$update_pkgs_fn"
     then
-	:
-    else
 	cat "$plan_summary" 1>&2
 	exit 1
     fi
@@ -498,6 +522,10 @@ if test "_$1" = _install -o "_$1" = _update; then
     sed -n 's/^PKGNAME=//p' "$inst_summary" "$inst_auto_summary" |
     download_pkgs
 
+    if test -n "$download_only"; then
+	exit 0
+    fi
+
     if test -s "$rem_summary" -o -s "$extra_rem_summary"; then
 	sed -n 's/^PKGNAME=//p' "$rem_summary" "$extra_rem_summary" \
 	    > "$extra_rem_pkgs"
@@ -513,12 +541,12 @@ if test "_$1" = _install -o "_$1" = _update; then
     while read pkg; do
 	if pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_auto_summary" > /dev/null; then
 	    echo "Installing package $pkg as a dependency..." 1>&2
-	    if ! pkg_add $pkg_opts -UA "$PACKAGES/All/$pkg.tgz"; then
+	    if ! pkg_add $pkg_opts -UA "$CACHEDIR/All/$pkg$SUFX"; then
 		cleanup_db; exit 1
 	    fi
 	elif pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_summary" > /dev/null; then
 	    echo "Installing package $pkg..." 1>&2
-	    if ! pkg_add $pkg_opts -U "$PACKAGES/All/$pkg.tgz"; then
+	    if ! pkg_add $pkg_opts -U "$CACHEDIR/All/$pkg$SUFX"; then
 		cleanup_db; exit 1
 	    fi
 	fi
@@ -1048,9 +1076,67 @@ fi
 ######################################################################
 ######################################################################
 # clean
-if test "$1" = clean; then
-    echo 'Not implemented yet' 1>&2
-    exit 1
+usage_clean_cache (){
+    cat <<'EOF'
+nih clean-cache [options] [pkgs...]
+
+      Delete binaries in cache directory. By default all binaries
+      except those of installed packages are removed.
+
+   option:
+      -h    display this help message
+      -n    output files to be deleted
+      -a    remove all binaries
+
+Examples:
+   nih clean-cache
+   nih clean-cache -n
+   nih clean-cache -a
+EOF
+}
+
+if test "$1" = clean-cache; then
+    shift
+    while getopts hna f; do
+	case "$f" in
+	    '?')
+		exit 1;;
+	    h)
+		usage_clean_cache
+		exit 0;;
+	    n)
+		noop=1;;
+	    a)
+		rem_all=1;;
+	esac
+    done
+    shift `expr $OPTIND - 1`
+
+    cd $CACHEDIR/All
+
+    present=$tmp_dir/present
+    installed=$tmp_dir/installed
+    del=$tmp_dir/del
+
+    if test -n "$rem_all"; then
+	printf '' > "$installed"
+    else
+	pkg_info -Xa | awk -v SUFX="$SUFX" '/^PKGNAME=/ {print substr($0, 9) SUFX}' |
+	sort -u > "$installed"
+    fi
+
+    eval "ls -1 *$SUFX" | sort > "$present"
+
+    echo 'The following files will be deleted'
+    comm -13 "$installed" "$present" > "$del"
+    indent "$del"
+    if test -n "$noop" || ! yesno 'Proceed'; then
+	exit 0
+    fi
+
+    xargs rm -f < "$del"
+
+    exit 0
 fi
 
 ######################################################################

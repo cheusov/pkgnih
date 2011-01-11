@@ -8,3 +8,7 @@ Build requirements:
 
 Installation:
     mkcmake all install
+
+    In addition you may want to install files under doc/ directory.
+
+    mkcmake all-doc install-doc
