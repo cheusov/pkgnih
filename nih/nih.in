@@ -304,21 +304,24 @@ if test -z "$PKG_SUMMARY"; then
     PKG_SUMMARY=$confdir/pkg_summary.txt
 fi
 
-if ! test -r "$PKG_SUMMARY"; then
-    cat 1>&2 <<EOF
+summary_exists (){
+    if ! test -r "$PKG_SUMMARY"; then
+	cat 1>&2 <<EOF
 '$PKG_SUMMARY' file doesn't exist or is not readable.
 Perhaps you need to run 'nih refresh'
 EOF
-    exit 1
-fi
+	exit 1
+    fi
+}
 
 mkdir -p "$confdir"
 
 refresh_summary (){
+    summary_exists
+
     tiny_summary="$tmp_dir/tiny_summary"
-#    tiny_summary="$confdir/tiny_summary"
     grep -E '^$|^(PKGNAME=|PKGPATH=|COMMENT=|automatic=|CONFLICTS=|DEPENDS=)' \
-	"$PKG_SUMMARY" > "$tiny_summary"
+	"$PKG_SUMMARY" > "$tiny_summary" || true
     export PKG_SUMMARY="$tiny_summary"
 }
 
@@ -340,7 +343,7 @@ nih install <packages>
       -d     download binaries only, do not update installed packages
 
 Here <packages> are either PKGBASEs, PKGNAMEs or PKGPATHs, optionally
-prepanded with `+' (package will be marked as installed as a dependency)
+prepended with `+' (package will be marked as installed as a dependency)
 or `-' (package will be removed). If neither `+' nor `-' were specified
 packages will be marked as installed by user. The marker `-' may be useful
 for resolving conflicts between installed and new packages. Automatically
@@ -713,8 +716,6 @@ if test "$1" = verify; then
 	exit 1
     fi
 
-    refresh_summary
-
     pkg_status "-$opts" "$@"
 
     exit 0
@@ -767,7 +768,9 @@ if test "$1" = status; then
     done
     shift `expr $OPTIND - 1`
 
-    refresh_summary
+    if echo "$opts" | grep 'b[^s]*$' > /dev/null; then
+	refresh_summary
+    fi
 
     pkg_status "-$opts" "$@"
 
@@ -859,6 +862,12 @@ if test "$1" = search; then
     if test -n "$in_installed"; then
 	export PKG_DIGGER_SUMMARY="$tmp_dir/installed_summary"
 	pkg_bin_summary -a automatic > "$PKG_DIGGER_SUMMARY"
+    fi
+
+    if test "$PKG_DIGGER_SUMMARY" = "$PKG_SUMMARY" -a \
+	"$PKG_DIGGER_BACKEND" = ''
+    then
+	summary_exists
     fi
 
     pkg_digger ${opts+-$opts} "$@"
@@ -1052,6 +1061,7 @@ if test "$1" = deps; then
     if test -z "$remote_summary"; then
 	pkg_bin_summary -fPKGNAME,PKGPATH,DEPENDS
     else
+	summary_exists
 	cat "$PKG_SUMMARY"
     fi |
     pkg_summary2deps -d $pn_opts |
