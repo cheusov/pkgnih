@@ -179,6 +179,12 @@ If you want to do this, run the following:
 .VB
    nih install editors/emacs23 -emacs
 .VE
+Before package installation or removal a list of installed packages
+is saved in ~/.nih/installed_YYYYMMDD_hhmm.txt file unless
+.I NO_INSTALLED_COPY
+variable is set in config file. The same relates to
+.IR uninstall " and " leaf
+commands.
 .P
 .RS
 .B "nih install"

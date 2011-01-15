@@ -200,6 +200,27 @@ verbose (){
     printf "%s\n" "$1"
 }
 
+get_date (){
+    date +%Y%m%d_%H%M
+}
+
+# saves list of installed packages
+save_installed_packages (){
+    if test -n "$NO_INSTALLED_COPY"; then
+	return
+    fi
+
+    installed_fn=$confdir/installed_`get_date`
+    counter=''
+    while test -f "${installed_fn}$counter.txt"; do
+	counter=${counter-0}
+	counter=$(($counter+1))
+    done
+
+    installed_fn="${installed_fn}$counter.txt"
+    pkg_bin_summary -f PKGNAME,PKGPATH,automatic,nih_try,nih_hold >"$installed_fn"
+}
+
 ######################################################################
 ######################################################################
 ######################################################################
@@ -297,7 +318,7 @@ EOF
     fi
 
     if test -z "$NO_SUMMARY_COPY"; then
-	date_sufx=`date +%Y%m%d_%H%M`
+	date_sufx=`get_date`
 	cp pkg_summary.txt pkg_summary_${date_sufx}.txt
 	cp SHA512.txt SHA512_${date_sufx}.txt
     fi
@@ -536,6 +557,8 @@ if test "_$1" = _install -o "_$1" = _update; then
 	exit 0
     fi
 
+    save_installed_packages
+
     if test -s "$rem_summary" -o -s "$extra_rem_summary"; then
 	sed -n 's/^PKGNAME=//p' "$rem_summary" "$extra_rem_summary" \
 	    > "$extra_rem_pkgs"
@@ -656,6 +679,8 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
     if ! yesno remove_dep 'Remove them'; then
 	exit 0
     fi
+
+    save_installed_packages
 
     cat "$tmp_dir/4" "$tmp_dir/2" | xargs $PKG_DELETE_CMD $pkg_delete_opts
 
@@ -957,6 +982,11 @@ if test "$1" = leaf; then
     done
     shift `expr $OPTIND - 1`
 
+    if echo "$opts" | awk 'BEGIN { exit (!/[RE]/ || /n/) }' > /dev/null; then
+	save_installed_packages
+    fi
+
+    save_installed_packages
     pkg_status "-$opts" "$@"
 
     exit 0
