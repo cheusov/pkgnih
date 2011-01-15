@@ -296,6 +296,11 @@ EOF
 	exit 1
     fi
 
+    if test -z "$NO_SUMMARY_COPY"; then
+	date_sufx=`date +%Y%m%d_%H%M`
+	cp pkg_summary.txt pkg_summary_${date_sufx}.txt
+	cp SHA512.txt SHA512_${date_sufx}.txt
+    fi
     exit 0
 fi
 
