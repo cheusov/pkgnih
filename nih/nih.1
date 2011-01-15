@@ -57,6 +57,42 @@ accepts the following options:
 Display help message.
 .RE
 .TP
+.B  info
+Show information about packages in the repository or about installed packages.
+.P
+.RS
+.B "nih info"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -b
+Query pkg_summary.txt (the default).
+.TP
+.B -o
+Query pkg_online database.
+.TP
+.B -I
+Display information about installed packages.
+.TP
+.B -r
+Output raw package summaries.
+.TP
+.B -q
+quiet mode, do not print "No matches found" to stderr
+.RE
+.P
+.RS
+Examples:
+.VB
+   nih info -h
+   nih info glib2 runawk emacs
+   nih info -Ir glib2 runawk
+   nih info -orq glib2 runawk
+.VE
+.RE
+.TP
 .B  search
 Search for packages in pkg_summary(5), online database or in installed packages.
 For details see pkg_digger(1).
@@ -111,6 +147,8 @@ Examples:
    nih search c:kw:'dns server'
    nih search n:p:lua
    nih search FILE_SIZE:awk:'fvalue+0 > 100000000'
+   nih search ::emacs
+   nih search -I3 automatic::yes
    nih search -9 lang/mawk
    nih search -os
    nih search -of

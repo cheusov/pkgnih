@@ -51,6 +51,7 @@ Commands:
    nih remove        - Uninstall packages
  nih verify          - Verify packages integrity
  nih status          - Show the status of installed packages
+ nih info            - Show information about package
  nih audit           - Security audit
  nih leaf            - Output or remove leaf packages
  nih license         - Working with licenses
@@ -833,7 +834,35 @@ Examples:
 EOF
 }
 
-if test "$1" = search; then
+# info
+usage_info (){
+    cat <<'EOF'
+nih info [options] [PKGBASEs]
+
+      Show information about packages
+
+   option:
+      -h    display this help message
+
+      -b    search in pkg_summary.txt (the default)
+      -o    search using pkg_online
+      -I    search in installed packages
+
+      -r    raw output in pkg_summary(5) format
+      -q    quiet mode, do not print "No matches found" to stderr
+
+See pkg_digger(1) for details.
+
+Examples:
+   nih info -h
+   nih info runawk
+   nih info -I runawk
+   nih info -o oberon
+EOF
+}
+
+if test "_$1" = _search -o "_$1" = _info; then
+    op="$1"
     shift
     export PKG_DIGGER_SUMMARY="$PKG_SUMMARY"
 
@@ -851,7 +880,7 @@ if test "$1" = search; then
 		unset PKG_DIGGER_BACKEND || true
 		in_installed=1;;
 	    h)
-		usage_search
+		usage_$op
 		exit 0;;
 	    *)
 		opts="${opts}$f";;
@@ -870,7 +899,13 @@ if test "$1" = search; then
 	summary_exists
     fi
 
-    pkg_digger ${opts+-$opts} "$@"
+    if test "$op" = info; then
+	for i in "$@"; do
+	    pkg_digger -9 ${opts+-$opts} PKGBASE:exact:"$i"
+	done
+    else
+	pkg_digger ${opts+-$opts} "$@"
+    fi
 
     exit 0
 fi
