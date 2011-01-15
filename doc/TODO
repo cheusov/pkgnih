@@ -1,3 +1,6 @@
+- nih search: add 'b' synonym for PKGBASE
+- nih info <pkg> - synonym for nih search -9 n:e:<pkg>
+- nih search -r doesn't work without -39
 - nih refresh - copy pkg_summary.txt to pkg_summary-YYYYMMDD.txt
   and use such summaries for in 'nih clean-cache' and 'nih install'
 - before update warn about missed binaries for installed packages
