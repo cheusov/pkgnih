@@ -1,8 +1,7 @@
-- nih search -r doesn't work without -39
 - nih refresh - copy pkg_summary.txt to pkg_summary-YYYYMMDD.txt
   and use such summaries for in 'nih clean-cache' and 'nih install'
 - before update warn about missed binaries for installed packages
   (downgrade will not be possible)
 - yesno_<type>=yes|no variables for yesno questions.
 - save summary of installed packages to make downgrade possible
-- use pkg_distbb for source-based update
+- use distbb for source-based update
