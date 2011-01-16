@@ -204,6 +204,10 @@ get_date (){
     date +%Y%m%d_%H%M
 }
 
+summary2binary (){
+    awk -v SUFX="$SUFX" '/^PKGNAME=/ {print substr($0, 9) SUFX}' "$@"
+}
+
 # saves list of installed packages
 save_installed_packages (){
     if test -n "$NO_INSTALLED_COPY"; then
@@ -1168,6 +1172,8 @@ nih clean-cache [options] [pkgs...]
       -h    display this help message
       -n    output files to be deleted
       -a    remove all binaries
+      -i    binaries for packages listed in ~/.nih/installed_*.txt
+            are not removed.
 
 Examples:
    nih clean-cache
@@ -1178,7 +1184,7 @@ EOF
 
 if test "$1" = clean-cache; then
     shift
-    while getopts hna f; do
+    while getopts hnai f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1189,6 +1195,8 @@ if test "$1" = clean-cache; then
 		noop=1;;
 	    a)
 		rem_all=1;;
+	    i)
+		keep_installed=1;;
 	esac
     done
     shift `expr $OPTIND - 1`
@@ -1202,8 +1210,13 @@ if test "$1" = clean-cache; then
     if test -n "$rem_all"; then
 	printf '' > "$installed"
     else
-	pkg_info -Xa | awk -v SUFX="$SUFX" '/^PKGNAME=/ {print substr($0, 9) SUFX}' |
-	sort -u > "$installed"
+	{
+	    pkg_info -Xa
+
+	    if test -n "$keep_installed"; then
+		find "$confdir" -name 'installed_*.txt' | xargs cat
+	    fi
+	} | summary2binary | sort -u > "$installed"
     fi
 
     eval "ls -1 *$SUFX" | sort > "$present"
