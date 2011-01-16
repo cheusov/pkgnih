@@ -1,9 +1,6 @@
 - ftp -o | wget -O
-- revert default for "deps" command to remote repository,
-  deps -I -- for installed packages
 - Use pkg_summary-YYYYMMDD.txt
   and use such summaries for in 'nih clean-cache' and 'nih install'
 - before update warn about missed binaries for installed packages
   (downgrade will not be possible)
-- save summary of installed packages to make downgrade possible
 - use distbb for source-based update
