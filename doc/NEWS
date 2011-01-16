@@ -1,9 +1,20 @@
 ======================================================================
-Version 0.3.0, by Aleksey Cheusov, Sun, 16 Jan 2011 15:54:18 +0200
+Version 0.3.1, by Aleksey Cheusov, Sun, 16 Jan 2011 23:01:21 +0200
+
+  Fix in generating an "update plan".
 
   Command "nih info" was added. It shows an information about packages
-  in the repository or about installed packages. See the manual page
-  for details.
+  in the repository or about installed packages. See a manual page for
+  details.
+
+  nih clean-cache:
+    - New option -i was added that takes into account
+      ~/.nih/installed_*.txt files.
+
+  nih deps:
+    - Option -z has been replaced with -I. By default, pkg_summary.txt
+      is analysed, not installed packages just like in "nih search"
+      and "nih info".
 
   "nih verify", "nih status -s" and other commands that don't require
   pkg_summary.txt now work normally without "nih refresh" and even
@@ -19,15 +30,6 @@ Version 0.3.0, by Aleksey Cheusov, Sun, 16 Jan 2011 15:54:18 +0200
   ~/.nih/installed_YYYYMMDD_hhmm.txt file containing a list of
   installed packages before removal/installation is created thus
   allowing to restore the previus state of the system.
-
-  nih clean-cache:
-    - New option -i was added that takes into account
-      ~/.nih/installed_*.txt files.
-
-  nih deps:
-    - Option -z has been replaced with -I. By default, pkg_summary.txt
-      is analysed, not installed packages just like in "nih search"
-      and "nih info".
 
   yes_* variables were introduced in config file for always answering
   "Yes" to particular questions.
