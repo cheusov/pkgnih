@@ -52,7 +52,6 @@ Commands:
  nih verify          - Verify packages integrity
  nih status          - Show the status of installed packages
  nih info            - Show information about package
- nih audit           - Security audit
  nih leaf            - Output or remove leaf packages
  nih license         - Working with licenses
  nih list            - List packages
@@ -817,15 +816,6 @@ fi
 ######################################################################
 ######################################################################
 ######################################################################
-# audit
-if test "$1" = audit; then
-    echo 'Not implemented yet' 1>&2
-    exit 1
-fi
-
-######################################################################
-######################################################################
-######################################################################
 # search
 usage_search (){
     cat <<'EOF'
@@ -1097,7 +1087,7 @@ Examples:
    nih deps -PB
    nih deps glib2
    nih deps -r glib2
-   nih deps -rI ikiwiki
+   nih deps -rI pkgnih
    nih deps -lBP 'devel/glib2;glib2' 'devel/libmaa;libmaa'
    nih deps -P devel/glib2 devel/libmaa
 EOF
