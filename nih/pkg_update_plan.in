@@ -347,9 +347,10 @@ BEGIN {
 				pkgbase = pkgname2pkgbase($6)
 				depbase = pkgname2pkgbase(dep1)
 
-				if (!(pkgbase in add_base) || !(depbase in add_base)){
-					addme [depbase] = 0
+				if (! (pkgbase in add_base)){
 					addme [pkgbase] = 0
+				}else if (! (depbase in add_base)){
+					addme [depbase] = 0
 				}else{
 					ex = ex2 = 1
 				}
