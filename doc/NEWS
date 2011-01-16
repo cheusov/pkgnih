@@ -1,4 +1,43 @@
 ======================================================================
+Version 0.3.0, by Aleksey Cheusov, Sun, 16 Jan 2011 15:54:18 +0200
+
+  Command "nih info" was added. It shows an information about packages
+  in the repository or about installed packages. See the manual page
+  for details.
+
+  "nih verify", "nih status -s" and other commands that don't require
+  pkg_summary.txt now work normally without "nih refresh" and even
+  without binary repository (without pkg_summary.txt) at all.  Thanks
+  to Andrey N. Oktyabrski for pointing out about these problem.
+
+  Unless NO_SUMMARY_COPY variable is set in configuration file,
+  downloaded pkg_summary.txt and SHA512.txt files are copied to
+  "pkg_summary_YYYYMMDD_hhmm.txt" and "SHA512_YYYYMMDD_hhmm.txt"
+  respectively, thus allowing to restore and use them in the future.
+
+  Unless NO_INSTALLED_COPY variable is set in configuration file,
+  ~/.nih/installed_YYYYMMDD_hhmm.txt file containing a list of
+  installed packages before removal/installation is created thus
+  allowing to restore the previus state of the system.
+
+  nih clean-cache:
+    - New option -i was added that takes into account
+      ~/.nih/installed_*.txt files.
+
+  nih deps:
+    - Option -z has been replaced with -I. By default, pkg_summary.txt
+      is analysed, not installed packages just like in "nih search"
+      and "nih info".
+
+  yes_* variables were introduced in config file for always answering
+  "Yes" to particular questions.
+
+  fix: "nih search -r" without -3|-9 options doesn't fail with strange
+  error messages anymore.
+
+  Minor fixes in nih.conf
+
+======================================================================
 Version 0.2.0, by Aleksey Cheusov, Mon,  3 Jan 2011 19:01:56 +0200
 
-    First publicly available release.
+  First publicly available release.
