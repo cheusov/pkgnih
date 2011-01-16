@@ -121,10 +121,11 @@ function process_pkg (pkg,            base,pref){
 	if (pref == "-"){
 		rem_pkgs [pair] = 0
 	}else if (pref == "+"){
-		delete add_pkgs [pair]
-		add_auto_pkgs [pair] = 0
-		rem_pkgs [pair] = 0
-		add_base [base] = 0
+		if (! (pair in add_pkgs)){
+			add_auto_pkgs [pair] = 0
+			rem_pkgs [pair] = 0
+			add_base [base] = 0
+		}
 	}else{
 		delete add_auto_pkgs [pair]
 		add_pkgs [pair] = 0
@@ -346,9 +347,8 @@ BEGIN {
 				pkgbase = pkgname2pkgbase($6)
 				depbase = pkgname2pkgbase(dep1)
 
-				if (pkgbase in add_base){
+				if (!(pkgbase in add_base) || !(depbase in add_base)){
 					addme [depbase] = 0
-				}else if (depbase in add_base){
 					addme [pkgbase] = 0
 				}else{
 					ex = ex2 = 1
