@@ -1086,7 +1086,7 @@ nih deps [options] [pkgs...]
       -P    output PKGPATH
       -N    output PKGNAME
       -t    output dependencies in tsort(1) compatible format
-      -z    analyse pkg_summary(5)
+      -I    analyse installed packages
 If both -P and -N are applied, PKGPATH;PKGNAME is output,
 if both -P and -B are applied, PKGPATH;PKGBASE is output.
 
@@ -1096,7 +1096,7 @@ Examples:
    nih deps -PB
    nih deps glib2
    nih deps -r glib2
-   nih deps -rz ikiwiki
+   nih deps -rI ikiwiki
    nih deps -lBP 'devel/glib2;glib2' 'devel/libmaa;libmaa'
    nih deps -P devel/glib2 devel/libmaa
 EOF
@@ -1106,7 +1106,7 @@ if test "$1" = deps; then
     shift
     sb_opts=''
     pn_opts=''
-    while getopts hrlBNPtz f; do
+    while getopts hrlBNPtI f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1125,15 +1125,15 @@ if test "$1" = deps; then
 		pn_opts="$pn_opts -nr";;
 	    P)
 		pn_opts="$pn_opts -p";;
-	    z)
-		remote_summary=1;;
+	    I)
+		installed_summary=1;;
 	esac
     done
     shift `expr $OPTIND - 1`
 
     pn_opts=${pn_opts:--n}
 
-    if test -z "$remote_summary"; then
+    if test -n "$installed_summary"; then
 	pkg_bin_summary -fPKGNAME,PKGPATH,DEPENDS
     else
 	summary_exists
