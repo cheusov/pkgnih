@@ -222,7 +222,8 @@ save_installed_packages (){
     done
 
     installed_fn="${installed_fn}$counter.txt"
-    pkg_bin_summary -f PKGNAME,PKGPATH,automatic,nih_try,nih_hold >"$installed_fn"
+    pkg_bin_summary -f PKGNAME,PKGPATH,DEPENDS,COMMENT,automatic,nih_try,nih_hold \
+	> "$installed_fn"
 }
 
 ######################################################################
