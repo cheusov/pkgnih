@@ -1,6 +1,7 @@
-- audit command
-- Use pkg_summary-YYYYMMDD.txt
-  and use such summaries for in 'nih clean-cache' and 'nih install'
+- separate pkg_install_plan script from nih
+- man page for pkg_update_plan
+- nih install: compare packages by BUILD_DATE and SIZE_PKG
+- nih install: use pkg_summary-YYYYMMDD.txt?
 - before update warn about missed binaries for installed packages
   (downgrade will not be possible)
 - use distbb for source-based update
