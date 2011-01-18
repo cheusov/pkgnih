@@ -451,7 +451,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 	    d)
 		download_only=1;;
 	    B)
-		cmp_opts='-B';;
+		cmp_opts='-b';;
 	    *)
 		opts="${opts}$f";;
 	esac
