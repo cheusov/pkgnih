@@ -352,7 +352,7 @@ refresh_summary (){
     summary_exists
 
     tiny_summary="$tmp_dir/tiny_summary"
-    grep -E '^$|^(PKGNAME=|PKGPATH=|COMMENT=|automatic=|CONFLICTS=|DEPENDS=)' \
+    grep -E '^$|^(PKGNAME=|PKGPATH=|COMMENT=|automatic=|CONFLICTS=|DEPENDS=|BUILD_DATE=)' \
 	"$PKG_SUMMARY" > "$tiny_summary" || true
     export PKG_SUMMARY="$tiny_summary"
 }
@@ -373,6 +373,7 @@ nih install <packages>
       -n     don't actually install a package, just report the steps that
              would be taken if it were.
       -d     download binaries only, do not update installed packages
+      -B     consider packages different if their BUILD_DATE differ
 
 Here <packages> are either PKGBASEs, PKGNAMEs or PKGPATHs, optionally
 prepended with `+' (package will be marked as installed as a dependency)
@@ -438,7 +439,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     cmd="$1"
     shift
 
-    while getopts hnd f; do
+    while getopts hndB f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -449,6 +450,8 @@ if test "_$1" = _install -o "_$1" = _update; then
 		exit 0;;
 	    d)
 		download_only=1;;
+	    B)
+		cmp_opts='-B';;
 	    *)
 		opts="${opts}$f";;
 	esac
@@ -467,7 +470,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     update_pkgs_fn="$tmp_dir/pkgs_specs.txt"
     printf '' > "$update_pkgs_fn"
     if test $# -eq 0; then
-	pkg_cmp_summary -pu "$installed_summary" "$PKG_SUMMARY" \
+	pkg_cmp_summary -pu $cmp_opts "$installed_summary" "$PKG_SUMMARY" \
 	    > "$cmp_summary"
 	awk '$1 ~ /^[<!]/ {
 		print "-" $3
@@ -497,7 +500,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 	exit 1
     fi
 
-    pkg_cmp_summary "$installed_summary" "$plan_summary" |
+    pkg_cmp_summary $cmp_opts "$installed_summary" "$plan_summary" |
     grep -v '^=' > "$cmp_summary" || true
 
     printf '%s\n' '---------------------- UPDATE PLAN -------------------------'
@@ -775,6 +778,7 @@ nih status [options] [PKGBASEs]
       -r     raw output (pkg_summary format)
       -u     analyse packages marked as installed by user (the default, see -a)
       -a     analyse all packages (see -u)
+      -B     consider packages different if their BUILD_DATE differ
       -A     by default up-to-date packages are skipped,
              with -A they are output too
       -q     no noisy reminder about output format
@@ -789,7 +793,7 @@ EOF
 if test "$1" = status; then
     shift
     opts='b'
-    while getopts hbsruaqA f; do
+    while getopts hbsruaqAB f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1151,7 +1155,7 @@ fi
 ######################################################################
 ######################################################################
 ######################################################################
-# clean
+# clean-cache
 usage_clean_cache (){
     cat <<'EOF'
 nih clean-cache [options] [pkgs...]
