@@ -462,7 +462,8 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     verbose "Getting installed packages..."
     installed_summary="$tmp_dir/installed_summary"
-    pkg_bin_summary -fPKGNAME,PKGPATH,COMMENT,automatic,CONFLICTS,DEPENDS \
+    pkg_bin_summary \
+	-fPKGNAME,PKGPATH,COMMENT,automatic,CONFLICTS,DEPENDS,BUILD_DATE \
 	> "$installed_summary"
 
     cmp_summary="$tmp_dir/cmp_summary"
