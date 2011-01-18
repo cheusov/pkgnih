@@ -199,6 +199,9 @@ would be taken if it were.
 .TP
 .B -d
 Do not update installed packages, download binaries only.
+.TP
+.B -B
+Consider packages different if their BUILD_DATE differ.
 .RE
 .P
 .RS
@@ -301,7 +304,11 @@ Analyse all packages (see -u).
 .TP
 .B -A
 By default up-to-date packages are not output,
-with -A they are output too
+with -A they are output too.
+.TP
+.B -B
+Consider packages different if their BUILD_DATE differ.
+This option works with -b only.
 .TP
 .B -q
 No noisy reminder about output format.
