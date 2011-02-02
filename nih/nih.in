@@ -374,6 +374,7 @@ nih install <packages>
              would be taken if it were.
       -d     download binaries only, do not update installed packages
       -B     consider packages different if their BUILD_DATE differ
+      -D     For debugging purposes
 
 Here <packages> are either PKGBASEs, PKGNAMEs or PKGPATHs, optionally
 prepended with `+' (package will be marked as installed as a dependency)
@@ -439,7 +440,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     cmd="$1"
     shift
 
-    while getopts hndB f; do
+    while getopts hndBD f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -452,6 +453,8 @@ if test "_$1" = _install -o "_$1" = _update; then
 		download_only=1;;
 	    B)
 		cmp_opts='-b';;
+	    D)
+		debug=1;;
 	    *)
 		opts="${opts}$f";;
 	esac
@@ -494,7 +497,11 @@ if test "_$1" = _install -o "_$1" = _update; then
 	exit 0
     fi
 
-    if ! $PKG_UPDATE_PLAN_CMD -iv "$installed_summary" "$PKG_SUMMARY" \
+    if test -n "$debug"; then
+	debug_opt=-v
+    fi
+
+    if ! $PKG_UPDATE_PLAN_CMD -iv $debug_opt "$installed_summary" "$PKG_SUMMARY" \
 	    > "$plan_summary" < "$update_pkgs_fn"
     then
 	cat "$plan_summary" 1>&2
