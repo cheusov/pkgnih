@@ -1,4 +1,19 @@
 ======================================================================
+Version 0.4, by Aleksey Cheusov, Fri, 11 Feb 2011 16:40:36 +0200
+
+  Fix in generating "update plan"
+  (extra -pkgname were needed for upgrade).
+
+  nih status:
+    - New option -B was added for considering packages different
+      if their BUILD_DATE differ.
+
+  nih install:
+    - New option -B was added for considering packages different
+      if their BUILD_DATE differ.
+    - New option -D was added for debugging purposes.
+
+======================================================================
 Version 0.3.1, by Aleksey Cheusov, Sun, 16 Jan 2011 23:01:21 +0200
 
   Fix in generating an "update plan".
