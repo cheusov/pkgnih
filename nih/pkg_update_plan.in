@@ -221,11 +221,13 @@ function rm (file){
 function rem_packages_from_summary (input, output,             pkgs,cmd){
 	pkgs = hash_to_indices(rem_pkgs)
 
-	assert(pkgs != "")
+	if (pkgs != "")
+		# remove specified packages from inst_summary
+		cmd = "pkg_grep_summary -v -t strlist PKGPANA '" pkgs "' < "	\
+			shquote(input) " > " output
+	else
+		cmd = ("cp " input " " output)
 
-	# remove specified packages from inst_summary
-	cmd = "pkg_grep_summary -v -t strlist PKGPANA '" pkgs "' < " \
-		shquote(input) " > " output
 	system(cmd)
 }
 

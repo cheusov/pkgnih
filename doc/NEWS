@@ -1,7 +1,12 @@
 ======================================================================
+Version 0.4.1, by Aleksey Cheusov, Sun, 13 Feb 2011 00:54:56 +0200
+
+  Fix bug in pkg_update_plan introduced in 0.4
+
+======================================================================
 Version 0.4, by Aleksey Cheusov, Fri, 11 Feb 2011 16:40:36 +0200
 
-  Fix in generating "update plan"
+  Fix bug in pkg_update_plan
   (extra -pkgname were needed for upgrade).
 
   nih status:
