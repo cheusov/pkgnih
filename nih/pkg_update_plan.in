@@ -86,6 +86,8 @@ function process_pkg (pkg,            base,pref,pair,rempair){
 		rempair = inst_name2pair [base]
 	}else if (base in inst_path2pair){
 		rempair = inst_path2pair [base]
+	}else if (index(base, ",")){
+		rempair = base
 	}else if (pref == "-"){
 		print pkg " cannot be found" > "/dev/stderr"
 		ex = 1
@@ -98,6 +100,8 @@ function process_pkg (pkg,            base,pref,pair,rempair){
 			pair = avail_name2pair [base]
 		}else if (base in avail_path2pair){
 			pair = avail_path2pair [base]
+		}else if (index(base, ",")){
+			pair = base
 		}else{
 			print pkg " cannot be found" > "/dev/stderr"
 			ex = 1
@@ -166,6 +170,8 @@ BEGIN {
 			pkgname = substr($0, 9)
 		}else if ($0 ~ /^PKGPATH=/){
 			pkgpath = substr($0, 9)
+		}else if ($0 ~ /^PROVIDES=/){
+			provides_arr [substr($0, 10)] = 1
 		}else if (NF == 0){
 			pkgbase = pkgname
 			sub(/-[^-]*$/, "", pkgbase)
@@ -185,6 +191,14 @@ BEGIN {
 			avail_path2pair [pkgpath] = pkgpair
 
 			pkgname = pkgpath = ""
+
+			for (i in provides_arr){
+				if (i in avail_provides)
+					avail_provides [i] = avail_provides [i] " " pkgpair
+				else
+					avail_provides [i] = pkgpair
+			}
+			delete provides_arr
 		}
 	}
 	xclose(avail_summary)
@@ -374,6 +388,10 @@ BEGIN {
 
 				if (!(pkgbase in add_base)){
 					addme [pkgbase] = 0
+				}else if (($3 in avail_provides) &&
+						  !index(avail_provides [$3], " "))
+				{
+					addme [avail_provides [$3]] = 0
 				}else{
 					ex = ex2 = 1
 				}
