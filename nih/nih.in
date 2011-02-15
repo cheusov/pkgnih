@@ -405,7 +405,7 @@ check_cksums (){
     if test "$expected_sha512" = "$curr_sha512"; then
 	return 0
     else
-	echo "$1 is corrupted"
+	echo "$1 is corrupted, checksum mismatch"
 	return 1
     fi
 }
