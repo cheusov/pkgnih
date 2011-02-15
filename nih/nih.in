@@ -463,7 +463,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     refresh_summary
 
-    verbose "Getting installed packages..."
+    verbose "Getting a list of installed packages..."
     installed_summary="$tmp_dir/installed_summary"
     pkg_bin_summary \
 	-fPROVIDES,REQUIRES,PKGNAME,PKGPATH,COMMENT,automatic,CONFLICTS,DEPENDS,BUILD_DATE \
@@ -489,7 +489,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     ##################################################################
     ######################### update plan ############################
-    verbose "Generating update plan..."
+    verbose "Generating an update plan..."
     plan_summary="$tmp_dir/plan_summary"
     printf '' > "$plan_summary"
     if ! test -s "$update_pkgs_fn"; then
