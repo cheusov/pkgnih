@@ -352,7 +352,7 @@ refresh_summary (){
     summary_exists
 
     tiny_summary="$tmp_dir/tiny_summary"
-    grep -E '^$|^(PKGNAME=|PKGPATH=|COMMENT=|automatic=|CONFLICTS=|DEPENDS=|BUILD_DATE=)' \
+    grep -E '^$|^(PKGNAME|PKGPATH|COMMENT|automatic|CONFLICTS|DEPENDS|BUILD_DATE|PROVIDES|REQUIRES)=' \
 	"$PKG_SUMMARY" > "$tiny_summary" || true
     export PKG_SUMMARY="$tiny_summary"
 }

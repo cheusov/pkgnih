@@ -211,7 +211,7 @@ BEGIN {
 
 ############################################################
 function grep_package_cmd (package, field){
-	return "pkg_grep_summary -r -fPKGNAME,PKGPATH,DEPENDS,CONFLICTS,COMMENT,BUILD_DATE -t strlist " \
+	return "pkg_grep_summary -r -fPKGNAME,PKGPATH,DEPENDS,CONFLICTS,COMMENT,BUILD_DATE,REQUIRES,PROVIDES -t strlist " \
 		field " " shquote(package)
 }
 
@@ -343,6 +343,9 @@ BEGIN {
 		ex = 0
 		printf "" > errfn2
 		while (xgetline0(errfn)){
+			if (verbose_mode > 1)
+				print $0 > "/dev/stderr"
+
 			ex2 = 0
 			if ($1 == "d:" && $2 == "not_found"){
 				dep1 = $3
@@ -403,7 +406,7 @@ BEGIN {
 
 	if (ex){
 		system("cat " errfn2)
-		if (verbose_mode > 1){
+		if (verbose_mode > 2){
 			system("cat " planfn " 1>&2")
 		}
 		exitnow(1)
