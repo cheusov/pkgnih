@@ -511,6 +511,13 @@ if test "_$1" = _install -o "_$1" = _update; then
     pkg_cmp_summary $cmp_opts "$installed_summary" "$plan_summary" |
     grep -v '^=' > "$cmp_summary" || true
 
+    pkg_grep_summary -s force_update yes < "$plan_summary" |
+    awk '/^PKGNAME=/ {
+	base = ver = substr($0, 9);
+	sub(/-[^-]*$/, "", base)
+	sub(/^.*-/, "", ver)
+	printf "! %s x %s\n", base, ver}' >> "$cmp_summary"
+
     printf '%s\n' '---------------------- UPDATE PLAN -------------------------'
 
     rem_pkgs=`awk '$1 == "-" {print $2}' "$cmp_summary"`
