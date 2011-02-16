@@ -1,4 +1,19 @@
 ======================================================================
+Version 0.5, by Aleksey Cheusov, Wed, 16 Feb 2011 23:38:20 +0200
+
+  Yet another bug in pkg_update_plan introduced in 0.3.0
+  was fixed (packages were marked as auto-removable incorrectly).
+
+  Better algorithm for detecting potential problem was
+  implemented. Now it checks PROVIDES/REQUIRES consistency and uses
+  this information for automatically resolving problems.
+
+  Also, packages with unchanged version but inconsistent changes in
+  CONFLICTS/DEPENDS/PROVIDES/REQUIRES are now handled correctly.
+
+  Minor fixes and updates in documentation.
+
+======================================================================
 Version 0.4.1, by Aleksey Cheusov, Sun, 13 Feb 2011 00:54:56 +0200
 
   Fix bug in pkg_update_plan introduced in 0.4
