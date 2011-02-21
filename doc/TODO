@@ -1,3 +1,6 @@
+- ignore packages absent in pkg_summary when "nih update"
+- FILE_NAME
+- support for "nih install /path/to/binary.tgz"
 - disable REQUIRES/PROVIDES checks
 - separate pkg_install_plan script from nih
 - man page for pkg_update_plan
