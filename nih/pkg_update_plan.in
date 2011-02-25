@@ -225,7 +225,7 @@ BEGIN {
 
 ############################################################
 function grep_package_cmd (package, field){
-	return "pkg_grep_summary -r -fPKGNAME,PKGPATH,DEPENDS,CONFLICTS,COMMENT,BUILD_DATE,REQUIRES,PROVIDES -t strlist " \
+	return "pkg_grep_summary -r -fPKGNAME,PKGPATH,DEPENDS,CONFLICTS,COMMENT,BUILD_DATE,REQUIRES,PROVIDES,FILE_NAME -t strlist " \
 		field " " shquote(package)
 }
 

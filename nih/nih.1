@@ -166,7 +166,8 @@ Examples:
 .TP
 .BR  install " and " update
 Install or update specified packages. They may be specified as
-PKGBASEs, PKGNAMEs or PKGPATHs, optionally prepended by `-' (marker
+PKGBASEs, PKGNAMEs, PKGPATHs or filename of binary packages,
+optionally prepended by `-' (marker
 for removal), `+' or `*' (marker for auto-removable), or `?'
 (auto-removable flag will not be changed).  Packages without prefix
 will be marked as installed by user.
@@ -220,6 +221,7 @@ Examples:
    nih install +GConf +xproto
    nih install -- -gmake -autoconf -automake -libtool-base
    nih install textproc/dict-client -wip/dict-client
+   nih install /usr/pkgsrc/packages/xyz-1.2.3.tgz
 .VE
 .RE
 .TP

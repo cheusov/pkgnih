@@ -204,7 +204,14 @@ get_date (){
 }
 
 summary2binary (){
-    awk -v SUFX="$SUFX" '/^PKGNAME=/ {print substr($0, 9) SUFX}' "$@"
+    awk -v SUFX="$SUFX" '
+    /^PKGNAME=/ {pkg1 = substr($0, 9) SUFX}
+    /^FILE_NAME=/ {pkg2 = substr($0, 11)}
+    NF == 0 {
+	if (pkg2) print pkg2
+	else print pkg1
+	pkg1 = pkg2 = ""
+    }' "$@"
 }
 
 # saves list of installed packages
@@ -352,7 +359,7 @@ refresh_summary (){
     summary_exists
 
     tiny_summary="$tmp_dir/tiny_summary"
-    grep -E '^$|^(PKGNAME|PKGPATH|COMMENT|automatic|CONFLICTS|DEPENDS|BUILD_DATE|PROVIDES|REQUIRES)=' \
+    grep -E '^$|^(PKGNAME|PKGPATH|COMMENT|automatic|CONFLICTS|DEPENDS|BUILD_DATE|PROVIDES|REQUIRES|FILE_NAME)=' \
 	"$PKG_SUMMARY" > "$tiny_summary" || true
     export PKG_SUMMARY="$tiny_summary"
 }
@@ -483,7 +490,19 @@ if test "_$1" = _install -o "_$1" = _update; then
 	}' "$cmp_summary" > "$update_pkgs_fn"
     else
 	for i; do
-	    printf '%s\n' "$i" >> "$update_pkgs_fn"
+	    if echo "$i" | grep -E '^[+*?]?/' > /dev/null; then
+		prefix=`echo "$i" | sed 's|/.*$||'`
+		fn=`echo "$i" | sed 's|^[^/]*||'`
+		pkg_info -X "$fn" |
+		sed "s ^FILE_NAME=.*$ FILE_NAME=$fn " |
+		tee -a "$tiny_summary" |
+		awk -v prefix="$prefix" '
+		     /^PKGPATH=/ {p=substr($0, 9)}
+		     /^PKGNAME=/ {n=substr($0, 9)}
+		     END {print prefix p "," n}' >> "$update_pkgs_fn"
+	    else
+		printf '%s\n' "$i" >> "$update_pkgs_fn"
+	    fi
 	done
     fi
 
@@ -572,7 +591,8 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     ##################################################################
     ########################## installing ############################
-    sed -n 's/^PKGNAME=//p' "$inst_summary" "$inst_auto_summary" |
+    cat "$inst_summary" "$inst_auto_summary" |
+    pkg_grep_summary -e FILE_NAME | sed -n 's/^PKGNAME=//p' |
     download_pkgs
 
     if test -n "$download_only"; then
@@ -592,16 +612,20 @@ if test "_$1" = _install -o "_$1" = _update; then
 	done
     fi
 
+    cd $CACHEDIR/All
+
     pkg_summary2deps -ndtr "$plan_summary" | tsort |
     while read pkg; do
-	if pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_auto_summary" > /dev/null; then
+	fn_auto_pkg=`pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_auto_summary" | summary2binary`
+	fn_pkg=`pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_summary" | summary2binary`
+	if test -n "$fn_auto_pkg"; then
 	    echo "Installing package $pkg as a dependency..." 1>&2
-	    if ! pkg_add $pkg_opts -UA "$CACHEDIR/All/$pkg$SUFX"; then
+	    if ! pkg_add $pkg_opts -UA "$fn_auto_pkg"; then
 		cleanup_db; exit 1
 	    fi
-	elif pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_summary" > /dev/null; then
+	elif test -n "$fn_pkg"; then
 	    echo "Installing package $pkg..." 1>&2
-	    if ! pkg_add $pkg_opts -U "$CACHEDIR/All/$pkg$SUFX"; then
+	    if ! pkg_add $pkg_opts -U "$fn_pkg"; then
 		cleanup_db; exit 1
 	    fi
 	fi
