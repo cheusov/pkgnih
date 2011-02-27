@@ -1,4 +1,3 @@
-- ignore packages absent in pkg_summary when "nih update"
 - disable REQUIRES/PROVIDES checks
 - separate pkg_install_plan script from nih
 - man page for pkg_update_plan
