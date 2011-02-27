@@ -495,11 +495,13 @@ if test "_$1" = _install -o "_$1" = _update; then
 		fn=`echo "$i" | sed 's|^[^/]*||'`
 		pkg_info -X "$fn" |
 		sed "s ^FILE_NAME=.*$ FILE_NAME=$fn " |
-		tee -a "$tiny_summary" |
+		tee "$tiny_summary".tmp |
 		awk -v prefix="$prefix" '
 		     /^PKGPATH=/ {p=substr($0, 9)}
 		     /^PKGNAME=/ {n=substr($0, 9)}
 		     END {print prefix p "," n}' >> "$update_pkgs_fn"
+		cat "$tiny_summary" >> "$tiny_summary".tmp
+		pkg_uniq_summary "$tiny_summary".tmp > "$tiny_summary"
 	    else
 		printf '%s\n' "$i" >> "$update_pkgs_fn"
 	    fi
