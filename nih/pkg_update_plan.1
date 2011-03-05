@@ -1,0 +1,92 @@
+.\"     $NetBSD$
+.\"
+.\" Copyright (c) 2011 by Aleksey Cheusov (vle@gmx.net)
+.\" Absolutely no warranty.
+.\"
+.\" ------------------------------------------------------------------
+.de VB \" Verbatim Begin
+.ft CW
+.nf
+.ne \\$1
+..
+.de VE \" Verbatim End
+.ft R
+.fi
+..
+.\" ------------------------------------------------------------------
+.TH NIH 1 "Mar 5, 2011" "" ""
+.SH NAME
+pkg_update_plan \- generates the update plan
+.SH SYNOPSIS
+.BI pkg_update_plan " [options] " "<inst_summary> <avail_summary>" " [packages...]" 
+.SH DESCRIPTION
+.B pkg_update_plan
+takes a list of installed packages in 
+.B inst_summary
+file (in pkg_summary(5) format),
+packages available for installation in
+.B avail_summary
+file (also in pkg_summary(5) format),
+packages to install and/or remove,
+and outputs so called "update plan"
+to stdout (also in pkg_summary(5) format).
+Update plan is a list of packages expected after installing, removing and updating
+packages listed in
+.IR packages ,
+satisfying all dependencies and resolving conflicts.
+At least the following fields are expected in
+.B inst_summary
+file:
+.IR PKGNAME ", " PKGPATH ", " COMMENT ", " CONFLICTS ", " DEPENDS ", "
+.IR BUILD_DATE ", " PROVIDES ", " REQUIRES  " and " automatic
+(set to "yes" for packages installed to satisfy dependencies).
+At least the following fields are expected in
+.B avail_summary
+file:
+.IR PKGNAME ", " PKGPATH ", " COMMENT ", " CONFLICTS ", " DEPENDS ", "
+.IR BUILD_DATE ", " LICENSE ", " FILE_NAME ", " PROVIDES " and " REQUIRES .
+In stdout packages marked for installation or update are marked by
+.I force_update
+field set to 
+.IR yes .
+.P
+.I packages
+may be specified as
+PKGBASEs (e.g. emacs), PKGNAMEs (e.g. emacs-22.3nb12) or PKGPATHs (editors/emacs22)
+optionally prepended by `-' (marker
+for removal), `+' or `*' (marker for auto-removable), or `?'
+(auto-removable flag is not changed).  Packages without prefix
+are marked as installed by user.
+.B pkg_update_plan
+tries to resolve conflicts and satisfy dependencies automatically.
+If it fails, error messages are output to stderr and exit status is non-zero.
+By default PKGPATH of installed
+packages remains unchanged, that is, if, for example, emacs-21 was installed
+from editors/emacs21, it will not be updated to emacs-23 from editors/emacs23.
+If you want to do this, run the following:
+.VB
+   pkg_update_plan inst_summary avail_summary editors/emacs23 -emacs
+.VE
+.SH EXAMPLES
+   pkg_update_plan mawk lang/gawk
+   pkg_update_plan audio/flac123 +libao-alsa -libao-oss
+   pkg_update_plan sysutils/mc -wip/mc
+.VB
+.VE
+.SH OPTIONS
+.TP
+.B "-h"
+Display help message.
+.TP
+.B "-v"
+Enable verbose mode. Repeated -v flag increases verbosity level.
+.TP
+.B "-i"
+Obtain
+.I packages
+from stdin.
+.SH SEE ALSO
+.BR pkg_summary-utils(7) ,
+.BR pkg_summary(5)
+.SH AUTHOR
+Aleksey Cheusov <vle@gmx.net>
