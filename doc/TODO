@@ -2,10 +2,10 @@
 - ignore packages absent in pkg_summary when "nih update"
 - disable REQUIRES/PROVIDES checks
 - separate pkg_install_plan script from nih
-- man page for pkg_update_plan
 - nih install: use pkg_summary-YYYYMMDD.txt?
 - Use pkg_summary-YYYYMMDD.txt
   and use such summaries for in 'nih clean-cache' and 'nih install'
 - before update warn about missed binaries for installed packages
   (downgrade will not be possible)
 - use distbb for source-based update
+- 'nih install -k' ignore failures during downloads.

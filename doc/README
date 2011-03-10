@@ -7,8 +7,9 @@ Why not:
     - They are low level tools and cannot be used for handling
       hundreds of packages efficiently.
 
-  pkgchk:
-    - It lacks useful features. It is extreammly slow.
+  pkg_chk:
+    - I was using pkg_chk for several years and it's quiet good tool.
+      But it lacks some useful features. It is also extreammly slow.
 
   pkg_rolling-replace:
     - Replacing packages "in place" is not safe.

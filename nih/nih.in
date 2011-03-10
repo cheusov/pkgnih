@@ -481,12 +481,11 @@ if test "_$1" = _install -o "_$1" = _update; then
     update_pkgs_fn="$tmp_dir/pkgs_specs.txt"
     printf '' > "$update_pkgs_fn"
     if test $# -eq 0; then
-	pkg_cmp_summary -pu $cmp_opts "$installed_summary" "$PKG_SUMMARY" \
+	pkg_cmp_summary -p $cmp_opts "$installed_summary" "$PKG_SUMMARY" \
 	    > "$cmp_summary"
 	awk '$1 ~ /^[<!]/ {
 		print "-" $3
-		if ($NF == "U") print $3 "-" $5
-		else print "+" $3 "-" $5
+		print "?" $3 "-" $5
 	}' "$cmp_summary" > "$update_pkgs_fn"
     else
 	for i; do
@@ -534,7 +533,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     pkg_grep_summary -s force_update yes < "$plan_summary" |
     awk '/^PKGNAME=/ {
-	base = ver = substr($0, 9);
+	base = ver = substr($0, 9)
 	sub(/-[^-]*$/, "", base)
 	sub(/^.*-/, "", ver)
 	printf "! %s x %s\n", base, ver}' >> "$cmp_summary"

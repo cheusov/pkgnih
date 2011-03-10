@@ -18,6 +18,6 @@ SCRIPTS =		${INSCRIPTS}
 FILES =			nih.conf
 FILESDIR_nih.conf=	${EGDIR}
 
-MAN =			nih.1
+MAN =			nih.1 pkg_update_plan.1
 
 .include <mkc.prog.mk>
