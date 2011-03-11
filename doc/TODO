@@ -1,7 +1,3 @@
-- nih.conf:
-   # nih.default.conf is included automatically
-   #
-   # user settings are below this line
 - config file section in nih.1
 - nih meta-list meta-info etc.
 - disable REQUIRES/PROVIDES checks

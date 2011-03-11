@@ -6,13 +6,13 @@ PKG_SUMMARY_URL=ftp://ftp.ee.NetBSD.org/pub/pkgsrc/packages/$(uname -s)/$(uname 
 fetch_ftp (){
     _base=`basename $1`
     rm -f "$_base"
-    /usr/bin/ftp -o "$_base" -V -q1800 "$1"
+    /usr/bin/ftp -o "$_base" -V -q1800 $FTP_OPTIONS "$1"
 }
 
 fetch_wget (){
     _base=`basename $1`
     rm -f "$_base"
-    wget -O "$_base" --timeout=1800 --progress=bar "$1"
+    wget -O "$_base" --timeout=1800 --progress=bar $WGET_OPTIONS "$1"
 }
 
 # Command to download binaries, pkg_summary and SHA512
@@ -22,6 +22,10 @@ fetch (){
 #    fetch_wget "$@"
 #    fetch_curl "$@"
 }
+
+# Uncomment the following to avoid "Trying 2001:...." annoyance on
+# hosts with no configured IPv6
+#FTP_OPTIONS='-4'
 
 # Uncomment the following line if you use prebuild local packages
 #PKG_SUMMARY=/usr/pkgsrc/packages/All/pkg_summary.txt

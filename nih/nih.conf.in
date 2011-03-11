@@ -4,3 +4,6 @@
 # For the list of settings see @dfltconfdir@/nih.default.conf
 # One example is below
 
+# Uncomment the following to avoid "Trying 2001:...." annoyance on
+# hosts with no configured IPv6
+#FTP_OPTIONS='-4'
