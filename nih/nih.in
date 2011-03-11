@@ -64,7 +64,7 @@ EOF
 sysconfdir=${NIH_SYSCONFDIR-@sysconfdir@}/nih
 confdir=$HOME/.nih
 
-CACHEDIR=${CACHEDIR-@CACHEDIR@}
+CACHEDIR=${CACHEDIR-@cachedir@}
 PKG_INFO_CMD=${PKG_INFO_CMD-@PKG_INFO_CMD@}
 PKG_ADMIN_CMD=${PKG_ADMIN_CMD-@PKG_ADMIN_CMD@}
 PKG_DELETE_CMD=${PKG_DELETE_CMD-@PKG_DELETE_CMD@}
@@ -84,6 +84,7 @@ EOF
     exit 1
 fi
 
+. @dfltconfdir@/nih.default.conf
 . "$conffile"
 
 # temp directory
