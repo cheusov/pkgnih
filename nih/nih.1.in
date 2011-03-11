@@ -462,6 +462,7 @@ are not removed.
 .TP
 .IR "~/.nih/config" " or " @sysconfdir@/nih/config
 Configuration file for nih.
+.br
 See @dfltconfdir@/nih.default.conf for details.
 .SH SEE ALSO
 .BR pkg_status(1) ,
