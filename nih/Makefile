@@ -17,10 +17,11 @@ INSCRIPTS =		nih pkg_update_plan
 SCRIPTS =		${INSCRIPTS}
 
 INFILES =		nih.conf nih.default.conf
-FILES =			${INFILES}
+FILES :=		${INFILES}
 FILESDIR_nih.conf=	${EGDIR}
 FILESDIR =		${DFLTCONFDIR}
 
+INFILES +=		nih.1
 MAN =			nih.1 pkg_update_plan.1
 
 .include <mkc.prog.mk>
