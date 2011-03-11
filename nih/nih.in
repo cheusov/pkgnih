@@ -257,7 +257,7 @@ nih refresh [options]
       -h     display this help message
 
 ~/.nih/config:
-   PKG_SUMMARY_URL - URL or file name for pkg_summary.bz2/pkg_summary.txt
+   REPOSITORY - URL or file name for pkg_summary.bz2/pkg_summary.txt
    PKG_SUMMARY     - path to pkg_summary.txt, set this variable if you use
                    local pkg_summary, otherwise keep it unset
    fetch function  - download command
@@ -270,7 +270,7 @@ fetch_summary_file (){
     if test -f pkg_summary.$1; then
 	mv pkg_summary.$1 pkg_summary.$1.old
     fi
-    fetch "$PKG_SUMMARY_URL/All/pkg_summary.$1"
+    fetch "$REPOSITORY/All/pkg_summary.$1"
     case "$1" in
 	gz)  gzip -dc  pkg_summary.gz  > pkg_summary.txt.tmp || return 1;;
 	bz2) bzip2 -dc pkg_summary.bz2 > pkg_summary.txt.tmp || return 1;;
@@ -285,7 +285,7 @@ fetch_sha512_file (){
     if test -f SHA512.$1; then
 	mv SHA512.$1 SHA512.$1.old
     fi
-    fetch "$PKG_SUMMARY_URL/SHA512.$1"
+    fetch "$REPOSITORY/SHA512.$1"
     echo done
 
     case "$1" in
@@ -424,7 +424,7 @@ download_pkgs (){
 	while read pkg; do
 	    if ! test -f "$pkg$SUFX" || ! check_cksums "$pkg$SUFX"; then
 		echo "Downloading package $pkg..."
-		fetch "$PKG_SUMMARY_URL/All/$pkg$SUFX"
+		fetch "$REPOSITORY/All/$pkg$SUFX"
 		# ensure that downloaded file is correct
 		check_cksums "$pkg$SUFX"
 	    fi

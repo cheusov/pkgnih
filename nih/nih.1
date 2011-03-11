@@ -47,7 +47,7 @@ Display help message
 .B  refresh
 Download pkg_summary(5) and SHA512 files from remote repository and
 unpack them to ~/.nih/. URL for these files is specified in
-PKG_SUMMARY_URL configuration variable. Unless
+REPOSITORY configuration variable. Unless
 .I NO_SUMMARY_COPY
 variable is set in configuration file, pkg_summary.txt and SHA512.txt
 files are copied to "pkg_summary_YYYYMMDD_hhmm.txt" and "SHA512_YYYYMMDD_hhmm.txt"
@@ -449,7 +449,7 @@ accepts the following options:
 Display help message.
 .TP
 .B -n
-Output files to be removed, do not delete them.
+Output files to be removed, do not remove them.
 .TP
 .B -a
 Remove all binaries.
