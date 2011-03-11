@@ -1,7 +1,17 @@
 # -*-mode: sh-*-
 
 # Select mirror
-PKG_SUMMARY_URL=ftp://ftp.ee.NetBSD.org/pub/pkgsrc/packages/$(uname -s)/$(uname -m)/$(uname -r | cut -d_ -f1)
+opsys=$(uname -s)
+osver=$(uname -r | sed 's/[_-].*$//')
+arch=$(uname -m)
+case "$opsys" in
+    DragonFly)
+	PKG_SUMMARY_URL="http://mirror-master.dragonflybsd.org/packages/$arch/DragonFly-$osver/stable";;
+    Minix)
+	PKG_SUMMARY_URL="ftp://ftp.minix3.org/pub/minix/packages/$osver/$arch";;
+    *)
+	PKG_SUMMARY_URL="ftp://ftp.ee.netbsd.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
+esac
 
 fetch_ftp (){
     _base=`basename $1`
