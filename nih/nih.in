@@ -422,11 +422,11 @@ download_pkgs (){
     (
 	cd "$CACHEDIR/All"
 	while read pkg; do
-	    if ! test -f "$pkg$SUFX" || ! check_cksums "$pkg$SUFX"; then
+	    if ! test -f "$pkg" || ! check_cksums "$pkg"; then
 		echo "Downloading package $pkg..."
-		fetch "$REPOSITORY/All/$pkg$SUFX"
+		fetch "$REPOSITORY/All/$pkg"
 		# ensure that downloaded file is correct
-		check_cksums "$pkg$SUFX"
+		check_cksums "$pkg"
 	    fi
 	done
     )
@@ -593,8 +593,8 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     ##################################################################
     ########################## installing ############################
-    cat "$inst_summary" "$inst_auto_summary" |
-    pkg_grep_summary -t re FILE_NAME '^[^/]' | sed -n 's/^PKGNAME=//p' |
+    summary2binary "$inst_summary" "$inst_auto_summary" |
+    grep -v '^[/.]' |
     download_pkgs
 
     if test -n "$download_only"; then
