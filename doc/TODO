@@ -1,6 +1,5 @@
-- config file section in nih.1
 - nih meta-list meta-info etc.
-- disable REQUIRES/PROVIDES checks
+- optionally disable REQUIRES/PROVIDES checks
 - separate pkg_install_plan script from nih
 - nih install: use pkg_summary-YYYYMMDD.txt?
 - Use pkg_summary-YYYYMMDD.txt
