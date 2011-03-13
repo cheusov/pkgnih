@@ -52,6 +52,7 @@ Commands:
  nih verify          - Verify packages integrity
  nih status          - Show the status of installed packages
  nih info            - Show information about package
+ nih meta            - Output available or installed meta packages
  nih leaf            - Output or remove leaf packages
  nih license         - Working with licenses
  nih list            - List packages
@@ -153,20 +154,29 @@ END {
 ' "$@"
 }
 
-show_summary (){
+show_summary_IPNC (){
+    # PKGPATH (PKGNAME)     COMMENT
     awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
          /^PKGPATH=/ {pkgpath=substr($0, 9)}
          /^COMMENT=/ {comment=substr($0, 9)}
          NF == 0 {printf "%s\t%s\t%s\n", pkgpath, pkgname, comment}' "$@" |
     sort |
-    show_packages
+    show_packages_IPNC
+}
+
+show_summary_BC (){
+    # PKGPATH (PKGNAME)     COMMENT
+    awk '/^PKGNAME=/ {pkgbase=substr($0, 9); sub(/-[^-]*$/, "", pkgbase)}
+         /^COMMENT=/ {comment=substr($0, 9)}
+         NF == 0 {printf "%19s %s\n", pkgbase, comment}' "$@" |
+    sort -k1b
 }
 
 indent (){
     awk '{print "    " $0}' "$@"
 }
 
-show_packages (){
+show_packages_IPNC (){
     awk -F'\t' '{printf "%s (%s)\n     %s\n", $1, $2, $3}' "$@" | indent
 }
 
@@ -577,15 +587,15 @@ if test "_$1" = _install -o "_$1" = _update; then
     fi
 
     echo 'The following packages will be removed'
-    show_summary "$rem_summary"
+    show_summary_IPNC "$rem_summary"
     if test -s "$extra_rem_summary"; then
 	echo '    //'
-	show_summary "$extra_rem_summary"
+	show_summary_IPNC "$extra_rem_summary"
     fi
     echo 'The following packages will be installed'
-    show_summary "$inst_summary"
+    show_summary_IPNC "$inst_summary"
     echo 'The following packages will be installed as auto-removable'
-    show_summary "$inst_auto_summary"
+    show_summary_IPNC "$inst_auto_summary"
 
     if ! yesno install 'Proceed'; then
 	exit 0
@@ -932,7 +942,34 @@ Examples:
 EOF
 }
 
-if test "_$1" = _search -o "_$1" = _info; then
+# meta
+usage_meta (){
+    cat <<'EOF'
+nih meta [options]
+
+      List meta packages
+
+   option:
+      -h    display this help message
+
+      -b    search in pkg_summary.txt (the default)
+      -o    search using pkg_online
+      -I    search in installed packages
+
+      -r    raw output in pkg_summary(5) format
+      -q    quiet mode, do not print "No matches found" to stderr
+
+See pkg_digger(1) for details.
+
+Examples:
+   nih meta -h
+   nih meta
+   nih meta -I
+   nih meta -o
+EOF
+}
+
+if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
     op="$1"
     shift
     export PKG_DIGGER_SUMMARY="$PKG_SUMMARY"
@@ -970,13 +1007,17 @@ if test "_$1" = _search -o "_$1" = _info; then
 	summary_exists
     fi
 
-    if test "$op" = info; then
-	for i in "$@"; do
-	    pkg_digger -9 ${opts+-$opts} PKGBASE:exact:"$i"
-	done
-    else
-	pkg_digger ${opts+-$opts} "$@"
-    fi
+    case "$op" in
+	info)
+	    for i in "$@"; do
+		pkg_digger -9 ${opts+-$opts} PKGBASE:exact:"$i"
+	    done;;
+	meta)
+	    pkg_digger -3r ${opts+-$opts} CATEGORIES:word:meta-pkgs |
+	    show_summary_BC;;
+	*)
+	    pkg_digger ${opts+-$opts} "$@";;
+    esac
 
     exit 0
 fi

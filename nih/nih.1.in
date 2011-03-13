@@ -97,6 +97,39 @@ Examples:
 .VE
 .RE
 .TP
+.B meta
+Output available or installed meta packages
+.P
+.RS
+.B "nih meta"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -b
+Query pkg_summary.txt (the default).
+.TP
+.B -o
+Query pkg_online database.
+.TP
+.B -I
+Display information about installed packages.
+.TP
+.B -q
+quiet mode, do not print "No matches found" to stderr
+.RE
+.P
+.RS
+Examples:
+.VB
+   nih meta -h
+   nih meta
+   nih meta -I
+   nih meta -oq
+.VE
+.RE
+.TP
 .B  search
 Search for packages in pkg_summary(5), online database or in installed packages.
 For details see pkg_digger(1).
