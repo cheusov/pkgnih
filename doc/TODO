@@ -1,4 +1,3 @@
-- nih meta-list meta-info etc.
 - optionally disable REQUIRES/PROVIDES checks
 - separate pkg_install_plan script from nih
 - nih install: use pkg_summary-YYYYMMDD.txt?
