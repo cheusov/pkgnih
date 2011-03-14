@@ -116,7 +116,7 @@ function process_pkg (pkg,            base,pref,pair,rempair){
 	base = pkgname2pkgbase(base)
 
 	if (pref == "?"){
-		if (!(rempair in inst_pair2auto) || inst_pair2auto [rempair])
+		if (!(base in inst_base2auto) || inst_base2auto [base])
 			pref = "+"
 		else
 			pref = ""
@@ -157,7 +157,7 @@ BEGIN {
 			inst_name2pair [pkgname] = pkgpair
 			inst_base2pair [pkgbase] = pkgpair
 			inst_path2pair [pkgpath] = pkgpair
-			inst_pair2auto [pkgpair] = auto
+			inst_base2auto [pkgbase] = auto
 
 			pkgname = pkgpath = ""
 			auto = 0
