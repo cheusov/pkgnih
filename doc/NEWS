@@ -1,4 +1,40 @@
 ======================================================================
+Version 0.6, by Aleksey Cheusov, Mon, 14 Mar 2011 15:18:05 +0200
+
+  Bug in handling flag "automatic" was fixed in pkg_update_plan(1).
+  Update pkgnih to 0.6 is recomended!
+
+  etc/nih/conf:
+   - Default settings have been moved from share/examples/nih/nih.conf
+     to lib/nih/nih.default.conf. Almost empty nih.conf is installed
+     to share/examples/nih/nih.conf. Please update your existing
+     etc/nih/config according to share/examples/nih/nih.conf.
+   - Two new variables were added to nih config file: FTP_OPTIONS and
+     WGET_OPTIONS for specifying extra arguments for ftp(1) or
+     wget(1) commands.
+   - variable PKG_SUMMARY_URL has been renamed to REPOSITORY
+   - Default value for variable REPOSITORY is correct for DragonFlyBSD
+     and Minix.
+
+  New command "nih meta" was implemented that outputs meta packages.
+  See the manual page for details.
+
+  Since this release "nih install" accepts file names of binary
+  packages in additiona to PKGBASEs, PKGNAMEs and PKGPATHs, for
+  example
+       # nih install    /path/to/file/binary-1.2.3.tgz
+       # nih install   +/path/to/file/binary-1.2.3.tgz
+       # nih install '*'/path/to/file/binary-1.2.3.tgz
+       # nih install '?'/path/to/file/binary-1.2.3.tgz
+
+  Manual page for pkg_update_plan was added.
+
+  nih.1 was updated
+
+  "nih install" uses field FILE_NAME if it is provided by
+  pkg_summary.txt
+
+======================================================================
 Version 0.5, by Aleksey Cheusov, Wed, 16 Feb 2011 23:38:20 +0200
 
   Yet another bug in pkg_update_plan introduced in 0.3.0
