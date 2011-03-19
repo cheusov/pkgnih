@@ -190,10 +190,13 @@ yesno (){
     # $2 - question
     while true; do
 	printf '%s (y/N)? ' "$2"
+	set +e # workaround for buggy DragonFlyBSD/FreeBSD /bin/sh
 	if test -n "$always_yes" || eval 'test -n "$yes_'"$1\""; then
 	    echo Yes
+	    set -e # workaround for buggy DragonFlyBSD/FreeBSD /bin/sh
 	    return 0
 	fi
+	set -e # workaround for buggy DragonFlyBSD/FreeBSD /bin/sh
 
 	read answer
 	answer=${answer:-no}
