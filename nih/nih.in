@@ -583,7 +583,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     extra_rem_pkgs="$tmp_dir/extra_rem"
     extra_rem_summary="$tmp_dir/extra_rem_summary"
     printf '' > "$extra_rem_summary"
-    if ! pkg_lint_summary -cd "$inst_summary" "$inst_auto_summary" \
+    if ! pkg_lint_summary -c "$inst_summary" "$inst_auto_summary" \
 	"$installed_summary" > "$conflicts_msg"
     then
 	awk '$1 == "c:" {print $5; print $8}
@@ -639,12 +639,12 @@ if test "_$1" = _install -o "_$1" = _update; then
 	fn_pkg=`pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_summary" | summary2binary`
 	if test -n "$fn_auto_pkg"; then
 	    echo "Installing package $pkg as a dependency..." 1>&2
-	    if ! pkg_add $pkg_opts -UA "$fn_auto_pkg"; then
+	    if ! pkg_add $pkg_opts -UDA "$fn_auto_pkg"; then
 		cleanup_db; exit 1
 	    fi
 	elif test -n "$fn_pkg"; then
 	    echo "Installing package $pkg..." 1>&2
-	    if ! pkg_add $pkg_opts -U "$fn_pkg"; then
+	    if ! pkg_add $pkg_opts -UD "$fn_pkg"; then
 		cleanup_db; exit 1
 	    fi
 	fi
