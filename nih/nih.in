@@ -88,22 +88,26 @@ fi
 . @dfltconfdir@/nih.default.conf
 . "$conffile"
 
-# temp directory
-tmp_dir=`mktemp -d /tmp/nih.XXXXXX`
-trap "rm -rf $tmp_dir" 0 1 2 15
-test -n "$tmp_dir" || exit 1
-
 # handling global options
 process_options (){
     alt_getopt \
 	h     'usage; exit 0' \
 	V     'echo nih-@VERSION@; exit 0' \
 	y     'always_yes=1' \
+	D     'debug=1' \
 	-- "$@"
 }
 cmds=`process_options "$@"`
 eval "$cmds"
 
+# temp directory
+tmp_dir=`mktemp -d /tmp/nih.XXXXXX`
+if test -z "$debug"; then
+    trap "rm -rf $tmp_dir" 0 1 2 15
+fi
+test -n "$tmp_dir" || exit 1
+
+#
 if test $# -eq 0; then
     usage
     exit 1
