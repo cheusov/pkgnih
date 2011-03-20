@@ -86,8 +86,12 @@ function process_pkg (pkg,            base,pref,pair,rempair){
 		rempair = inst_name2pair [base]
 	}else if (base in inst_path2pair){
 		rempair = inst_path2pair [base]
-	}else if (index(base, ",")){
-		rempair = base
+	}else if (match(base, /,/)){
+		rempair = pkgname2pkgbase(substr(base,RSTART + 1))
+		if (rempair in inst_base2pair)
+			rempair = inst_base2pair [rempair]
+		else
+			rempair = base
 	}else if (pref == "-"){
 		print pkg " cannot be found" > "/dev/stderr"
 		ex = 1
