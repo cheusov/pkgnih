@@ -1,4 +1,20 @@
 ======================================================================
+Version 0.6.1, by Aleksey Cheusov, Sun, 20 Mar 2011 16:14:28 +0200
+
+  Workaround for buggy /bin/sh on DragonFly and FreeBSD<=7.n.
+  On these systems  the following code
+    set -e; if eval false; then ...; fi; echo ok
+  doesn't work properly. Due to this problem nih almost always fails.
+  On these two platform you also need pkg_online-client>=0.12.1
+  for 'nih search -o', 'nih info -o' and 'nih meta -o'.
+
+  Another bug was fixed in pkg_update_summary. It caused "unicity
+  problem" when package upgrade is requested.
+
+  'pkg_add -D' is used for installing packages in order to temporarily
+  (during installation process) ignore unsatisfied dependencies.
+
+======================================================================
 Version 0.6, by Aleksey Cheusov, Mon, 14 Mar 2011 15:18:05 +0200
 
   Bug in handling flag "automatic" was fixed in pkg_update_plan(1).
