@@ -172,8 +172,8 @@ show_summary_BC (){
     # PKGPATH (PKGNAME)     COMMENT
     awk '/^PKGNAME=/ {pkgbase=substr($0, 9); sub(/-[^-]*$/, "", pkgbase)}
          /^COMMENT=/ {comment=substr($0, 9)}
-         NF == 0 {printf "%19s %s\n", pkgbase, comment}' "$@" |
-    sort -k1b
+         NF == 0 {printf "%-19s %s\n", pkgbase, comment}' "$@" |
+    sort
 }
 
 indent (){
