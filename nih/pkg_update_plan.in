@@ -142,6 +142,10 @@ function process_pkg (pkg,            base,pref,pair,rempair){
 	}
 }
 
+function pair2name (pair){
+	return substr(pair, index(pair, ",") + 1)
+}
+
 ############################################################
 # reading and analysing installed and available summaries
 BEGIN {
@@ -197,10 +201,29 @@ BEGIN {
 			pkgname = pkgpath = ""
 
 			for (i in provides_arr){
-				if (i in avail_provides)
-					avail_provides [i] = avail_provides [i] " " pkgpair
-				else
+				if (! (i in avail_provides)){
 					avail_provides [i] = pkgpair
+				}else{
+					add = 1
+
+					if (!index(avail_provides [i], " ")){
+						oldname = pair2name(avail_provides [i])
+						oldbase = pkgname2pkgbase(oldname)
+						newname = pair2name(pkgpair)
+						newbase = pkgname2pkgbase(newname)
+
+						if (newbase == oldbase){
+							oldver = pkgname2version(oldname)
+							newver = pkgname2version(newname)
+
+							add = 0
+							if (newver > oldver)
+								avail_provides [i] = pkgpair
+						}
+					}
+					if (add)
+						avail_provides [i] = avail_provides [i] " " pkgpair
+				}
 			}
 			delete provides_arr
 		}
