@@ -398,6 +398,8 @@ BEGIN {
 				{
 					addme [avail_provides [$3]] = 0
 				}else{
+					printf "%s is provided by the following packages: %s\n", $3, avail_provides [$3]
+					printf "Select one of them manually\n"
 					ex = ex2 = 1
 				}
 			}else{
