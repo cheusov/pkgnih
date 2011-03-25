@@ -5,7 +5,7 @@ Version 0.6.2, by Aleksey Cheusov, Sun, 20 Mar 2011 16:14:28 +0200
   On these systems  the following code
     set -e; if eval false; then ...; fi; echo ok
   doesn't work properly. Due to this problem nih almost always fails.
-  On these two platform you also need pkg_online-client>=0.12.1
+  On these two platforms you also need pkg_online-client>=0.12.1
   for 'nih search -o', 'nih info -o' and 'nih meta -o'.
 
   Another bug was fixed in pkg_update_plan. It caused "unicity
