@@ -186,17 +186,20 @@ BEGIN {
 			pkgpair = (pkgpath "," pkgname)
 
 			if (pkgbase in inst_base2pair){
-				currpath = inst_base2pair [pkgbase]
-				sub(/,.*/, "", currpath)
-				if (currpath == pkgpath)
-					avail_base2pair [pkgbase] = pkgpair
-			}else if (! (pkgbase in avail_base2pair) ||
-					  pkgname_gt_pkgname(pkgname, avail_base2name [pkgbase]))
+				instpath = inst_base2pair [pkgbase]
+				sub(/,.*/, "", instpath)
+			}else{
+				instpath = pkgpath
+			}
+
+			if (instpath == pkgpath &&
+				(! (pkgbase in avail_base2pair) ||
+				 pkgname_gt_pkgname(pkgname, pair2name(avail_base2pair [pkgbase]))))
 			{
 				avail_base2pair [pkgbase] = pkgpair
+				avail_path2pair [pkgpath] = pkgpair
 			}
 			avail_name2pair [pkgname] = pkgpair
-			avail_path2pair [pkgpath] = pkgpair
 
 			pkgname = pkgpath = ""
 
