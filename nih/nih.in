@@ -380,6 +380,9 @@ refresh_summary (){
     grep -E '^$|^(PKGNAME|PKGPATH|COMMENT|automatic|CONFLICTS|DEPENDS|BUILD_DATE|PROVIDES|REQUIRES|FILE_NAME)=' \
 	"$PKG_SUMMARY" > "$tiny_summary" || true
     export PKG_SUMMARY="$tiny_summary"
+
+    refreshed_summary="$tmp_dir/refreshed_summary"
+    pkg_refresh_summary "$tiny_summary" > "$refreshed_summary"
 }
 
 ######################################################################
@@ -499,7 +502,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     update_pkgs_fn="$tmp_dir/pkgs_specs.txt"
     printf '' > "$update_pkgs_fn"
     if test $# -eq 0; then
-	pkg_cmp_summary -p $cmp_opts "$installed_summary" "$PKG_SUMMARY" \
+	pkg_cmp_summary -p $cmp_opts "$installed_summary" "$refreshed_summary" \
 	    > "$cmp_summary"
 	awk '$1 ~ /^[<!]/ {
 		print "-" $3
