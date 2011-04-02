@@ -760,7 +760,7 @@ EOF
     if ! yesno remove_auto 'Remove them'; then
 	exit 0
     fi
-    if yesno remove_auto_recurs 'Recursively'; then
+    if yesno remove_auto_recurs 'Remove auto-removed packages recursively'; then
 	pkg_delete_opts="$pkg_delete_opts -A"
     fi
     awk '{print $1}' "$tmp_dir/1" | xargs $PKG_DELETE_CMD $pkg_delete_opts
