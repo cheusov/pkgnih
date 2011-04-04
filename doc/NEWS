@@ -1,4 +1,15 @@
 ======================================================================
+Version 0.6.4, by Aleksey Cheusov, Tue,  5 Apr 2011 01:03:20 +0300
+
+  @prefix@/sbin/pkg_add is used instead of just pkg_add.
+  This fixes a problem under NetBSD (with default PATH) where
+  /usr/sbin/pkg_add doesn't support flag -D needed by nih.
+
+  ~/.nih is created at the very beginning.
+  This fixes 'cd: ~/.nih: No such file or directory' problem
+  on fresh systems.
+
+======================================================================
 Version 0.6.3, by Aleksey Cheusov, Sat,  2 Apr 2011 00:51:22 +0300
 
   pkg_update_plan:
