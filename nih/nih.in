@@ -85,6 +85,8 @@ EOF
     exit 1
 fi
 
+mkdir -p "$confdir"
+
 . @dfltconfdir@/nih.default.conf
 . "$conffile"
 
@@ -370,8 +372,6 @@ EOF
 	exit 1
     fi
 }
-
-mkdir -p "$confdir"
 
 refresh_summary (){
     summary_exists
