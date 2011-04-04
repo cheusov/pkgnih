@@ -1,4 +1,19 @@
 ======================================================================
+Version 0.6.3, by Aleksey Cheusov, Sat,  2 Apr 2011 00:51:22 +0300
+
+  pkg_update_plan:
+    - Better algorithm for resolving devendencies.  First, DEPENDS and
+      CONFLICTS are analysed. Then PROVIDES/REQUIRES.  This fixes the
+      problem with multiple packages with different name that PROVIDES
+      the same shared library.
+    - Fix (unicity problem)
+    - Better error message for "l:" failures
+
+  nih:
+    - Fix (package with highest version per (PKGPATH, PKGBASE) was not
+      detected correctly in some situations)
+
+======================================================================
 Version 0.6.2, by Aleksey Cheusov, Sun, 20 Mar 2011 16:14:28 +0200
 
   Workaround for buggy /bin/sh on DragonFly and FreeBSD<=7.n.
