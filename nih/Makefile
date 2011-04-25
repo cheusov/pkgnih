@@ -1,5 +1,6 @@
 EGDIR ?=		${DATADIR}/examples/nih # specific to pkgsrc
-CACHEDIR ?=		/usr/pkgsrc/packages
+PACKAGES ?=		/usr/pkgsrc/packages
+CACHEDIR ?=		${PACKAGES}
 DFLTCONFDIR ?=		${LIBDIR}/nih
 
 PKG_INFO ?=		${SBINDIR}/pkg_info
@@ -12,10 +13,12 @@ INTEXTS_REPLS +=	PKG_ADMIN_CMD  ${PKG_ADMIN}
 INTEXTS_REPLS +=	PKG_ADD_CMD    ${PKG_ADD}
 INTEXTS_REPLS +=	PKG_DELETE_CMD ${PKG_DELETE}
 
+INTEXTS_REPLS +=	PACKAGES       ${PACKAGES}
+
 INTEXTS_REPLS +=	cachedir       ${CACHEDIR}
 INTEXTS_REPLS +=	dfltconfdir    ${DFLTCONFDIR}
 
-INSCRIPTS =		nih pkg_update_plan
+INSCRIPTS =		nih pkg_update_plan pkg_status
 SCRIPTS =		${INSCRIPTS}
 
 INFILES =		nih.conf nih.default.conf
