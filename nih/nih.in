@@ -447,7 +447,10 @@ download_pkgs (){
 		echo "Downloading package $pkg..."
 		fetch "$REPOSITORY/All/$pkg"
 		# ensure that downloaded file is correct
-		check_cksums "$pkg"
+		if ! check_cksums "$pkg"; then
+		    echo 'Checksum mismatch (nih refresh?)' 1>&2
+		    exit 1
+		fi
 	    fi
 	done
     )
