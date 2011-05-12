@@ -79,3 +79,23 @@ fetch (){
 # Uncomment the folowing line if you want to always say Yes to question
 # about file removal from cache directory
 #yes_remove_pkgs=1
+
+# NIH provides a way to change a format of packages list by defining
+# the following shell function in @sysconfdir/nih/config file
+summary2packages_to_be_installed (){
+    # input: pkg_summary
+    show_summary_N "$@" | indent
+#  EXAMPLES:
+#    show_summary_BC "$@" | indent
+#    show_summary_NC "$@" | indent
+#    show_summary_PNC "$@" | indent
+#    pkg_summary4view "$@" | indent
+}
+summary2packages_to_be_installed_as_dep (){
+    # input: pkg_summary
+    show_summary_N "$@" | indent
+}
+summary2packages_to_be_removed (){
+    # input: pkg_summary
+    show_summary_N "$@" | indent
+}

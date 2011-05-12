@@ -161,15 +161,14 @@ END {
 ' "$@"
 }
 
-show_summary_IPNC (){
+show_summary_PNC (){
     # PKGPATH (PKGNAME)     COMMENT
     awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
          /^PKGPATH=/ {pkgpath=substr($0, 9)}
          /^COMMENT=/ {comment=substr($0, 9)}
          NF == 0 {printf "%s\t%s\t%s\n", pkgpath, pkgname, comment}' "$@" |
     sort |
-    awk -F'\t' '{printf "%s (%s)\n     %s\n", $1, $2, $3}' |
-    indent
+    awk -F'\t' '{printf "%s (%s)\n     %s\n", $1, $2, $3}'
 }
 
 show_summary_BC (){
@@ -178,6 +177,36 @@ show_summary_BC (){
          /^COMMENT=/ {comment=substr($0, 9)}
          NF == 0 {printf "%-19s %s\n", pkgbase, comment}' "$@" |
     sort
+}
+
+show_summary_NC (){
+    # PKGPATH (PKGNAME)     COMMENT
+    awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
+         /^COMMENT=/ {comment=substr($0, 9)}
+         NF == 0 {printf "%-19s %s\n", pkgname, comment}' "$@" |
+    sort
+}
+
+wrap (){ # fmt(1) is not portable accross different OSes
+    w=$1
+    shift
+    awk -v w="$w" '
+	{
+	    for (i=1; i<=NF; ++i) {
+		sz += length($i)+1
+		if (i != 1 && sz > w){
+		    sz = length($i)+1
+		    printf "\n"
+		}
+		printf "%s ", $i
+	    }
+	} END {printf "\n"}' "$@"
+}
+
+show_summary_N (){
+    # PKGPATH (PKGNAME)     COMMENT
+    awk '/^PKGNAME=/ {printf "%s ", substr($0, 9)}
+	END {printf "\n"}' "$@" | wrap 70
 }
 
 indent (){
@@ -600,23 +629,23 @@ if test "_$1" = _install -o "_$1" = _update; then
     # rem
     if test -s "$rem_summary" -o -s "$extra_rem_summary"; then
 	echo 'The following packages will be removed'
-	show_summary_IPNC "$rem_summary"
+	summary2packages_to_be_removed "$rem_summary"
 	if test -s "$extra_rem_summary"; then
 	    echo '    //'
-	    show_summary_IPNC "$extra_rem_summary"
+	    summary2packages_to_be_removed "$extra_rem_summary"
 	fi
     fi
 
     # install
     if test -s "$inst_summary"; then
 	echo 'The following packages will be installed'
-	show_summary_IPNC "$inst_summary"
+	summary2packages_to_be_installed "$inst_summary"
     fi
 
     # install as a depdendency
     if test -s "$inst_auto_summary"; then
 	echo 'The following packages will be installed as auto-removable'
-	show_summary_IPNC "$inst_auto_summary"
+	summary2packages_to_be_installed_as_dep "$inst_auto_summary"
     fi
 
     #
