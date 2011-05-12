@@ -168,7 +168,8 @@ show_summary_IPNC (){
          /^COMMENT=/ {comment=substr($0, 9)}
          NF == 0 {printf "%s\t%s\t%s\n", pkgpath, pkgname, comment}' "$@" |
     sort |
-    show_packages_IPNC
+    awk -F'\t' '{printf "%s (%s)\n     %s\n", $1, $2, $3}' |
+    indent
 }
 
 show_summary_BC (){
@@ -181,10 +182,6 @@ show_summary_BC (){
 
 indent (){
     awk '{print "    " $0}' "$@"
-}
-
-show_packages_IPNC (){
-    awk -F'\t' '{printf "%s (%s)\n     %s\n", $1, $2, $3}' "$@" | indent
 }
 
 cleanup_db (){
