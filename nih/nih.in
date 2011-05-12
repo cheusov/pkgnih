@@ -1310,16 +1310,21 @@ if test "$1" = clean-cache; then
 	} | summary2binary | sort -u > "$installed"
     fi
 
-    eval "ls -1 *$SUFX" | sort > "$present"
+    ls -1 | grep "$SUFX"'$' | sort > "$present"
 
-    echo 'The following files will be deleted'
     comm -13 "$installed" "$present" > "$del"
-    indent "$del"
-    if test -n "$noop" || ! yesno remove_pkgs 'Proceed'; then
+    if test -s "$del"; then
+	echo 'The following files will be deleted'
+	indent "$del"
+	if test -n "$noop" || ! yesno remove_pkgs 'Proceed'; then
+	    exit 0
+	fi
+
+	xargs rm -f < "$del"
+    else
+	echo 'The are no binaries to remove'
 	exit 0
     fi
-
-    xargs rm -f < "$del"
 
     exit 0
 fi
