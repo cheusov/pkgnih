@@ -6,6 +6,7 @@ nih/nih.1
 nih/nih.default.conf
 build_me
 build_sandbox_me
+nih/pkg_status
 nih/pkg_update_plan
 pkg_summary.txt
 needed_summary.txt
