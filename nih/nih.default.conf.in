@@ -99,3 +99,7 @@ summary2packages_to_be_removed (){
     # input: pkg_summary
     show_summary_N "$@" | indent
 }
+summary2meta_packages (){
+    # input: pkg_summary
+    show_summary_BC "$@"
+}

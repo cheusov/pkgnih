@@ -1066,7 +1066,7 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 	    done;;
 	meta)
 	    pkg_digger -3r ${opts+-$opts} CATEGORIES:word:meta-pkgs |
-	    show_summary_BC;;
+	    summary2meta_packages;;
 	*)
 	    pkg_digger ${opts+-$opts} "$@";;
     esac
