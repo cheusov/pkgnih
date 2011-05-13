@@ -930,7 +930,7 @@ nih search [options] [args]
 
       Search for packages
 
-   option:
+   options:
       -h    display this help message
 
       -b    search in pkg_summary.txt (the default)
@@ -974,7 +974,7 @@ nih info [options] [PKGBASEs]
 
       Show information about packages
 
-   option:
+   options:
       -h    display this help message
 
       -b    search in pkg_summary.txt (the default)
@@ -1001,7 +1001,7 @@ nih meta [options]
 
       List meta packages
 
-   option:
+   options:
       -h    display this help message
 
       -b    search in pkg_summary.txt (the default)
@@ -1085,7 +1085,7 @@ nih leaf [options]
       Output or remove automatically installed leaf packages,
       by default list of leaves is output.
 
-   option:
+   options:
       -h    display this help message
       -t    output only PKGNAME
       -R    remove automatically installed leaf packages
@@ -1129,9 +1129,50 @@ fi
 ######################################################################
 ######################################################################
 # list
+usage_list (){
+    cat <<'EOF'
+nih list [options]
+
+      Output available or installed packages.
+
+   options:
+      -h       display this help message
+      -a|-I    output all installed packages
+      -u       output packages installed by user
+
+Examples:
+   nih list -h
+   nih list
+   nih list -u
+EOF
+}
+
 if test "$1" = list; then
-    echo 'Not implemented yet' 1>&2
-    exit 1
+    shift
+    opts='a'
+    while getopts hauI f; do
+	case "$f" in
+	    '?')
+		exit 1;;
+	    h)
+		usage_list
+		exit 0;;
+	    I)
+		info_opts="${info_opts}a";;
+	    a|u)
+		info_opts="${info_opts}$f";;
+	esac
+    done
+    shift `expr $OPTIND - 1`
+
+    if test -n "$info_opts"; then
+	pkg_bin_summary -a automatic -- "-$info_opts" |
+	summary2installed_packages
+    else
+	summary2available_packages "$PKG_SUMMARY"
+    fi
+
+    exit 0
 fi
 
 ######################################################################
@@ -1144,7 +1185,7 @@ nih mark [options] PKGBASEs
 
       Mark packages
 
-   option:
+   options:
       -h    display this help message
       -u    mark packages as installed by user
       -a    mark packages as auto-removable
@@ -1206,7 +1247,7 @@ nih deps [options] [pkgs...]
 
       Output a dependency graph of installed packages or remote summary.
 
-   option:
+   options:
       -h    display this help message
       -r    output dependencies, by default packages
             that depend on "pkgs" are output.
@@ -1297,7 +1338,7 @@ nih clean-cache [options] [pkgs...]
       Delete binaries in cache directory. By default all binaries
       except those of installed packages are removed.
 
-   option:
+   options:
       -h    display this help message
       -n    output files to be deleted
       -a    remove all binaries

@@ -128,6 +128,12 @@ Examples:
    nih meta -I
    nih meta -oq
 .VE
+.P
+One can change format of the output
+with a help of shell
+functions 'summary2meta_packages' in configuration file.
+See @dfltconfdir@/nih.default.conf for details.
+The default format may be changed in future releases.
 .RE
 .TP
 .B  search
@@ -256,6 +262,13 @@ Examples:
    nih install textproc/dict-client -wip/dict-client
    nih install /usr/pkgsrc/packages/xyz-1.2.3.tgz
 .VE
+.P
+One can change format of the output
+with a help of shell
+functions 'summary2packages_to_be_removed', 'summary2packages_to_be_installed'
+or 'summary2packages_to_be_installed_as_dep'  in configuration file.
+See @dfltconfdir@/nih.default.conf for details.
+The default format may be changed in future releases.
 .RE
 .TP
 .BR  uninstall ", " delete " and " remove
@@ -397,7 +410,37 @@ Examples:
 (not implemented yet)
 .TP
 .B  list
-(not implemented yet)
+Output available or installed packages. By default packages available
+in the repository are output.
+.P
+.RS
+.B "nih list"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -u
+Packages installed by user are output.
+.TP
+.B -a
+All installed packages are output.
+.RE
+.P
+.RS
+Examples:
+.VB
+   nih list -h
+   nih list
+   nih list -u
+.VE
+.P
+One can change format of the output with a help of shell
+functions 'summary2available_packages'
+or 'summary2installed_packages'  in configuration file.
+See @dfltconfdir@/nih.default.conf for details.
+The default format may be changed in future releases.
+.RE
 .TP
 .B  mark
 Mark packages as auto-removed or as installed by user.

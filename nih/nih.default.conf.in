@@ -103,3 +103,11 @@ summary2meta_packages (){
     # input: pkg_summary
     show_summary_BC "$@"
 }
+summary2available_packages (){
+    # input: pkg_summary
+    show_summary_NC "$@"
+}
+summary2installed_packages (){
+    # input: pkg_summary
+    show_summary_NC "$@"
+}
