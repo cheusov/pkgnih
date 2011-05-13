@@ -11,12 +11,12 @@ case "$opsys" in
 	REPOSITORY="ftp://ftp.minix3.org/pub/minix/packages/$osver/$arch";;
     *)
 	# Estonian mirror is closest to me and it very fast :-)
-	REPOSITORY="ftp://ftp.ee.netbsd.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
-#	REPOSITORY="ftp://ftp3.de.netbsd.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
-#	REPOSITORY="ftp://ftp.be.netbsd.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
-#	REPOSITORY="ftp://ftp6.jp.netbsd.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
-#	REPOSITORY="ftp://ftp2.us.netbsd.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
-#	REPOSITORY="ftp://ftp.netbsd.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
+	REPOSITORY="ftp://ftp.ee.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
+#	REPOSITORY="ftp://ftp3.de.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
+#	REPOSITORY="ftp://ftp.be.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
+#	REPOSITORY="ftp://ftp6.jp.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
+#	REPOSITORY="ftp://ftp2.us.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
+#	REPOSITORY="ftp://ftp.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
 esac
 
 fetch_ftp (){
