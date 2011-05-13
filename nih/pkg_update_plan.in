@@ -46,9 +46,9 @@
 #   -v        verbose mode
 #   -i        obtains packages specifications from stdin
 # <packages> may be either PKGBASEs, PKGNAMEs or PKGPATHs,
-# optionally prepanded by `-' (marked for removal),
-# `+' or `*' (auto-removable), or `?' (auto-removable flag will not be changed).
-# Packages without prefix will be marked as installed by user.
+# optionally appended by `-' (marked for removal),
+# `+' (auto-removable), or `_' (auto-removable flag is not changed).
+# Packages without suffix will be marked as installed by user.
 #.end-str
 
 BEGIN {
@@ -71,13 +71,15 @@ BEGIN {
 
 ############################################################
 # preparations
-function process_pkg (pkg,            base,pref,pair,rempair){
-	match(pkg, /^[-+*?]/)
-	pref = substr(pkg, 1, RLENGTH)
-	base = substr(pkg, 1 + RLENGTH)
-
-	if (pref == "*"){
-		pref = "+"
+function process_pkg (pkg,            base,suff,pair,rempair){
+	if (match(pkg, /[-+_]$/)){
+		suff = substr(pkg, RSTART, 1)
+		base = substr(pkg, 1, RSTART-1)
+#		print "suff=" suff > "/dev/stderr"
+#		print "base=" base > "/dev/stderr"
+	}else{
+		suff = ""
+		base = pkg
 	}
 
 	if (base in inst_base2pair){
@@ -92,12 +94,12 @@ function process_pkg (pkg,            base,pref,pair,rempair){
 			rempair = inst_base2pair [rempair]
 		else
 			rempair = base
-	}else if (pref == "-"){
+	}else if (suff == "-"){
 		print pkg " cannot be found" > "/dev/stderr"
 		ex = 1
 	}
 
-	if (pref != "-"){
+	if (suff != "-"){
 		if (base in avail_base2pair){
 			pair = avail_base2pair [base]
 		}else if (base in avail_name2pair){
@@ -119,16 +121,16 @@ function process_pkg (pkg,            base,pref,pair,rempair){
 	sub(/^.*,/, "", base)
 	base = pkgname2pkgbase(base)
 
-	if (pref == "?"){
+	if (suff == "_"){
 		if (!(base in inst_base2auto) || inst_base2auto [base])
-			pref = "+"
+			suff = "+"
 		else
-			pref = ""
+			suff = ""
 	}
 
-	if (pref == "-"){
+	if (suff == "-"){
 		rem_pkgs [rempair] = 0
-	}else if (pref == "+"){
+	}else if (suff == "+"){
 		if (! (pair in add_pkgs)){
 			add_auto_pkgs [pair] = 0
 			rem_pkgs [rempair] = 0
@@ -449,7 +451,7 @@ BEGIN {
 			break
 
 		for (pkg in addme)
-			process_pkg("?" pkg)
+			process_pkg(pkg "_")
 		delete addme
 
 		new_imghash = get_imghash()

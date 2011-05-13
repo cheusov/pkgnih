@@ -204,25 +204,25 @@ Examples:
 .RE
 .TP
 .BR  install " and " update
-Install or update specified packages. They may be specified as
-PKGBASEs, PKGNAMEs, PKGPATHs or filename of binary packages,
-optionally prepended by `-' (marker
-for removal), `+' or `*' (marker for auto-removable), or `?'
-(auto-removable flag will not be changed).  Packages without prefix
-will be marked as installed by user.
+Install or update specified packages. Packages may be specified as
+PKGBASE, PKGNAME, PKGPATH or a filename with optional suffix `-'
+(marker for removal), `+' (marker for auto-removable), or `_'
+(auto-removable flag is not changed).  Packages without suffix will be
+marked as installed by user. Automatically installed leaf packages are
+removed automatically.
 .B nih
-tries to resolve conflicts and to satisfy dependencies automatically,
+tries to resolve conflicts and to satisfy dependencies automatically.
 If it fails, one can do this manually. By default PKGPATH of installed
 packages remain unchanged, that is if, for example, emacs-21 was installed
 from editors/emacs21, it will not be updated to emacs-23 from editors/emacs23.
 If you want to do this, run the following:
 .VB
-   nih install editors/emacs23 -emacs
+   nih install editors/emacs23 emacs-
 .VE
 Before package installation or removal a list of installed packages
-is saved in ~/.nih/installed_YYYYMMDD_hhmm.txt file unless
+is saved to ~/.nih/installed_YYYYMMDD_hhmm.txt file unless
 .I NO_INSTALLED_COPY
-variable is set in config file. The same relates to
+variable is set in config file. The same for
 .IR uninstall " and " leaf
 commands.
 .P
@@ -255,11 +255,11 @@ Examples:
    nih -y update -d openoffice2 firefox midori
    nih install mawk lang/gawk
    nih install perl
-   nih install libao-alsa -libao-oss
-   nih install editors/emacs20 -emacs
+   nih install libao-alsa libao-oss-
+   nih install editors/emacs20 emacs-
    nih install +GConf +xproto
-   nih install -- -gmake -autoconf -automake -libtool-base
-   nih install textproc/dict-client -wip/dict-client
+   nih install gmake- autoconf- automake- libtool-base-
+   nih install textproc/dict-client wip/dict-client-
    nih install /usr/pkgsrc/packages/xyz-1.2.3.tgz
 .VE
 .P

@@ -431,12 +431,13 @@ nih install <packages>
       -B     consider packages different if their BUILD_DATE differ
       -D     For debugging purposes
 
-Here <packages> are either PKGBASEs, PKGNAMEs or PKGPATHs, optionally
-prepended with `+' (package will be marked as installed as a dependency)
-or `-' (package will be removed). If neither `+' nor `-' were specified
-packages will be marked as installed by user. The marker `-' may be useful
-for resolving conflicts between installed and new packages. Automatically
-installed leaf packages will be removed.
+Packages may be specified as PKGBASE, PKGNAME, PKGPATH or a filename
+with optional suffix `-' (marker for removal), `+' (marker for
+auto-removable), or `_' (auto-removable flag will not be changed).
+Packages without suffix will be marked as installed by user.
+Marker `-' may be useful for resolving conflicts between installed
+and new packages. Automatically installed leaf packages are removed
+automatically.
 
 Examples:
    nih update
@@ -535,21 +536,25 @@ if test "_$1" = _install -o "_$1" = _update; then
 	pkg_cmp_summary -p $cmp_opts "$installed_summary" "$refreshed_summary" \
 	    > "$cmp_summary"
 	awk '$1 ~ /^[<!]/ {
-		print "-" $3
-		print "?" $3 "-" $5
+		print $3 "-"
+		print $3 "-" $5 "_"
 	}' "$cmp_summary" > "$update_pkgs_fn"
     else
 	for i; do
-	    if echo "$i" | grep -E '^[+*?]?/' > /dev/null; then
-		prefix=`echo "$i" | sed 's|/.*$||'`
-		fn=`echo "$i" | sed 's|^[^/]*||'`
+	    if echo "$i" | grep '^/' > /dev/null; then
+		suffix=`echo "$i" | sed -n 's|^.*\([-+_]\)$|\1|p'`
+		if test -n "$suffix"; then
+		    fn=`echo "$i" | sed 's|^\(.*\)[-+_]$|\1|'`
+		else
+		    fn="$i"
+		fi
 		pkg_info -X "$fn" |
 		sed "s ^FILE_NAME=.*$ FILE_NAME=$fn " |
 		tee "$tiny_summary".tmp |
-		awk -v prefix="$prefix" '
+		awk -v suffix="$suffix" '
 		     /^PKGPATH=/ {p=substr($0, 9)}
 		     /^PKGNAME=/ {n=substr($0, 9)}
-		     END {print prefix p "," n}' >> "$update_pkgs_fn"
+		     END {print p "," n suffix}' >> "$update_pkgs_fn"
 		cat "$tiny_summary" >> "$tiny_summary".tmp
 		pkg_uniq_summary "$tiny_summary".tmp > "$tiny_summary"
 	    else
