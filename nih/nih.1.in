@@ -205,8 +205,9 @@ Examples:
 .TP
 .BR  install " and " update
 Install or update specified packages. Packages may be specified as
-PKGBASE, PKGNAME, PKGPATH or a filename with optional suffix `-'
-(marker for removal), `+' (marker for auto-removable), or `_'
+PKGBASE, PKGNAME, PKGPATH or a filename with optional suffix "-"
+(marker for removal), "--" (marker for removal with dependent packages), "+"
+(marker for auto-removable), or "_"
 (auto-removable flag is not changed).  Packages without suffix will be
 marked as installed by user. Automatically installed leaf packages are
 removed automatically.
@@ -253,11 +254,11 @@ Examples:
    nih install -h
    nih update
    nih -y update -d openoffice2 firefox midori
-   nih install mawk lang/gawk
-   nih install perl
+   nih install mawk_ lang/gawk
+   nih install perl-5.12.2nb2
    nih install libao-alsa libao-oss-
    nih install editors/emacs20 emacs-
-   nih install +GConf +xproto
+   nih install GConf+ xproto+
    nih install gmake- autoconf- automake- libtool-base-
    nih install textproc/dict-client wip/dict-client-
    nih install /usr/pkgsrc/packages/xyz-1.2.3.tgz

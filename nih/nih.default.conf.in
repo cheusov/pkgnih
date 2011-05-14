@@ -71,18 +71,6 @@ fetch (){
 #yes_install=1
 
 # Uncomment the folowing line if you want to always say Yes to question
-# about package uninstalling with dependent packages
-#yes_remove_dep=1
-
-# Uncomment the folowing line if you want to always say Yes to question
-# about uninstalling auto-removable packages
-#yes_remove_auto=1
-
-# Uncomment the folowing line if you want to always say Yes to question
-# about package uninstalling with dependent packages recursively
-#yes_remove_auto_recurs=1
-
-# Uncomment the folowing line if you want to always say Yes to question
 # about file removal from cache directory
 #yes_remove_pkgs=1
 

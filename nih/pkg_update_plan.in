@@ -67,16 +67,17 @@ BEGIN {
 	avail_summary = ARGV [2]
 	ARGV [2] = ""
 	ARGV [1] = "-"
+
+	inst_deps = tmpfile()
+	inst_deps_ok = 0
 }
 
 ############################################################
 # preparations
-function process_pkg (pkg,            base,suff,pair,rempair){
-	if (match(pkg, /[-+_]$/)){
-		suff = substr(pkg, RSTART, 1)
+function process_pkg (pkg,            base,suff,pair,rempair,pipe){
+	if (match(pkg, /([-+_]|--)$/)){
+		suff = substr(pkg, RSTART)
 		base = substr(pkg, 1, RSTART-1)
-#		print "suff=" suff > "/dev/stderr"
-#		print "base=" base > "/dev/stderr"
 	}else{
 		suff = ""
 		base = pkg
@@ -88,15 +89,27 @@ function process_pkg (pkg,            base,suff,pair,rempair){
 		rempair = inst_name2pair [base]
 	}else if (base in inst_path2pair){
 		rempair = inst_path2pair [base]
-	}else if (match(base, /,/)){
+	}else if (match(base, /;/)){
 		rempair = pkgname2pkgbase(substr(base,RSTART + 1))
 		if (rempair in inst_base2pair)
 			rempair = inst_base2pair [rempair]
 		else
 			rempair = base
-	}else if (suff == "-"){
+	}else if (suff == "-" || suff == "--"){
 		print pkg " cannot be found" > "/dev/stderr"
 		ex = 1
+	}
+
+	if (suff == "--"){
+		if (!inst_deps_ok){
+			xsystem("pkg_summary2deps -dpnr " inst_summary " > " inst_deps)
+			inst_deps_ok = 1
+		}
+		pipe = "pkg_subgraph_deps -np '" rempair "' < " inst_deps
+		while (0 < (pipe | getline pkg)){
+			process_pkg(pkg "-")
+		}
+		return
 	}
 
 	if (suff != "-"){
@@ -106,7 +119,7 @@ function process_pkg (pkg,            base,suff,pair,rempair){
 			pair = avail_name2pair [base]
 		}else if (base in avail_path2pair){
 			pair = avail_path2pair [base]
-		}else if (index(base, ",")){
+		}else if (index(base, ";")){
 			pair = base
 		}else{
 			print pkg " cannot be found" > "/dev/stderr"
@@ -118,7 +131,7 @@ function process_pkg (pkg,            base,suff,pair,rempair){
 		return
 
 	base = pair
-	sub(/^.*,/, "", base)
+	sub(/^.*;/, "", base)
 	base = pkgname2pkgbase(base)
 
 	if (suff == "_"){
@@ -145,7 +158,7 @@ function process_pkg (pkg,            base,suff,pair,rempair){
 }
 
 function pair2name (pair){
-	return substr(pair, index(pair, ",") + 1)
+	return substr(pair, index(pair, ";") + 1)
 }
 
 ############################################################
@@ -162,7 +175,7 @@ BEGIN {
 		}else if (NF == 0){
 			pkgbase = pkgname
 			sub(/-[^-]*$/, "", pkgbase)
-			pkgpair = (pkgpath "," pkgname)
+			pkgpair = (pkgpath ";" pkgname)
 
 			inst_name2pair [pkgname] = pkgpair
 			inst_base2pair [pkgbase] = pkgpair
@@ -185,11 +198,11 @@ BEGIN {
 		}else if (NF == 0){
 			pkgbase = pkgname
 			sub(/-[^-]*$/, "", pkgbase)
-			pkgpair = (pkgpath "," pkgname)
+			pkgpair = (pkgpath ";" pkgname)
 
 			if (pkgbase in inst_base2pair){
 				instpath = inst_base2pair [pkgbase]
-				sub(/,.*/, "", instpath)
+				sub(/;.*/, "", instpath)
 			}else{
 				instpath = pkgpath
 			}
@@ -267,6 +280,7 @@ function rm (file){
 
 function rem_packages_from_summary (input, output,             pkgs,cmd){
 	pkgs = hash_to_indices(rem_pkgs)
+	gsub(/;/, ",", pkgs)
 
 	if (pkgs != "")
 		# remove specified packages from inst_summary

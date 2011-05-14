@@ -1,4 +1,32 @@
 ======================================================================
+Version 0.7.0, by Aleksey Cheusov, Sat, 14 May 2011 18:22:31 +0300
+
+  Subcommand "list" was implemented. See manual page for details.
+
+  Output format of "install|update", "meta" and "list" subcommands can
+  be changed by user in configure file.
+
+  "pkg install" and "pkg_update_summary".
+  Prefixes was replaced with suffixes.
+    prefix -    =>   suffix -
+    (none)      =>   suffix -- (remove with dependent packages)
+    prefix +    =>   suffix +
+    prefix ?    =>   suffix _
+    prefix *    =>   (removed)
+
+  Clean-ups in "nih install" output. New default format of the output.
+
+  Fix: "nih clean-cache" fails if there are no binaries in cache
+  directory.  Thanks to Zafer Aydogan for the report.
+
+  Program pkg_status becomes a part of pkgnih. pkg_status package is
+  no longer needed.
+
+  "nih remove" was reimplemented using "nih install" =>
+  "pkg_delete -A" is not used anymore =>
+  automatically installed leaf packages are removed correctly.
+
+======================================================================
 Version 0.6.4, by Aleksey Cheusov, Tue,  5 Apr 2011 01:03:20 +0300
 
   @prefix@/sbin/pkg_add is used instead of just pkg_add.

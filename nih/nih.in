@@ -771,46 +771,12 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
 	echo 'Nothing to do' 1>&2
 	exit 1
     fi
-    pkg_info -I "$@" > "$tmp_dir/1" || true
-    if ! test -s "$tmp_dir/1"; then
-	echo 'Nothing to do' 1>&2
-	exit 1
-    fi
-    awk '{print $1}' "$tmp_dir/1" > "$tmp_dir/2"
 
-    echo 'The following packages will be removed:'
-    indent "$tmp_dir/1"
+    for i in "$*"; do
+	plan="$plan $i--"
+    done
 
-    echo 'The following dependent packages will be removed:'
-    pkg_bin_summary -f 'PKGNAME PKGPATH DEPENDS COMMENT' |
-    tee "$tmp_dir/installed_summary" | pkg_summary2deps -nrd |
-	pkg_subgraph_deps -xnf "$tmp_dir/2" > "$tmp_dir/4"
-    pkg_grep_summary -S PKGNAME "$tmp_dir/4" < "$tmp_dir/installed_summary" |
-    awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
-         /^COMMENT=/ {comment=substr($0, 9)}
-         NF == 0 {printf "%-19s %s\n", pkgname, comment}' > "$tmp_dir/3"
-    indent "$tmp_dir/3"
-
-    if ! yesno remove_dep 'Remove them'; then
-	exit 0
-    fi
-
-    save_installed_packages
-
-    cat "$tmp_dir/4" "$tmp_dir/2" | xargs $PKG_DELETE_CMD $pkg_delete_opts
-
-    cat <<'EOF'
-The following packages were installed as auto-removed
-and are no longer needed:
-EOF
-    pkg_status -l | tee "$tmp_dir/1" | indent -
-    if ! yesno remove_auto 'Remove them'; then
-	exit 0
-    fi
-    if yesno remove_auto_recurs 'Remove auto-removed packages recursively'; then
-	pkg_delete_opts="$pkg_delete_opts -A"
-    fi
-    awk '{print $1}' "$tmp_dir/1" | xargs $PKG_DELETE_CMD $pkg_delete_opts
+    $0 install $plan
 
     exit 0
 fi
