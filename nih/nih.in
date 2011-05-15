@@ -162,7 +162,7 @@ END {
 }
 
 show_summary_PNC (){
-    # PKGPATH (PKGNAME)     COMMENT
+    # PKGPATH <tab> (PKGNAME) <tab> COMMENT <nl>
     awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
          /^PKGPATH=/ {pkgpath=substr($0, 9)}
          /^COMMENT=/ {comment=substr($0, 9)}
@@ -172,7 +172,7 @@ show_summary_PNC (){
 }
 
 show_summary_BC (){
-    # PKGPATH (PKGNAME)     COMMENT
+    # PKGBASE     COMMENT <nl>
     awk '/^PKGNAME=/ {pkgbase=substr($0, 9); sub(/-[^-]*$/, "", pkgbase)}
          /^COMMENT=/ {comment=substr($0, 9)}
          NF == 0 {printf "%-19s %s\n", pkgbase, comment}' "$@" |
@@ -180,11 +180,25 @@ show_summary_BC (){
 }
 
 show_summary_NC (){
-    # PKGPATH (PKGNAME)     COMMENT
+    # PKGNAME     COMMENT <nl>
     awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
          /^COMMENT=/ {comment=substr($0, 9)}
          NF == 0 {printf "%-19s %s\n", pkgname, comment}' "$@" |
     sort
+}
+
+show_summary_N (){
+    # PKGNAME
+    awk '/^PKGNAME=/ {printf "%s ", substr($0, 9)}
+	END {printf "\n"}' "$@" | wrap 70
+}
+
+show_summary_NP (){
+    # PKGNAME(PKGNAME)
+    awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
+         /^PKGPATH=/ {pkgpath=substr($0, 9)}
+         NF == 0 {printf "%s (%s)  ", pkgname, pkgpath}
+	END {printf "\n"}' "$@" | wrap 70
 }
 
 wrap (){ # fmt(1) is not portable accross different OSes
@@ -201,12 +215,6 @@ wrap (){ # fmt(1) is not portable accross different OSes
 		printf "%s ", $i
 	    }
 	} END {printf "\n"}' "$@"
-}
-
-show_summary_N (){
-    # PKGPATH (PKGNAME)     COMMENT
-    awk '/^PKGNAME=/ {printf "%s ", substr($0, 9)}
-	END {printf "\n"}' "$@" | wrap 70
 }
 
 indent (){

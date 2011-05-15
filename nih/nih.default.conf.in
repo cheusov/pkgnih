@@ -80,6 +80,7 @@ summary2packages_to_be_installed (){
     # input: pkg_summary
     show_summary_N "$@" | indent
 #  EXAMPLES:
+#    show_summary_NP "$@" | indent
 #    show_summary_BC "$@" | indent
 #    show_summary_NC "$@" | indent
 #    show_summary_PNC "$@" | indent
