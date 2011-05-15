@@ -14,7 +14,6 @@ case "$opsys" in
     *)
 	# Estonian mirror is closest to me and it very fast :-)
 	REPOSITORY="ftp://ftp.ee.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver"
-#	REPOSITORY="ftp://mirror.corbina.net/pub/NetBSD/packages/$opsys/$arch/$osver"
 #	REPOSITORY="ftp://ftp3.de.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver"
 #	REPOSITORY="ftp://ftp2.jp.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver"
 #	REPOSITORY="ftp://ftp2.us.NetBSD.org/pub/NetBSD/packages/$arch/$osver"
