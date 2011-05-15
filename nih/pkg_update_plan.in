@@ -295,6 +295,7 @@ function rem_packages_from_summary (input, output,             pkgs,cmd){
 function create_packages_summary (output, hash,                  pkgs,cmd)
 {
 	pkgs = hash_to_indices(hash)
+	gsub(/;/, ",", pkgs)
 
 	cmd = grep_package_cmd(pkgs, "PKGPANA") " < " shquote(avail_summary)
 	cmd = cmd " | awk 'NF == 0 {print \"force_update=yes\"} {print}'"
