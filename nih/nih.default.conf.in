@@ -6,17 +6,20 @@ osver=$(uname -r | sed 's/[_-].*$//')
 arch=$(uname -m)
 case "$opsys" in
     DragonFly)
-	REPOSITORY="http://mirror-master.dragonflybsd.org/packages/$arch/DragonFly-$osver/stable";;
+	REPOSITORY="http://mirror-master.dragonflybsd.org/packages/$arch/DragonFly-$osver/stable"
+	;;
     Minix)
-	REPOSITORY="ftp://ftp.minix3.org/pub/minix/packages/$osver/$arch";;
+	REPOSITORY="ftp://ftp.minix3.org/pub/minix/packages/$osver/$arch"
+	;;
     *)
 	# Estonian mirror is closest to me and it very fast :-)
-	REPOSITORY="ftp://ftp.ee.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
-#	REPOSITORY="ftp://mirror.corbina.net/pub/NetBSD/packages/$opsys/$arch/$osver";;
-#	REPOSITORY="ftp://ftp3.de.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
-#	REPOSITORY="ftp://ftp2.jp.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
-#	REPOSITORY="ftp://ftp2.us.NetBSD.org/pub/NetBSD/packages/$arch/$osver";;
-#	REPOSITORY="ftp://ftp.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
+	REPOSITORY="ftp://ftp.ee.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver"
+#	REPOSITORY="ftp://mirror.corbina.net/pub/NetBSD/packages/$opsys/$arch/$osver"
+#	REPOSITORY="ftp://ftp3.de.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver"
+#	REPOSITORY="ftp://ftp2.jp.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver"
+#	REPOSITORY="ftp://ftp2.us.NetBSD.org/pub/NetBSD/packages/$arch/$osver"
+#	REPOSITORY="ftp://ftp.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver"
+	;;
 esac
 
 fetch_ftp (){
