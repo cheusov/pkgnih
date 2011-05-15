@@ -13,9 +13,8 @@ case "$opsys" in
 	# Estonian mirror is closest to me and it very fast :-)
 	REPOSITORY="ftp://ftp.ee.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
 #	REPOSITORY="ftp://ftp3.de.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
-#	REPOSITORY="ftp://ftp.be.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
-#	REPOSITORY="ftp://ftp6.jp.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
-#	REPOSITORY="ftp://ftp2.us.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
+#	REPOSITORY="ftp://ftp2.jp.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
+#	REPOSITORY="ftp://ftp2.us.NetBSD.org/pub/NetBSD/packages/$arch/$osver";;
 #	REPOSITORY="ftp://ftp.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver";;
 esac
 
