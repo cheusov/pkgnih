@@ -96,7 +96,7 @@ function process_pkg (pkg,            base,suff,pair,rempair,pipe){
 		else
 			rempair = base
 	}else if (suff == "-" || suff == "--"){
-		print pkg " cannot be found" > "/dev/stderr"
+		print "Package " base " is not found" > "/dev/stderr"
 		ex = 1
 		return
 	}
@@ -123,8 +123,9 @@ function process_pkg (pkg,            base,suff,pair,rempair,pipe){
 		}else if (index(base, ";")){
 			pair = base
 		}else{
-			print pkg " cannot be found" > "/dev/stderr"
+			print "Package " base " is not found" > "/dev/stderr"
 			ex = 1
+			return
 		}
 	}
 
