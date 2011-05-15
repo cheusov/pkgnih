@@ -780,7 +780,7 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
 	exit 1
     fi
 
-    for i in "$*"; do
+    for i in "$@"; do
 	plan="$plan $i--"
     done
 
