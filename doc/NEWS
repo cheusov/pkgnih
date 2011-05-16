@@ -1,5 +1,5 @@
 ======================================================================
-Version 0.7.0, by Aleksey Cheusov, Sat, 14 May 2011 18:22:31 +0300
+Version 0.7.0, by Aleksey Cheusov, Mon, 16 May 2011 22:55:59 +0300
 
   Subcommand "list" was implemented. See manual page for details.
 
@@ -17,7 +17,7 @@ Version 0.7.0, by Aleksey Cheusov, Sat, 14 May 2011 18:22:31 +0300
   Clean-ups in "nih install" output. New default format of the output.
 
   Fix: "nih clean-cache" fails if there are no binaries in cache
-  directory.  Thanks to Zafer Aydogan for the report.
+  directory.
 
   Program pkg_status becomes a part of pkgnih. pkg_status package is
   no longer needed.
@@ -25,6 +25,8 @@ Version 0.7.0, by Aleksey Cheusov, Sat, 14 May 2011 18:22:31 +0300
   "nih remove" was reimplemented using "nih install" =>
   "pkg_delete -A" is not used anymore =>
   automatically installed leaf packages are removed correctly.
+
+  Thanks to Zafer Aydogan for his testing and a lot of suggestions!
 
 ======================================================================
 Version 0.6.4, by Aleksey Cheusov, Tue,  5 Apr 2011 01:03:20 +0300
