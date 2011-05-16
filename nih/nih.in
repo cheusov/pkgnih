@@ -562,7 +562,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 		awk -v suffix="$suffix" '
 		     /^PKGPATH=/ {p=substr($0, 9)}
 		     /^PKGNAME=/ {n=substr($0, 9)}
-		     END {print p "," n suffix}' >> "$update_pkgs_fn"
+		     END {print p ";" n suffix}' >> "$update_pkgs_fn"
 		cat "$tiny_summary" >> "$tiny_summary".tmp
 		pkg_uniq_summary "$tiny_summary".tmp > "$tiny_summary"
 	    else

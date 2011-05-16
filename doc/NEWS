@@ -1,5 +1,5 @@
 ======================================================================
-Version 0.7.0, by Aleksey Cheusov, Mon, 16 May 2011 22:55:59 +0300
+Version 0.7.1, by Aleksey Cheusov, Tue, 17 May 2011 00:19:50 +0300
 
   Subcommand "list" was implemented. See manual page for details.
 
