@@ -1,4 +1,15 @@
 ======================================================================
+Version 0.7.2, by Aleksey Cheusov, Mon, 13 Jun 2011 22:44:31 +0300
+
+  Fix for "Package xxx is not found" problem:
+
+       0 > nih -y install editors/emacs20
+       ...
+       0 > nih -y install editors/emacs22 emacs-
+       Package editors/emacs22 is not found
+       1 >
+
+======================================================================
 Version 0.7.1, by Aleksey Cheusov, Tue, 17 May 2011 00:19:50 +0300
 
   Subcommand "list" was implemented. See manual page for details.
