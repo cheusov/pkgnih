@@ -9,3 +9,4 @@
   (downgrade will not be possible)
 - use distbb for source-based update
 - 'nih install -k' ignore failures during downloads.
+- nih audit
