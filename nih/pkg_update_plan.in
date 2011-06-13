@@ -214,8 +214,8 @@ BEGIN {
 				 pkgname_gt_pkgname(pkgname, pair2name(avail_base2pair [pkgbase]))))
 			{
 				avail_base2pair [pkgbase] = pkgpair
-				avail_path2pair [pkgpath] = pkgpair
 			}
+			avail_path2pair [pkgpath] = pkgpair
 			avail_name2pair [pkgname] = pkgpair
 
 			pkgname = pkgpath = ""
