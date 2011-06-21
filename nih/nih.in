@@ -577,7 +577,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     plan_summary="$tmp_dir/plan_summary"
     printf '' > "$plan_summary"
     if ! test -s "$update_pkgs_fn"; then
-	echo 'Nothing to do'
+	echo 'Everything is up-to-date.'
 	exit 0
     fi
 
@@ -776,7 +776,7 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
     shift `expr $OPTIND - 1`
 
     if test $# -eq 0; then
-	echo 'Nothing to do' 1>&2
+	echo 'No packages to be removed.' 1>&2
 	exit 1
     fi
 
@@ -833,7 +833,7 @@ if test "$1" = verify; then
     shift `expr $OPTIND - 1`
 
     if test k = "$opts"; then
-	echo 'Nothing to do' 1>&2
+	usage_verify
 	exit 1
     fi
 
@@ -949,7 +949,7 @@ EOF
 # info
 usage_info (){
     cat <<'EOF'
-nih info [options] [PKGBASEs]
+nih info [options] PKGBASE [PKGBASEs...]
 
       Show information about packages
 
@@ -1040,6 +1040,12 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 
     case "$op" in
 	info)
+	    if test $# -eq 0; then
+		echo 'No packages were specified'
+		usage_info
+		exit 1
+	    fi
+
 	    for i in "$@"; do
 		pkg_digger -9 ${opts+-$opts} PKGBASE:exact:"$i"
 	    done;;
