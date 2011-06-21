@@ -26,7 +26,7 @@ FILES :=		${INFILES}
 FILESDIR_nih.conf=	${EGDIR}
 FILESDIR =		${DFLTCONFDIR}
 
-INFILES +=		nih.1
-MAN =			nih.1 pkg_update_plan.1
+INFILES +=		nih.8
+MAN =			nih.8 pkg_update_plan.1
 
 .include <mkc.prog.mk>
