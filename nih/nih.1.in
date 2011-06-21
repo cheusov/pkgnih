@@ -453,11 +453,13 @@ accepts the following options:
 .B -h
 Display help message.
 .TP
-.B -u
-Mark packages as installed by user.
+.B -u/-U
+Mark/unmark packages as "installed by user".
 .TP
-.B -a
-Mark packages as auto-removable.
+.B -a/-A
+Mark/unmark packages as "installed as a dependency".
+.P
+NOTES: -a and -U are synonyms, -u and -A are synonyms
 .RE
 .P
 .RS

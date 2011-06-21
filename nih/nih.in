@@ -1170,29 +1170,32 @@ nih mark [options] PKGBASEs
       Mark packages
 
    options:
-      -h    display this help message
-      -u    mark packages as installed by user
-      -a    mark packages as auto-removable
+      -h       display this help message
+      -u/-U    mark/unmark packages as "installed by user"
+      -a/-A    mark/unmark packages as "installed as a dependency"
 
+NOTES:
+   -a and -U are synonyms
+   -u and -A are synonyms
 Examples:
    nih mark -a libmaa
-   nih mark -u pkg_status
+   nih mark -u ffmpeg
 EOF
 }
 
 if test "$1" = mark; then
     shift
     opts='l'
-    while getopts hua f; do
+    while getopts huUaA f; do
 	case "$f" in
 	    '?')
 		exit 1;;
 	    h)
 		usage_mark
 		exit 0;;
-	    u)
+	    u|A)
 		mode_u=1;;
-	    a)
+	    a|U)
 		mode_a=1;;
 	    *)
 		opts="${opts}$f";;
