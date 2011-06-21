@@ -54,7 +54,6 @@ Commands:
  nih info            - Show information about package
  nih meta            - Output available or installed meta packages
  nih leaf            - Output or remove leaf packages
- nih license         - Working with licenses
  nih list            - List packages
  nih mark            - Mark packages
  nih deps            - Show dependencies
@@ -1301,15 +1300,6 @@ if test "$1" = deps; then
 	pkg_subgraph_deps $sb_opts -p "$*" | sort -u
     fi
     exit 0
-fi
-
-######################################################################
-######################################################################
-######################################################################
-# license
-if test "$1" = license; then
-    echo 'Not implemented yet' 1>&2
-    exit 1
 fi
 
 ######################################################################
