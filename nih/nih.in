@@ -51,6 +51,7 @@ Commands:
    nih remove        - Uninstall packages
  nih verify          - Verify packages integrity
  nih status          - Show the status of installed packages
+ nih search          - Search on packages
  nih info            - Show information about package
  nih meta            - Output available or installed meta packages
  nih leaf            - Output or remove leaf packages
