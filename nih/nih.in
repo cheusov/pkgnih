@@ -326,13 +326,16 @@ fetch_summary_file (){
     if test -f pkg_summary.$1; then
 	mv pkg_summary.$1 pkg_summary.$1.old
     fi
-    fetch "$REPOSITORY/All/pkg_summary.$1"
-    case "$1" in
-	gz)  gzip -dc  pkg_summary.gz  > pkg_summary.txt.tmp || return 1;;
-	bz2) bzip2 -dc pkg_summary.bz2 > pkg_summary.txt.tmp || return 1;;
-	*)   echo 'Unknown ext'; exit 1;;
-    esac
-    mv pkg_summary.txt.tmp pkg_summary.txt
+    if fetch "$REPOSITORY/All/pkg_summary.$1"; then
+	case "$1" in
+	    gz)  gzip -dc  pkg_summary.gz  > pkg_summary.txt.tmp || return 1;;
+	    bz2) bzip2 -dc pkg_summary.bz2 > pkg_summary.txt.tmp || return 1;;
+	    *)   echo 'Unknown ext'; exit 1;;
+	esac
+	mv pkg_summary.txt.tmp pkg_summary.txt
+    else
+	return 1
+    fi
 }
 
 fetch_sha512_file (){
@@ -341,15 +344,17 @@ fetch_sha512_file (){
     if test -f SHA512.$1; then
 	mv SHA512.$1 SHA512.$1.old
     fi
-    fetch "$REPOSITORY/SHA512.$1"
-    echo done
-
-    case "$1" in
-	gz)   gzip  -dc SHA512.$1 > SHA512.txt.tmp || return 1;;
-	bz2)  bzip2 -dc SHA512.$1 > SHA512.txt.tmp || return 1;;
-	*)   echo 'Unknown ext'; exit 1;;
-    esac
-    mv SHA512.txt.tmp SHA512.txt
+    if fetch "$REPOSITORY/SHA512.$1"; then
+	echo done
+	case "$1" in
+	    gz)   gzip  -dc SHA512.$1 > SHA512.txt.tmp || return 1;;
+	    bz2)  bzip2 -dc SHA512.$1 > SHA512.txt.tmp || return 1;;
+	    *)   echo 'Unknown ext'; exit 1;;
+	esac
+	mv SHA512.txt.tmp SHA512.txt
+    else
+	return 1
+    fi
 }
 
 if test "$1" = refresh; then
@@ -378,10 +383,12 @@ EOF
     fetch=""
 
     if ! fetch_summary_file bz2 && ! fetch_summary_file gz; then
+	echo 'pkg_summary(5) file cannot be downloaded.' 1>&2
 	exit 1
     fi
 
     if ! fetch_sha512_file bz2 && ! fetch_sha512_file gz; then
+	echo 'SHA512 file cannot be downloaded.' 1>&2
 	exit 1
     fi
 
