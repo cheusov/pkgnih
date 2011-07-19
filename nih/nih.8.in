@@ -118,6 +118,9 @@ Display information about installed packages.
 .TP
 .B -q
 quiet mode, do not print "No matches found" to stderr
+.TP
+.B -r
+Raw summaries are output.
 .RE
 .P
 .RS

@@ -923,7 +923,7 @@ nih search [options] [args]
       -1    display 1-line information about packages (default)
       -3    display short information about packages
       -9    display full information about packages
-      -r    raw output in pkg_summary(5) format
+      -r    raw summaries are output
       -q    quiet mode, do not print "No matches found" to stderr
 
 See pkg_digger(1) for details.
@@ -962,7 +962,7 @@ nih info [options] PKGBASE [PKGBASEs...]
       -o    search using pkg_online
       -I    search in installed packages
 
-      -r    raw output in pkg_summary(5) format
+      -r    raw summaries are output
       -q    quiet mode, do not print "No matches found" to stderr
 
 See pkg_digger(1) for details.
@@ -989,7 +989,7 @@ nih meta [options]
       -o    search using pkg_online
       -I    search in installed packages
 
-      -r    raw output in pkg_summary(5) format
+      -r    raw summaries are output
       -q    quiet mode, do not print "No matches found" to stderr
 
 See pkg_digger(1) for details.
@@ -997,7 +997,7 @@ See pkg_digger(1) for details.
 Examples:
    nih meta -h
    nih meta
-   nih meta -I
+   nih meta -Ir
    nih meta -o
 EOF
 }
@@ -1020,6 +1020,9 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 	    I)
 		unset PKG_DIGGER_BACKEND || true
 		in_installed=1;;
+	    r)
+		raw=1
+		opts="${opts}r";;
 	    h)
 		usage_$op
 		exit 0;;
@@ -1053,7 +1056,11 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 	    done;;
 	meta)
 	    pkg_digger -3r ${opts+-$opts} CATEGORIES:word:meta-pkgs |
-	    summary2meta_packages;;
+	    if test -n "$raw"; then
+		cat
+	    else
+		summary2meta_packages
+	    fi;;
 	*)
 	    pkg_digger ${opts+-$opts} "$@";;
     esac
