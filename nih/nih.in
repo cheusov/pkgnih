@@ -728,10 +728,18 @@ if test "_$1" = _install -o "_$1" = _update; then
     while read pkg m; do
 	if test "$m" -eq 0; then
 	    echo "Marking $pkg as installed by user"
-	    $PKG_ADMIN_CMD unset automatic "$pkg"
+	    if test -z "$pkg_opts"; then
+		$PKG_ADMIN_CMD unset automatic "$pkg"
+	    else
+		echo '   skipped'
+	    fi
 	else
 	    echo "Marking $pkg as installed as a dependency"
-	    $PKG_ADMIN_CMD set automatic=yes "$pkg"
+	    if test -z "$pkg_opts"; then
+		$PKG_ADMIN_CMD set automatic=yes "$pkg"
+	    else
+		echo '   skipped'
+	    fi
 	fi
     done
     exit 0
@@ -786,7 +794,7 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
 	plan="$plan $i--"
     done
 
-    $0 install $plan
+    $0 install $pkg_delete_opts $plan
 
     exit 0
 fi
