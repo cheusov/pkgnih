@@ -1,6 +1,4 @@
 - nih leaf
-    -n    don't actually deinstall packages,
-      just report the steps that would be taken.
   nih leaf - don't use pkg_delete -A, use nih install instead ==>
      ==>  remove -E option
 

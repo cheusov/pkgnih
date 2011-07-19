@@ -398,7 +398,8 @@ Remove auto-removed leaf packages.
 Remove auto-removed leaf packages recursively.
 .TP
 .B -n
-Pass -n to pkg_delete(1).
+Don't actually deinstall packages,
+just report the steps that would be taken.
 .RE
 .P
 .RS
