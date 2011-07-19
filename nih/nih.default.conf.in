@@ -24,13 +24,15 @@ esac
 fetch_ftp (){
     _base=`basename $1`
     rm -f "$_base"
-    /usr/bin/ftp -o "$_base" -V -q1800 $FTP_OPTIONS "$1"
+    ftp_cmd=${NIH_FTP_CMD-@FTP_CMD@}
+    $ftp_cmd -o "$_base" -V -q1800 $FTP_OPTIONS "$1"
 }
 
 fetch_wget (){
     _base=`basename $1`
     rm -f "$_base"
-    wget -O "$_base" --timeout=1800 --progress=bar $WGET_OPTIONS "$1"
+    wget_cmd=${NIH_WGET_CMD-@WGET_CMD@}
+    $wget_cmd -O "$_base" --timeout=1800 --progress=bar $WGET_OPTIONS "$1"
 }
 
 # Command to download binaries, pkg_summary and SHA512
