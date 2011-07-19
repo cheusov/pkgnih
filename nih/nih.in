@@ -1132,6 +1132,7 @@ nih list [options]
    options:
       -h       display this help message
 
+      -b       output packages from binary repository (the default)
       -a|-I    output all installed packages
       -u       output packages installed by user
 
@@ -1147,13 +1148,15 @@ EOF
 if test "$1" = list; then
     shift
     opts='a'
-    while getopts hauIr f; do
+    while getopts hbauIr f; do
 	case "$f" in
 	    '?')
 		exit 1;;
 	    h)
 		usage_list
 		exit 0;;
+	    b)
+		info_opts='';;
 	    I)
 		info_opts="${info_opts}a";;
 	    a|u)

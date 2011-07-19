@@ -1,6 +1,5 @@
 - nih list:
     -a U prefix for packages installed by user
-    -b search in pkg_summary (default)
 - nih leaf
     -n    don't actually deinstall packages,
       just report the steps that would be taken.

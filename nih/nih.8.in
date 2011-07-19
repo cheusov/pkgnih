@@ -424,6 +424,9 @@ accepts the following options:
 .B -h
 Display help message.
 .TP
+.B -b
+Packages from binary repository are output. This is the default.
+.TP
 .B -a|-I
 All installed packages are output.
 .TP
@@ -472,7 +475,7 @@ NOTES: -a and -U are synonyms, -u and -A are synonyms
 Examples:
 .VB
    nih mark -a libmaa
-   nih mark -u pkg_status
+   nih mark -u ffmpeg
 .VE
 .RE
 .TP
