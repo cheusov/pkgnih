@@ -244,6 +244,9 @@ would be taken if it were.
 .B -d
 Do not update installed packages, download binaries only.
 .TP
+.B -k
+Continue downloading packages after errors are encountered.
+.TP
 .B -B
 Consider packages different if their BUILD_DATE differ.
 .TP
@@ -256,7 +259,7 @@ Examples:
 .VB
    nih install -h
    nih update
-   nih -y update -d openoffice2 firefox midori
+   nih -y update -dk openoffice2 firefox midori
    nih install mawk_ lang/gawk
    nih install perl-5.12.2nb2
    nih install libao-alsa libao-oss-
