@@ -11,6 +11,9 @@
      ==>  remove -E option
 - nih delete -n
 
+- better error message for 'nih refresh' like "downloading pkg_summary failed"
+- tnftp dependency on non-NetBSD systems, default ftp cient -> tnftp
+- nih verify: with option -> Nothing to do|Specify at least one option
 - nih install: option for not removing auto-installed leaf packages
 - nih install: a way to download ALL packages at once
 - autoverifying pkgdb after installation
