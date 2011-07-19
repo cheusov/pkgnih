@@ -1,3 +1,16 @@
+- nih list:
+    -r raw suboption
+    -a U prefix for packages installed by user
+    -b search in pkg_summary (default)
+- nih meta
+    -r raw suboption
+- nih leaf
+    -n    don't actually deinstall packages,
+      just report the steps that would be taken.
+  nih leaf - don't use pkg_delete -A, use nih install instead ==>
+     ==>  remove -E option
+- nih delete -n
+
 - nih install: option for not removing auto-installed leaf packages
 - nih install: a way to download ALL packages at once
 - autoverifying pkgdb after installation

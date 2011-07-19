@@ -1,7 +1,7 @@
 .\"     $NetBSD$
 .\"
-.\" Copyright (c) 2010 by Aleksey Cheusov (vle@gmx.net)
-.\" This man page contains portions of pkgin.1 by Emile Heitor.
+.\" Copyright (c) 2010-2011 by Aleksey Cheusov (vle@gmx.net)
+.\" This man page may contain portions of pkgin.1 by Emile Heitor.
 .\" Absolutely no warranty.
 .\"
 .\" ------------------------------------------------------------------
