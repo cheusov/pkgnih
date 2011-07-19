@@ -426,6 +426,9 @@ Packages installed by user are output.
 .TP
 .B -a
 All installed packages are output.
+.TP
+.B -r
+Raw summaries are output.
 .RE
 .P
 .RS
@@ -433,7 +436,7 @@ Examples:
 .VB
    nih list -h
    nih list
-   nih list -u
+   nih list -ur
 .VE
 .P
 One can change format of the output with a help of shell

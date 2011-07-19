@@ -65,6 +65,8 @@ EOF
 sysconfdir=${NIH_SYSCONFDIR-@sysconfdir@}/nih
 confdir=$HOME/.nih
 
+dfltconfdir=${NIH_DFLTCONFDIR-@dfltconfdir@}
+
 CACHEDIR=${CACHEDIR-@cachedir@}
 PKG_INFO_CMD=${PKG_INFO_CMD-@PKG_INFO_CMD@}
 PKG_ADMIN_CMD=${PKG_ADMIN_CMD-@PKG_ADMIN_CMD@}
@@ -88,7 +90,7 @@ fi
 
 mkdir -p "$confdir"
 
-. @dfltconfdir@/nih.default.conf
+. $dfltconfdir/nih.default.conf
 . "$conffile"
 
 # handling global options
@@ -1122,20 +1124,23 @@ nih list [options]
 
    options:
       -h       display this help message
+
       -a|-I    output all installed packages
       -u       output packages installed by user
+
+      -r       output raw summaries
 
 Examples:
    nih list -h
    nih list
-   nih list -u
+   nih list -ur
 EOF
 }
 
 if test "$1" = list; then
     shift
     opts='a'
-    while getopts hauI f; do
+    while getopts hauIr f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1146,15 +1151,25 @@ if test "$1" = list; then
 		info_opts="${info_opts}a";;
 	    a|u)
 		info_opts="${info_opts}$f";;
+	    r)
+		raw=1;;
 	esac
     done
     shift `expr $OPTIND - 1`
 
     if test -n "$info_opts"; then
 	pkg_bin_summary -a automatic -- "-$info_opts" |
-	summary2installed_packages
+	if test -n "$raw"; then
+	    cat
+	else
+	    summary2installed_packages
+	fi
     else
-	summary2available_packages "$PKG_SUMMARY"
+	if test -n "$raw"; then
+	    cat "$PKG_SUMMARY"
+	else
+	    summary2available_packages "$PKG_SUMMARY"
+	fi
     fi
 
     exit 0

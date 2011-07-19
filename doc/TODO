@@ -1,5 +1,4 @@
 - nih list:
-    -r raw suboption
     -a U prefix for packages installed by user
     -b search in pkg_summary (default)
 - nih meta
