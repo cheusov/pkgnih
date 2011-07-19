@@ -1,5 +1,3 @@
-- nih list:
-    -a U prefix for packages installed by user
 - nih leaf
     -n    don't actually deinstall packages,
       just report the steps that would be taken.
