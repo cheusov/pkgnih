@@ -72,7 +72,7 @@ accepts the following options:
 Display help message.
 .TP
 .B -b
-Query pkg_summary.txt (the default).
+Query binary repository (the default).
 .TP
 .B -o
 Query pkg_online database.
@@ -108,7 +108,7 @@ accepts the following options:
 Display help message.
 .TP
 .B -b
-Query pkg_summary.txt (the default).
+Query binary repository (the default).
 .TP
 .B -o
 Query pkg_online database.
@@ -151,7 +151,7 @@ accepts the following options:
 Display help message.
 .TP
 .B -b
-Search in pkg_summary.txt (the default).
+Search in binary repository (the default).
 .TP
 .B -o
 Search using pkg_online provided by wip/pkg_online-client package.
@@ -424,11 +424,11 @@ accepts the following options:
 .B -h
 Display help message.
 .TP
+.B -a|-I
+All installed packages are output.
+.TP
 .B -u
 Packages installed by user are output.
-.TP
-.B -a
-All installed packages are output.
 .TP
 .B -r
 Raw summaries are output.
