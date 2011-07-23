@@ -52,6 +52,11 @@ REPOSITORY configuration variable. Unless
 variable is set in configuration file, pkg_summary.txt and SHA512.txt
 files are copied to "pkg_summary_YYYYMMDD_hhmm.txt" and "SHA512_YYYYMMDD_hhmm.txt"
 respectively. So, you can restore them and use in the future.
+If
+.I IGNORE_CKSUMS
+variable
+is set to non-empty string, SHA512.txt file is not downloaded and cksums
+of binary packages are not ckecked.
 .P
 .RS
 .B "nih refresh"

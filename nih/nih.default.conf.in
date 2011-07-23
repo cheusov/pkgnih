@@ -110,3 +110,7 @@ summary2installed_packages (){
     # input: pkg_summary
     show_summary_NC "$@"
 }
+
+# Uncomment the folowing line if you want to ignore SHA512 file.
+# Some bulk build software doesn't provide it.
+#IGNORE_CKSUMS=1

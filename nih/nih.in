@@ -341,6 +341,10 @@ fetch_summary_file (){
 
 fetch_sha512_file (){
     # $1 - extension
+    if test -n "$IGNORE_CKSUMS"; then
+	return 0;
+    fi
+
     echo "Downloading SHA512.$1..."
     if test -f SHA512.$1; then
 	mv SHA512.$1 SHA512.$1.old
@@ -396,7 +400,9 @@ EOF
     if test -z "$NO_SUMMARY_COPY"; then
 	date_sufx=`get_date`
 	cp pkg_summary.txt pkg_summary_${date_sufx}.txt
-	cp SHA512.txt SHA512_${date_sufx}.txt
+	if test -z "$IGNORE_CKSUMS"; then
+	    cp SHA512.txt SHA512_${date_sufx}.txt
+	fi
     fi
     exit 0
 fi
@@ -404,7 +410,9 @@ fi
 ######################################################################
 # ensure that pkg_summary.txt exists and refresh it
 if test -z "$PKG_SUMMARY"; then
-    cksums=1 # checksums will be checked according to SHA512.txt
+    if test -z "$IGNORE_CKSUMS"; then
+	cksums=1 # checksums will be checked according to SHA512.txt
+    fi
     PKG_SUMMARY=$confdir/pkg_summary.txt
 fi
 
