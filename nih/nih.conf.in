@@ -7,3 +7,4 @@
 # Uncomment the following to avoid "Trying 2001:...." annoyance on
 # hosts with no configured IPv6
 FTP_OPTIONS='-4'
+WGET_OPTIONS='-4'
