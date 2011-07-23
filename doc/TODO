@@ -1,7 +1,7 @@
 - nih leaf
   nih leaf - don't use pkg_delete -A, use nih install instead ==>
      ==>  remove -E option
-
+- nih history: show differences
 - tnftp dependency on non-NetBSD systems, default ftp cient -> tnftp
 - nih install: option for not removing auto-installed leaf packages
 - nih install: a way to download ALL packages at once
