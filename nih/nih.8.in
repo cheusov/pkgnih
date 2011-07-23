@@ -381,6 +381,37 @@ Examples:
 .VE
 .RE
 .TP
+.B  audit
+Download a new pkg-vulnerabilities file and check the listed
+installed packages for vulnerabilities. If no package is given,
+check all installed packages.
+.P
+.RS
+.B "nih audit"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -d
+download a new pkg-vulnerabilities file,
+do not check packages.
+.TP
+.B -c
+check the packages for vulnerabilities
+using existing pkg-vulnerabilities file.
+.RE
+.P
+.RS
+Examples:
+.VB
+   nih audit -h
+   nih audit
+   nih audit -d
+   nih audit -c 'ffmpeg*'
+.VE
+.RE
+.TP
 .B  leaf
 Output or remove auto-removed leaf packages.
 .P

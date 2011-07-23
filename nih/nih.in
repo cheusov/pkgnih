@@ -52,6 +52,7 @@ Commands:
  nih verify          - Verify packages integrity
  nih status          - Show the status of installed packages
  nih search          - Search on packages
+ nih audit           - Check the installed packages for vulnerabilities
  nih info            - Show information about package
  nih meta            - Output available or installed meta packages
  nih leaf            - Output or remove leaf packages
@@ -1431,6 +1432,66 @@ if test "$1" = clean-cache; then
     else
 	echo 'The are no binaries to remove'
 	exit 0
+    fi
+
+    exit 0
+fi
+
+######################################################################
+######################################################################
+######################################################################
+# audit
+usage_audit (){
+    cat <<'EOF'
+nih audit [options] [pkgs...]
+
+      Download a new pkg-vulnerabilities file and check the listed
+      installed packages for vulnerabilities. If no package is given,
+      check all installed packages.
+
+   options:
+      -h    display this help message
+      -d    download a new pkg-vulnerabilities file,
+            do not check packages
+      -c    check the packages for vulnerabilities
+            using existing pkg-vulnerabilities file
+
+Examples:
+   nih audit -h
+   nih audit
+   nih audit -d
+   nih audit -c 'ffmpeg*'
+EOF
+}
+
+if test "$1" = audit; then
+    shift
+
+    check=1
+    download=1
+
+    while getopts hdc f; do
+	case "$f" in
+	    '?')
+		exit 1;;
+	    h)
+		usage_audit
+		exit 0;;
+	    d)
+		check=;;
+	    c)
+		download=;;
+	esac
+    done
+    shift `expr $OPTIND - 1`
+
+    if test -n "$download"; then
+	verbose 'Downloading new pkg-vulnerabilities file'
+	$PKG_ADMIN_CMD fetch-pkg-vulnerabilities -u
+    fi
+    if test -n "$check"; then
+	verbose 'Checking packages for vulnerabilities'
+	$PKG_ADMIN_CMD audit "$@"
     fi
 
     exit 0
