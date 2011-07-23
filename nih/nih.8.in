@@ -586,6 +586,21 @@ Remove all binaries.
 Binaries for packages listed in ~/.nih/installed_*.txt files
 are not removed.
 .RE
+.TP
+.B history
+Output installed, removed or updated packages
+using saved ~/.nih/installed_*.txt files.
+.P
+.RS
+.B "nih history"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -B
+Consider packages different if their BUILD_DATE differ.
+.RE
 .SH FILES
 .TP
 .IR "~/.nih/config" " or " @sysconfdir@/nih/config

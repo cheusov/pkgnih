@@ -60,6 +60,7 @@ Commands:
  nih mark            - Mark packages
  nih deps            - Show dependencies
  nih clean-cache     - Clean-up cache directory with binaries
+ nih history         - Output a history of changes
 EOF
 }
 
@@ -286,7 +287,8 @@ save_installed_packages (){
     done
 
     installed_fn="${installed_fn}$counter.txt"
-    pkg_bin_summary -f PKGNAME,PKGPATH,DEPENDS,COMMENT,automatic,nih_try,nih_hold \
+    pkg_bin_summary -f \
+	PKGNAME,PKGPATH,DEPENDS,COMMENT,automatic,nih_try,nih_hold,BUILD_DATE \
 	> "$installed_fn"
 }
 
@@ -1501,6 +1503,64 @@ if test "$1" = audit; then
 	verbose 'Checking packages for vulnerabilities'
 	$PKG_ADMIN_CMD audit "$@"
     fi
+
+    exit 0
+fi
+
+######################################################################
+######################################################################
+######################################################################
+# history
+usage_history (){
+    cat <<'EOF'
+nih history [options] [pkgs...]
+
+      Output installed, removed or updated packages last nih sessions
+      using saved ~/.nih/installed_*.txt files.
+
+   options:
+      -h    display this help message
+      -B    consider packages different if their BUILD_DATE differ
+
+Examples:
+   nih history -h
+   nih history
+   nih history -B
+EOF
+}
+
+if test "$1" = history; then
+    shift
+
+    while getopts hB f; do
+	case "$f" in
+	    '?')
+		exit 1;;
+	    h)
+		usage_history
+		exit 0;;
+	    B)
+		cmp_summary_opts=-b;;
+	esac
+    done
+    shift `expr $OPTIND - 1`
+
+    installed_fn="$tmp_dir/install"
+    pkg_bin_summary -f PKGNAME,PKGPATH,BUILD_DATE,automatic > "$installed_fn"
+
+    last_fn="$installed_fn"
+    last=current
+
+    ls ~/.nih/installed_*.txt |
+    while read curr_fn; do
+	curr=`echo $curr_fn | awk 'match($0, /[0-9].*[0-9]/) {
+	    print substr($0, RSTART, 4) "-" substr($0, RSTART+4, 2) "-" substr($0, RSTART+6, 2) " " substr($0, RSTART+9, 2) ":" substr($0, RSTART+11, 2)}'`
+	verbose "$last vs. $curr:"
+	pkg_cmp_summary $cmp_summary_opts -p "$last_fn" "$curr_fn" | grep -v ^= | indent
+
+	last="$curr"
+	last_fn="$curr_fn"
+    done
 
     exit 0
 fi
