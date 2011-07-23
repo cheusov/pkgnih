@@ -1,4 +1,3 @@
-- nih history: show differences
 - nih install: option for not removing auto-installed leaf packages
 - nih install: a way to download ALL packages at once
 - autoverifying pkgdb after installation
