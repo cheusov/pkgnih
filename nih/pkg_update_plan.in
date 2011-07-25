@@ -429,8 +429,12 @@ function resolve (flags){
 			{
 				addme [avail_provides [$3]] = 0
 			}else{
-				printf "%s is provided by the following packages: %s\n", $3, avail_provides [$3]
-				printf "Select one of them manually\n"
+				if ($3 in avail_provides){
+					printf "%s is provided by the following packages: %s\n", $3, avail_provides [$3]
+					printf "Select one of them manually\n"
+				}else{
+					printf "%s is required but is not provided by any package\n", $3
+				}
 				ex = ex2 = 1
 			}
 		}else{
