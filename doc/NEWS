@@ -1,4 +1,44 @@
 ======================================================================
+Version 0.8.0, by Aleksey Cheusov, Sun, 24 Jul 2011 01:11:25 +0300
+
+  nih remove:
+    - FIX: -n now works correctly
+      Affected versions: 0.7.1-0.7.2
+
+  nih install:
+    - FIX: "nih install -n" doesn't change "automatic" flag anymore
+    - new suboption -k for continuing download after failures
+    - BUILD_DATE field is included to installed_*.txt files
+
+  New command "nih audit" for checking packages for vulnerabilities
+
+  New command "nih history"
+
+  nih mark:
+    - new suboption -A and -U, synonyms to -u and -a respectively
+
+  nih list:
+    - new suboption -b for outputting packages in the repository
+    - new suboption -r for outputting raw package summaries
+
+  nih meta:
+    - new suboption -r for outputting raw package summaries
+
+  nih refresh:
+    - error message is output when download fails
+
+  Minor improvements in "nih -h" and manual page
+
+  Path to ftp(1) defaults to /usr/bin/ftp on NetBSD, FreeBSD, OpenBSD
+  and DragonFlyBSD.  On other systems it defaults to tnftp from
+  pkgsrc.
+
+  FTP_OPTIONS and WGET_OPTIONS default to "-4" for using IPv4 only.
+
+  New configuration variable IGNORE_CKSUMS was added in order to
+  ignore SHA512.txt absent in some repositories.
+
+======================================================================
 Version 0.7.2, by Aleksey Cheusov, Mon, 13 Jun 2011 22:44:31 +0300
 
   Fix for "Package xxx is not found" problem:
