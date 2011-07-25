@@ -1118,27 +1118,29 @@ nih leaf [options]
       -h    display this help message
       -t    output only PKGNAME
       -R    remove automatically installed leaf packages
-      -E    remove automatically installed leaf packages recursively
       -n    pass -n to pkg_delete
 
 Examples:
    nih leaf -t
    nih leaf -R
-   nih leaf -En
+   nih leaf -Rn
 EOF
 }
 
 if test "$1" = leaf; then
     shift
     opts='l'
-    while getopts htREn f; do
+    while getopts htRn f; do
 	case "$f" in
 	    '?')
 		exit 1;;
 	    h)
 		usage_leaf
 		exit 0;;
+	    R)
+		remove=1;;
 	    *)
+		pkg_delete_opts=-n
 		opts="${opts}$f";;
 	esac
     done
@@ -1148,8 +1150,28 @@ if test "$1" = leaf; then
 	save_installed_packages
     fi
 
-    save_installed_packages
-    pkg_status "-$opts" "$@"
+    if test -n "$remove"; then
+	rem_pkgnames="$tmp_dir/rem_pkgnames"
+	rem_summary="$tmp_dir/rem_summary"
+
+	pkg_status -lt > "$rem_pkgnames"
+
+	if test -s "$rem_pkgnames"; then
+	    echo 'The following packages will be removed'
+	    xargs pkg_bin_summary < "$rem_pkgnames" > "$rem_summary"
+	    summary2packages_to_be_removed "$rem_summary"
+
+	    if ! yesno remove_pkgs 'Proceed'; then
+		exit 0
+	    fi
+
+	    save_installed_packages
+	    xargs $PKG_DELETE_CMD $pkg_delete_opts < "$rem_pkgnames"
+	else
+	fi
+    else
+	pkg_status "-$opts" "$@"
+    fi
 
     exit 0
 fi

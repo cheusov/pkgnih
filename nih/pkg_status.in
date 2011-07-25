@@ -58,7 +58,7 @@ usage:
   pkg_status -s [-ruaTAqDp0] [ [--] pkg_info_args ]
   pkg_status -b [-ruaTAqDBN] [ [--] pkg_info_args ]
   pkg_status -k [-mULd]     [ [--] pkg_info_args or pkg_admin_args ]
-  pkg_status -l [-rtREn]
+  pkg_status -l [-rtRn]
 
 OPTIONS:
   -h         display this help message
@@ -84,7 +84,6 @@ OPTIONS for -l:
   -l         output leaf packages installed automatically
   -t         output only PKGNAME
   -R         remove automatically installed leaf packages
-  -E         the same as -R but with 'pkg_delete -A'
   -n         pass -n to pkg_delete
 OPTIONS for -k:
   -m         check checksums of installed files (pkg_admin check)
@@ -122,7 +121,7 @@ Examples:
    pkg_status -bA
    pkg_status -bar
 
-   pkg_status -lEn
+   pkg_status -lRn
 
    pkg_status -km
    pkg_status -kUd
@@ -132,7 +131,7 @@ EOF
 pkg_cmp_opts='-p'
 
 process_args (){
-    while getopts hVsbrAuaQqDp:0kmULcdltREnTB f; do
+    while getopts hVsbrAuaQqDp:0kmULcdltRnTB f; do
 	case $f in
 	    h)    usage; exit 0;;
 	    V)    echo 'pkg_status @VERSION@'; exit 0;;
@@ -158,7 +157,6 @@ process_args (){
 	    l)    mode_leaves=1;;
 	    t)    pkgpath_only=1;;
 	    R)    rem_leaves=1;;
-	    E)    pkg_delete_opts="$pkg_delete_opts -A"; rem_leaves=1;;
 	    n)    pkg_delete_opts="$pkg_delete_opts -n";;
 	    '?')  exit 1;;
 	esac
@@ -244,8 +242,8 @@ else
 fi
 
 get_leaves_summaries (){
-    pkg_bin_summary -f PKGNAME,COMMENT,PKGPATH,automatic,REQUIREDBY |
-    pkg_grep_summary . 'fields ["automatic"] == "yes" && fields ["REQUIREDBY"] == ""'
+    pkg_bin_summary -f PKGNAME,PKGPATH,DEPENDS,COMMENT,automatic > $tmp_dir/pkgs
+    pkg_summary2leaves -r $tmp_dir/pkgs
 }
 
 if test -n "$mode_leaves"; then

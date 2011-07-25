@@ -433,9 +433,6 @@ Output only PKGNAME.
 .B -R
 Remove auto-removed leaf packages.
 .TP
-.B -E
-Remove auto-removed leaf packages recursively.
-.TP
 .B -n
 Don't actually deinstall packages,
 just report the steps that would be taken.
@@ -446,7 +443,7 @@ Examples:
 .VB
    nih leaf -t
    nih leaf -R
-   nih leaf -En
+   nih leaf -Rn
 .VE
 .RE
 .TP
@@ -520,7 +517,7 @@ Examples:
 .RE
 .TP
 .B  deps
-      Output a dependency graph of installed packages.
+Output a dependency graph of available or installed packages.
 .P
 .RS
 .B "nih deps"
