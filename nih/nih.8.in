@@ -481,7 +481,7 @@ Examples:
 .RE
 .TP
 .B  deps
-      Output a dependency graph of installed packages.
+Output a dependency graph of available or installed packages.
 .P
 .RS
 .B "nih deps"
