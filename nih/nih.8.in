@@ -52,6 +52,11 @@ REPOSITORY configuration variable. Unless
 variable is set in configuration file, pkg_summary.txt and SHA512.txt
 files are copied to "pkg_summary_YYYYMMDD_hhmm.txt" and "SHA512_YYYYMMDD_hhmm.txt"
 respectively. So, you can restore them and use in the future.
+If
+.I IGNORE_CKSUMS
+variable
+is set to non-empty string, SHA512.txt file is not downloaded and cksums
+of binary packages are not ckecked.
 .P
 .RS
 .B "nih refresh"
@@ -381,6 +386,37 @@ Examples:
 .VE
 .RE
 .TP
+.B  audit
+Download a new pkg-vulnerabilities file and check the listed
+installed packages for vulnerabilities. If no package is given,
+check all installed packages.
+.P
+.RS
+.B "nih audit"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -d
+download a new pkg-vulnerabilities file,
+do not check packages.
+.TP
+.B -c
+check the packages for vulnerabilities
+using existing pkg-vulnerabilities file.
+.RE
+.P
+.RS
+Examples:
+.VB
+   nih audit -h
+   nih audit
+   nih audit -d
+   nih audit -c 'ffmpeg*'
+.VE
+.RE
+.TP
 .B  leaf
 Output or remove auto-removed leaf packages.
 .P
@@ -546,6 +582,21 @@ Remove all binaries.
 .B -i
 Binaries for packages listed in ~/.nih/installed_*.txt files
 are not removed.
+.RE
+.TP
+.B history
+Output installed, removed or updated packages
+using saved ~/.nih/installed_*.txt files.
+.P
+.RS
+.B "nih history"
+accepts the following options:
+.TP
+.B -h
+Display help message.
+.TP
+.B -B
+Consider packages different if their BUILD_DATE differ.
 .RE
 .SH FILES
 .TP

@@ -1,4 +1,3 @@
-- tnftp dependency on non-NetBSD systems, default ftp cient -> tnftp
 - nih install: option for not removing auto-installed leaf packages
 - nih install: a way to download ALL packages at once
 - autoverifying pkgdb after installation
@@ -10,4 +9,3 @@
 - before update warn about missed binaries for installed packages
   (downgrade will not be possible)
 - use distbb for source-based update
-- nih audit
