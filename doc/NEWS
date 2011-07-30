@@ -16,6 +16,7 @@ Version 0.8.0, by Aleksey Cheusov, Sun, 24 Jul 2011 01:11:25 +0300
 
   nih mark:
     - new suboption -A and -U, synonyms to -u and -a respectively
+    - if neither -a, -A, -u or -U were specified, markers are output.
 
   nih list:
     - new suboption -b for outputting packages in the repository

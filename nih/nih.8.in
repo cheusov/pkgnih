@@ -490,7 +490,9 @@ The default format may be changed in future releases.
 .RE
 .TP
 .B  mark
-Mark packages as auto-removed or as installed by user.
+Output markers of the specified packages (the default) or
+mark/unmark packages as auto-removed or as installed by user.
+If no packages are specified markers of all installed packages are output.
 .P
 .RS
 .B "nih mark"
@@ -511,9 +513,17 @@ NOTES: -a and -U are synonyms, -u and -A are synonyms
 .RS
 Examples:
 .VB
-   nih mark -a libmaa
-   nih mark -u ffmpeg
+   nih mark -h
+   nih mark
+   nih mark -a libmaa libpng
+   nih mark -u ffmpeg gsed
 .VE
+.P
+One can change format of the output
+with a help of shell
+functions 'summary2markers' in configuration file.
+See @dfltconfdir@/nih.default.conf for details.
+The default format may be changed in future releases.
 .RE
 .TP
 .B  deps

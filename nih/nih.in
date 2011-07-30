@@ -1290,8 +1290,9 @@ if test "$1" = mark; then
 	echo '-u and -d options are exclusive' 1>&2
 	exit 1
     elif test -z "$mode_u$mode_a"; then
-	echo 'Either -u or -d must be applied' 1>&2
-	exit 1
+	pkg_bin_summary -a nih_try,nih_hold,automatic "$@" |
+	summary2markers
+	exit 0
     elif test -n "$mode_a"; then
 	cmd='set automatic=yes'
     else
