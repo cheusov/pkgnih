@@ -1,5 +1,5 @@
 ======================================================================
-Version 0.8.0, by Aleksey Cheusov, Sun, 24 Jul 2011 01:11:25 +0300
+Version 0.8.0, by Aleksey Cheusov, Sat, 30 Jul 2011 13:38:05 +0300
 
   nih remove:
     - FIX: -n now works correctly
