@@ -1167,7 +1167,6 @@ if test "$1" = leaf; then
 
 	    save_installed_packages
 	    xargs $PKG_DELETE_CMD $pkg_delete_opts < "$rem_pkgnames"
-	else
 	fi
     else
 	pkg_status "-$opts" "$@"
