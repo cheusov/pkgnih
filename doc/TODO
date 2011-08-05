@@ -1,3 +1,4 @@
+- nih status: -v analyse vulnerable packages against binary or pkgsrc tree
 - nih history: fix for bash seen on Linux
 - nih install: ipp -- default repository for OI
 - nih status: -N   -- check installed(?) packages
