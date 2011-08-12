@@ -1,3 +1,5 @@
+- nih verify -s: ensures that all installed packages
+  were built for running system
 - nih history: fix for bash seen on Linux
 - nih install: ipp -- default repository for OI
 - nih status: -N   -- check installed(?) packages
