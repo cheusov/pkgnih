@@ -621,8 +621,8 @@ if test "_$1" = _install -o "_$1" = _update; then
 	exit 1
     fi
 
-    pkg_cmp_summary $cmp_opts "$installed_summary" "$plan_summary" |
-    grep -v '^=' > "$cmp_summary" || true
+    pkg_cmp_summary $cmp_opts "$installed_summary" "$plan_summary" \
+	> "$cmp_summary" || true
 
     pkg_grep_summary -s force_update yes < "$plan_summary" |
     awk '/^PKGNAME=/ {
@@ -639,7 +639,8 @@ if test "_$1" = _install -o "_$1" = _update; then
     pkg_grep_summary -t strlist PKGBASE "$rem_pkgs" \
 	< "$installed_summary" > "$rem_summary"
 
-    inst_pkgs=`awk '$1 ~ /^[+<>!]$/ {print $2}' "$cmp_summary"`
+    inst_pkgs=`awk '$1 ~ /^[<>!]$/ {print $2 "-" $4}
+                    $1 ~ /^[+]$/   {print $2 "-" $3}' "$cmp_summary" | sort -u`
     inst_pkgs=`echo $inst_pkgs`
 
     auto_pkgs=`pkg_grep_summary -v -e automatic < "$plan_summary" |
@@ -647,11 +648,11 @@ if test "_$1" = _install -o "_$1" = _update; then
     auto_pkgs=`echo $auto_pkgs`
 
     inst_auto_summary="$tmp_dir/inst_auto_summary"
-    pkg_grep_summary -t strlist PKGBASE "$inst_pkgs" < "$plan_summary" |
+    pkg_grep_summary -t strlist PKGNAME "$inst_pkgs" < "$plan_summary" |
     pkg_grep_summary -t strlist PKGNAME "$auto_pkgs" > "$inst_auto_summary"
 
     inst_summary="$tmp_dir/inst_summary"
-    pkg_grep_summary -t strlist PKGBASE "$inst_pkgs" < "$plan_summary" |
+    pkg_grep_summary -t strlist PKGNAME "$inst_pkgs" < "$plan_summary" |
     pkg_grep_summary -v -t strlist PKGNAME "$auto_pkgs" > "$inst_summary"
 
     conflicts_msg="$tmp_dir/conflicts"
@@ -705,6 +706,27 @@ if test "_$1" = _install -o "_$1" = _update; then
 	exit 0
     fi
 
+    cd $CACHEDIR/All
+
+    # Ensure that packages that will be be installed do not have
+    # common files
+    if test -n "$inst_pkgs"; then
+	echo "Checking packages from update plan for common files..." 1>&2
+	plist_summary="$tmp_dir/plist_summary"
+	for i in $inst_pkgs; do
+	    echo "./$i$SUFX"
+	done | 
+	xargs pkg_bin_summary -e -f PKGNAME,PKGPATH,PLIST > "$plist_summary"
+
+	awk '/^[=]/ {print $2}' "$cmp_summary" |
+	xargs pkg_bin_summary -e -f PKGNAME,PKGPATH,PLIST >> "$plist_summary"
+
+	if ! pkg_lint_summary -f "$plist_summary"; then
+	    exit 1
+	fi
+    fi
+
+    # installation
     save_installed_packages
 
     if test -s "$rem_summary" -o -s "$extra_rem_summary"; then
@@ -717,8 +739,6 @@ if test "_$1" = _install -o "_$1" = _update; then
 	    $PKG_DELETE_CMD -f $pkg_opts "$pkg"
 	done
     fi
-
-    cd $CACHEDIR/All
 
     pkg_summary2deps -ndtr "$plan_summary" | tsort |
     while read pkg; do
@@ -1158,7 +1178,7 @@ if test "$1" = leaf; then
 
 	if test -s "$rem_pkgnames"; then
 	    echo 'The following packages will be removed'
-	    xargs pkg_bin_summary < "$rem_pkgnames" > "$rem_summary"
+	    xargs pkg_bin_summary -e < "$rem_pkgnames" > "$rem_summary"
 	    summary2packages_to_be_removed "$rem_summary"
 
 	    if ! yesno remove_pkgs 'Proceed'; then
@@ -1289,7 +1309,7 @@ if test "$1" = mark; then
 	echo '-u and -d options are exclusive' 1>&2
 	exit 1
     elif test -z "$mode_u$mode_a"; then
-	pkg_bin_summary -a nih_try,nih_hold,automatic "$@" |
+	pkg_bin_summary -e -a nih_try,nih_hold,automatic "$@" |
 	summary2markers
 	exit 0
     elif test -n "$mode_a"; then
