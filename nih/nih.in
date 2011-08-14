@@ -100,7 +100,7 @@ process_options (){
     alt_getopt \
 	h     'usage; exit 0' \
 	V     'echo nih-@VERSION@; exit 0' \
-	y     'always_yes=1' \
+	y     'always_yes=-y' \
 	D     'debug=1' \
 	-- "$@"
 }
@@ -821,7 +821,7 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
 	plan="$plan $i--"
     done
 
-    $0 install $pkg_delete_opts $plan
+    $0 $always_yes install $pkg_delete_opts $plan
 
     exit 0
 fi
