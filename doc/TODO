@@ -1,3 +1,4 @@
+- nih: MESSAGES - notes about pkg_online-client and distbb.
 - nih history: warn about variable disabling creation of ~/.nih/installed_*
 - nih history: compressed ~/.nih/installed_*.txt
 - nih remove/install: syslog (idea belongs to Marc Espie)
