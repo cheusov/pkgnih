@@ -1,10 +1,15 @@
 - nih verify -s: ensures that all installed packages
   were built for running system
+- nih status: -v analyse vulnerable packages against binary or pkgsrc tree
 - nih history: fix for bash seen on Linux
+- nih install: ability to check a number bytes to download and
+  install/remove
 - nih install: ipp -- default repository for OI
 - nih status: -N   -- check installed(?) packages
                       against build-time dependencies
   nih status: -S   -- analyse symbols?
+- nih install: working with ALL binaries available in $CACHEDIR
+- nih install: direct invocation of pkg_add
 - nih install:        after downloading check PLIST consistency
 - nih clean-cache:    use FILE_NAME
 - nih clean-distdir

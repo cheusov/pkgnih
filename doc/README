@@ -4,7 +4,7 @@ NIH means Not Invented Here, yes, I'm talking about NIH syndrome :-)
 Why not:
 
   pkg_add/pkg_delete:
-    - They are low level tools and cannot be used for handling
+    - These are low level tools and cannot be used for handling
       hundreds of packages efficiently.
 
   pkg_chk:
@@ -19,10 +19,10 @@ Why not:
     - It doesn't allow to install or update packages, it only builds them
 
   pkgin:
-    - Package manager written in "C"??? No, thanks.
+    - Package manager written in "C"? No, thanks.
       "C" is a the worst programming language I've ever
       known for this task. All other reasons are secondary.
-    - I think sqlite3 database is absoletely useless for package management.
+    - sqlite is absoletely useless for package management.
 
   pkgmanager:
     - It is dead
