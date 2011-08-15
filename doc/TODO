@@ -1,4 +1,5 @@
 - nih history: warn about variable disabling creation of ~/.nih/installed_*
+- nih history: compressed ~/.nih/installed_*.txt
 - nih remove/install: syslog (idea belongs to Marc Espie)
 - nih -s <path_to_summary> that defaults to ~/.nih/pkg_summary.txt
 - nih verify -s: ensures that all installed packages
