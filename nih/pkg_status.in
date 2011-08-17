@@ -296,31 +296,7 @@ if test -n "$submode_raw"; then
     }
 else
     raw2hr (){
-	runpipe0 sort -k3,3 -t' ' '|' \
-	awk '
-	{
-	    pkgpath = pkgname = ver1 = ver2 = ua = ""
-	    pkgpath = $2
-	    pkgname = $3
-	    if ($1 ~ /^[<>=!]$/){
-		ver1    = $4
-		ver2    = $5
-		ua      = $6
-	    }else if ($1 == "-"){
-		ver1    = $4
-		ua      = $5
-	    }else if ($1 == "+"){
-		ver2    = $4
-	    }
-
-	    if ($1 == "<") op = ""
-	    else op = $1
-
-	    if (ua == "U") op = op "U"
-
-	    printf "%3s %-30s %-15s %-12s %-12s\n", \
-		op, pkgpath, pkgname, ver1, ver2
-	}'
+	sort -k3 -t' ' | @libexecdir@/nih/cmp2hr
     }
 fi
 

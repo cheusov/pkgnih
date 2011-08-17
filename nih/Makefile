@@ -24,8 +24,11 @@ INTEXTS_REPLS +=	PACKAGES       ${PACKAGES}
 INTEXTS_REPLS +=	cachedir       ${CACHEDIR}
 INTEXTS_REPLS +=	dfltconfdir    ${DFLTCONFDIR}
 
-INSCRIPTS =		nih pkg_update_plan pkg_status
+INTEXTS_REPLS +=	libexecdir     ${LIBEXECDIR}
+
+INSCRIPTS =		nih pkg_update_plan pkg_status cmp2hr
 SCRIPTS =		${INSCRIPTS}
+SCRIPTSDIR_cmp2hr =	${LIBEXECDIR}/nih
 
 INFILES =		nih.conf nih.default.conf
 FILES :=		${INFILES}
