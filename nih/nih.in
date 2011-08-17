@@ -453,6 +453,7 @@ nih install <packages>
 
    options:
       -h     display this help message
+
       -n     don't actually install a package, just report the steps that
              would be taken if it were.
       -d     download binaries only, do not update installed packages
@@ -473,9 +474,9 @@ Examples:
    nih update -dk
    nih install mawk lang/gawk
    nih install perl
-   nih install +GConf +xproto
-   nih install -- -gmake -autoconf -automake -libtool-base
-   nih install textproc/dict-client -wip/dict-client
+   nih install GConf+ xproto+
+   nih install gmake- autoconf- automake- libtool-base-
+   nih install textproc/dict-client wip/dict-client-
 EOF
 }
 
