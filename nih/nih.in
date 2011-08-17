@@ -1593,12 +1593,12 @@ if test "$1" = history; then
     last_fn="$installed_fn"
     last=current
 
-    ls ~/.nih/installed_*.txt |
+    ls -r ~/.nih/installed_*.txt |
     while read curr_fn; do
 	curr=`echo $curr_fn | awk 'match($0, /[0-9].*[0-9]/) {
 	    print substr($0, RSTART, 4) "-" substr($0, RSTART+4, 2) "-" substr($0, RSTART+6, 2) " " substr($0, RSTART+9, 2) ":" substr($0, RSTART+11, 2)}'`
-	verbose "$last vs. $curr:"
-	pkg_cmp_summary $cmp_summary_opts -p "$last_fn" "$curr_fn" |
+	verbose "$curr vs. $last"
+	pkg_cmp_summary $cmp_summary_opts -p "$curr_fn" "$last_fn" |
 	awk '$1 != "="' | sort -k3 -t' ' | @libexecdir@/nih/cmp2hr
 
 	last="$curr"
