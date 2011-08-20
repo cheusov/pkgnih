@@ -1,3 +1,4 @@
+- configuration variable for ~/.nih
 - nih: MESSAGES - notes about pkg_online-client and distbb.
 - nih history: warn about variable disabling creation of ~/.nih/installed_*
 - nih history: compressed ~/.nih/installed_*.txt
@@ -23,7 +24,8 @@
   nih remove -t
   nih list -t
   nih mark -t/-T
-      [+-<>=]aAuUhHtT
+  nih history:
+     [+-<>=]aAuUhHtT
 
 - nih install: option for not removing auto-installed leaf packages
 - nih install: a way to download ALL packages at once
