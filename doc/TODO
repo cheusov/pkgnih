@@ -9,7 +9,6 @@
   nih status: -S   -- analyse symbols?
 - nih install: working with ALL binaries available in $CACHEDIR
 - nih install: direct invocation of pkg_add
-- nih install:        after downloading check PLIST consistency
 - nih clean-cache:    use FILE_NAME
 - nih clean-distdir
 
