@@ -714,13 +714,18 @@ if test "_$1" = _install -o "_$1" = _update; then
     if test -n "$inst_pkgs"; then
 	echo "Checking packages from update plan for common files..." 1>&2
 	plist_summary="$tmp_dir/plist_summary"
-	for i in $inst_pkgs; do
-	    echo "./$i$SUFX"
-	done | 
-	xargs pkg_bin_summary -e -f PKGNAME,PKGPATH,PLIST > "$plist_summary"
 
-	awk '/^[=]/ {print $2}' "$cmp_summary" |
-	xargs pkg_bin_summary -e -f PKGNAME,PKGPATH,PLIST >> "$plist_summary"
+	{
+	    # packages to install
+	    for i in $inst_pkgs; do
+		echo "./$i$SUFX"
+	    done | 
+	    xargs pkg_bin_summary -e -f PKGNAME,PKGPATH,PLIST
+
+	    # remained packages
+	    awk '/^[=]/ {print $2}' "$cmp_summary" |
+	    xargs pkg_bin_summary -e -f PKGNAME,PKGPATH,PLIST
+	} | pkg_uniq_summary -n > "$plist_summary"
 
 	if ! pkg_lint_summary -f "$plist_summary"; then
 	    exit 1
