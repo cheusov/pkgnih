@@ -45,6 +45,7 @@
 #   -h        display this help
 #   -v        verbose mode
 #   -i        obtains packages specifications from stdin
+#   -t        mark packages to be installed with "try out" marker.
 # <packages> may be either PKGBASEs, PKGNAMEs or PKGPATHs,
 # optionally appended by `-' (marked for removal),
 # `+' (auto-removable), or `_' (auto-removable flag is not changed).
@@ -58,6 +59,7 @@ BEGIN {
 	}
 	verbose_mode = getarg("v")
 	from_stdin   = getarg("i")
+	try_out      = getarg("t")
 
 	if (ARGC < 3 - from_stdin){
 		exit 45
@@ -74,7 +76,7 @@ BEGIN {
 
 ############################################################
 # preparations
-function process_pkg (pkg,            base,suff,pair,rempair,pipe){
+function process_pkg (pkg, reqd,           base,suff,pair,rempair,pipe){
 	if (match(pkg, /([-+_]|--)$/)){
 		suff = substr(pkg, RSTART)
 		base = substr(pkg, 1, RSTART-1)
@@ -156,6 +158,8 @@ function process_pkg (pkg,            base,suff,pair,rempair,pipe){
 		add_pkgs [pair] = 0
 		rem_pkgs [rempair] = 0
 		add_base [base] = 0
+		if (reqd)
+			try_out_pkgbase [base] = 0
 	}
 }
 
@@ -255,11 +259,11 @@ BEGIN {
 	update_pkgpath_list = ""
 	if (from_stdin){
 		while (xgetline0()){
-			process_pkg($1)
+			process_pkg($1, try_out)
 		}
 	}else{
 		for (i=(ARGV [3] == "--" ? 4 : 3); i < ARGC; ++i){
-			process_pkg(ARGV [i])
+			process_pkg(ARGV [i], try_out)
 		}
 	}
 
@@ -300,9 +304,24 @@ function create_packages_summary (output, hash,                  pkgs,cmd)
 	gsub(/;/, ",", pkgs)
 
 	cmd = grep_package_cmd(pkgs, "PKGPANA") " < " shquote(avail_summary)
-	cmd = cmd " | awk 'NF == 0 {print \"force_update=yes\"} {print}'"
-	cmd = cmd " > " output
-	system(cmd)
+
+	close(output)
+	printf "" > output
+	while (cmd | getline){
+		if (/^PKGNAME=/)
+			pkgbase = pkgname2pkgbase(substr($0, 9))
+
+		if (NF == 0){
+			print "force_update=yes" > output
+			if (pkgbase in try_out_pkgbase)
+				print "try_out=yes" > output
+			pkgbase = ""
+		}
+
+		print $0 > output
+	}
+	xclose(output)
+	xclose(cmd)
 }
 
 function hash_to_indices (hash,           i,ret){
@@ -328,6 +347,7 @@ function generate_plan (output,           tmpfn,ii,s1)
 
 		system("cat " tmpfn " >> " s1)
 		rm(tmpfn)
+
 		break
 	}
 
@@ -341,12 +361,9 @@ function generate_plan (output,           tmpfn,ii,s1)
 		break
 	}
 
-#	cmd = "pkg_uniq_summary " s1 " > " s1 ".tmp; " \
-#		"pkg_summary2leaves -vra " s1 ".tmp > " output
 	cmd = "pkg_summary2leaves -vra " s1 " > " output
 	system(cmd)
 	rm(s1)
-#	rm(s1 ".tmp")
 }
 
 function get_imghash (){

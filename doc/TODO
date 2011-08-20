@@ -10,12 +10,9 @@
 - nih install:        after downloading check PLIST consistency
 - nih clean-cache:    use FILE_NAME
 - nih clean-distdir
+
 - nih try
-  nih install -t
-  nih remove -t
-  nih list -t
-  nih mark -t/-T
-      [+-<>=]aAuUhHtT
+- nih mark - aAuUhHtT markers
 
 - nih install: option for not removing auto-installed leaf packages
 - nih install: a way to download ALL packages at once

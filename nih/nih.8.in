@@ -255,6 +255,19 @@ Continue downloading packages after errors are encountered.
 .B -B
 Consider packages different if their BUILD_DATE differ.
 .TP
+.B -t
+Install packages and mark them as "try out".
+Later, such packages may be listed using
+.I nih list -t
+or uninstalled with a help of
+.IR "nih remove -t" .
+One can also manually mark/unmark packages as "try out" using
+.IR "nih mark -t/-T" .
+.br
+NOTE: "try out" marker is set with a help of
+.br
+.I pkg_admin set try_out=yes <packages>.
+.TP
 .B -D
 Enable debugging output.
 .RE
@@ -273,6 +286,7 @@ Examples:
    nih install gmake- autoconf- automake- libtool-base-
    nih install textproc/dict-client wip/dict-client-
    nih install /usr/pkgsrc/packages/xyz-1.2.3.tgz
+   nih install -t xfce4 fvwm openbox ctwm wmii fluxbox sawfish
 .VE
 .P
 One can change format of the output
@@ -296,6 +310,9 @@ Display help message.
 .B -n
 Don't actually remove a package, just report the steps that
 would be taken if it were.
+.TP
+.B -t
+Uninstall "try out" packages.
 .RE
 .P
 .RS
@@ -470,6 +487,9 @@ All installed packages are output.
 .B -u
 Packages installed by user are output.
 .TP
+.B -t
+"try out" packages are output.
+.TP
 .B -r
 Raw summaries are output.
 .RE
@@ -506,6 +526,9 @@ Mark/unmark packages as "installed by user".
 .TP
 .B -a/-A
 Mark/unmark packages as "installed as a dependency".
+.TP
+.B -t/-T
+Mark/unmark packages as "try out".
 .P
 NOTES: -a and -U are synonyms, -u and -A are synonyms
 .RE
