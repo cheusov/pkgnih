@@ -281,15 +281,15 @@ save_installed_packages (){
 
     installed_fn=$confdir/installed_`get_date`
     counter=''
-    while test -f "${installed_fn}$counter.txt"; do
+    while test -f "${installed_fn}$counter.bz2"; do
 	counter=${counter-0}
 	counter=$(($counter+1))
     done
 
     installed_fn="${installed_fn}$counter.txt"
     pkg_bin_summary -f \
-	PKGNAME,PKGPATH,DEPENDS,COMMENT,automatic,try_out,nih_hold,BUILD_DATE \
-	> "$installed_fn"
+	PKGNAME,PKGPATH,DEPENDS,COMMENT,automatic,try_out,nih_hold,BUILD_DATE |
+    bzip2 > "$installed_fn"
 }
 
 ######################################################################
@@ -1473,7 +1473,7 @@ nih clean-cache [options] [pkgs...]
       -h    display this help message
       -n    output files to be deleted
       -a    remove all binaries
-      -i    binaries for packages listed in ~/.nih/installed_*.txt
+      -i    binaries for packages listed in ~/.nih/installed_*
             are not removed.
 
 Examples:
@@ -1516,6 +1516,7 @@ if test "$1" = clean-cache; then
 
 	    if test -n "$keep_installed"; then
 		find "$confdir" -name 'installed_*.txt' | xargs cat
+		find "$confdir" -name 'installed_*.bz2' | xargs bzip2 -dc
 	    fi
 	} | summary2binary | sort -u > "$installed"
     fi
@@ -1643,11 +1644,25 @@ if test "$1" = history; then
     last_fn="$installed_fn"
     last=current
 
-    ls -r ~/.nih/installed_*.txt |
+    unpacked1_fn="$tmp_dir/unpacked1.txt"
+    unpacked2_fn="$tmp_dir/unpacked2.txt"
+
+    ls -r ~/.nih/installed_* |
     while read curr_fn; do
 	curr=`echo $curr_fn | awk 'match($0, /[0-9].*[0-9]/) {
 	    print substr($0, RSTART, 4) "-" substr($0, RSTART+4, 2) "-" substr($0, RSTART+6, 2) " " substr($0, RSTART+9, 2) ":" substr($0, RSTART+11, 2)}'`
 	verbose "$curr vs. $last"
+
+	if echo "$curr_fn" | grep [.]bz2 > /dev/null; then
+	    if test "$last_fn" = "$unpacked2_fn"; then
+		tmp_fn="$unpacked1_fn"
+	    else
+		tmp_fn="$unpacked2_fn"
+	    fi
+	    bzip2 -dc "$curr_fn" > "$tmp_fn"
+	    curr_fn="$tmp_fn"
+	fi
+
 	pkg_cmp_summary $cmp_summary_opts -p "$curr_fn" "$last_fn" |
 	awk '$1 != "="' | sort -k3 -t' ' | @libexecdir@/nih/cmp2hr
 

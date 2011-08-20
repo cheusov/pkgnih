@@ -229,7 +229,7 @@ If you want to do this, run the following:
    nih install editors/emacs23 emacs-
 .VE
 Before package installation or removal a list of installed packages
-is saved to ~/.nih/installed_YYYYMMDD_hhmm.txt file unless
+is saved to ~/.nih/installed_YYYYMMDD_hhmm.bz2 file unless
 .I NO_INSTALLED_COPY
 variable is set in config file. The same for
 .IR uninstall " and " leaf
@@ -613,13 +613,13 @@ Output files to be removed, do not remove them.
 Remove all binaries.
 .TP
 .B -i
-Binaries for packages listed in ~/.nih/installed_*.txt files
+Binaries for packages listed in ~/.nih/installed_* files
 are not removed.
 .RE
 .TP
 .B history
 Output installed, removed or updated packages
-using saved ~/.nih/installed_*.txt files.
+using saved ~/.nih/installed_* files.
 .P
 .RS
 .B "nih history"
