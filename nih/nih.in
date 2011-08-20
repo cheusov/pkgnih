@@ -1638,6 +1638,10 @@ if test "$1" = history; then
     done
     shift `expr $OPTIND - 1`
 
+    if test -n "$NO_INSTALLED_COPY"; then
+	echo "Warning: NO_INSTALLED_COPY is set in config file!"
+    fi
+
     installed_fn="$tmp_dir/install"
     pkg_bin_summary -f PKGNAME,PKGPATH,BUILD_DATE,automatic > "$installed_fn"
 
