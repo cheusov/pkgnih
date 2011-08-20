@@ -882,7 +882,9 @@ fi
 # verify
 usage_verify (){
     cat <<'EOF'
-nih verify [options] [PKGBASEs]
+nih verify -h
+nih verify -d|-c|-l|-L
+nih verify -m|-s [PKGBASEs]
 
       Verify installed or listed packages.
       By default all installed packages are verified.
@@ -894,17 +896,19 @@ nih verify [options] [PKGBASEs]
        -L     check the existence of library files listed in REQUIRES
        -d     check the presence of dependencies
        -c     check the conflicts
+       -s     compare `uname -r` and OS_VERSION from PKGBASEs
 Examples:
    nih verify -dclL
    nih verify -m
    nih verify -m 'lib*' gawk
+   nih verify -s
 EOF
 }
 
 if test "$1" = verify; then
     shift
     opts='k'
-    while getopts hmUlLdc f; do
+    while getopts hmUlLdcs f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -913,6 +917,8 @@ if test "$1" = verify; then
 		exit 0;;
 	    l)
 		opts="${opts}U";;
+	    s)
+		opts="${opts}S";;
 	    *)
 		opts="${opts}$f";;
 	esac

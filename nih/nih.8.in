@@ -345,14 +345,19 @@ Check for existence of library files listed in REQUIRES.
 .TP
 .B -d
 Check for presence of dependencies and their versions.
+.TP
+.B -s
+Compare "uname -r" output
+and version of an OS packages were built on.
 .RE
 .P
 .RS
 Examples:
 .VB
-   nih verify -dLU
+   nih verify -dLUs
    nih verify -m
    nih verify -m 'lib*' gawk
+   nih verify -s midori
 .VE
 .RE
 .TP

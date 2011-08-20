@@ -1,7 +1,5 @@
 - configuration variable for ~/.nih
 - nih -s <path_to_summary> that defaults to ~/.nih/pkg_summary.txt
-- nih verify -s: ensures that all installed packages
-  were built for running system
 - nih status: -v analyse vulnerable packages against binary or pkgsrc tree
 - nih install: ability to check a number bytes to download and
   install/remove

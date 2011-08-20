@@ -57,7 +57,7 @@ usage:
   pkg_status -V
   pkg_status -s [-ruaTAqDp0] [ [--] pkg_info_args ]
   pkg_status -b [-ruaTAqDBN] [ [--] pkg_info_args ]
-  pkg_status -k [-mULd]     [ [--] pkg_info_args or pkg_admin_args ]
+  pkg_status -k [-mULdS]     [ [--] pkg_info_args or pkg_admin_args ]
   pkg_status -l [-rtRn]
 
 OPTIONS:
@@ -90,6 +90,7 @@ OPTIONS for -k:
   -U         check for REQUIRES/PROVIDES coherence (pkg_lint_summary -l)
   -L         check existence of files listed in REQUIRES (pkg_lint_summary -L)
   -d         check for presense of dependencies (pkg_lint_summary -d)
+  -S         check for OS_VERSION of installed packages (pkg_lint_summary -s)
 Environment:
    PKG_STATUS_OPTIONS - additional options passed to pkg_status
    PKG_SUMMARY      - path to pkg_summary.{txt,gx,bz2},
@@ -124,14 +125,14 @@ Examples:
    pkg_status -lRn
 
    pkg_status -km
-   pkg_status -kUd
+   pkg_status -kUdS
 EOF
 }
 
 pkg_cmp_opts='-p'
 
 process_args (){
-    while getopts hVsbrAuaQqDp:0kmULcdltRnTB f; do
+    while getopts hVsbrAuaQqDp:0kmULcdltRnTBS f; do
 	case $f in
 	    h)    usage; exit 0;;
 	    V)    echo 'pkg_status @VERSION@'; exit 0;;
@@ -157,6 +158,7 @@ process_args (){
 	    l)    mode_leaves=1;;
 	    t)    pkgpath_only=1;;
 	    R)    rem_leaves=1;;
+	    S)    os_ver=1;;
 	    n)    pkg_delete_opts="$pkg_delete_opts -n";;
 	    '?')  exit 1;;
 	esac
@@ -264,8 +266,13 @@ if test -n "$mode_checks"; then
 	fi
     fi
 
-    if test -n "$check_reqs_provs$check_reqs_exist$check_deps$check_conflicts"; then
-	$PKG_INFO_CMD -X -a > $tmp_dir/bin_summary.txt
+    if test -n "$os_ver$check_reqs_provs$check_reqs_exist$check_deps$check_conflicts"
+    then
+	if test $# -eq 0; then
+	    $PKG_INFO_CMD -X -a
+	else
+	    $PKG_INFO_CMD -X "$@"
+	fi > $tmp_dir/bin_summary.txt
     fi
 
     if test -n "$check_reqs_provs"; then
@@ -281,6 +288,15 @@ if test -n "$mode_checks"; then
     if test -n "$check_deps$check_conflicts"; then
 	echo ' ---------------------- dependencies/conflicts ----------------------'
 	pkg_lint_summary $check_deps $check_conflicts $tmp_dir/bin_summary.txt || ex=1
+    fi
+
+    if test -n "$os_ver"; then
+	echo ' ---------------------- OS_VERSION ----------------------'
+	runpipe_base pkg_lint_summary -s $tmp_dir/bin_summary.txt '|' \
+	awk '$1 == "s:" {print $1, $2, $3, $4, $6}'
+	if test "$pipestatus_1" -ne 0; then
+	    ex=1
+	fi
     fi
 
     exit $ex
