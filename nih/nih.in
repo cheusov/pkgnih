@@ -1479,7 +1479,7 @@ nih clean-cache [options] [pkgs...]
 
    options:
       -h    display this help message
-      -n    output files to be deleted
+      -n    output files to be removed
       -a    remove all binaries
       -i    binaries for packages listed in ~/.nih/installed_*
             are not removed.
