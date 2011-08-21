@@ -38,6 +38,11 @@ Display nih version.
 .TP
 .B "-y"
 Answer 'Yes' to all questions.
+.TP
+.BI "-s" " summary_file"
+Specify path to pkg_summary(5) file for use instead of downloaded one
+or specified in a config file. Plain text, gzip-ed of bzip2-ed files
+are supported.
 .SH COMMANDS
 The following commands are provided.
 .TP

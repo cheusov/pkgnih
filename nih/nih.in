@@ -39,6 +39,7 @@ Global options:
  nih -h              - Display help message
  nih -V              - Display nih version
  nih -y              - Answer 'Yes' to all questions
+ nih -s <summary>    - pkg_summary(5) file
 
 Commands:
  nih <command> -h    - Display help message for a <command>
@@ -102,6 +103,7 @@ process_options (){
 	V     'echo nih-@VERSION@; exit 0' \
 	y     'always_yes=-y' \
 	D     'debug=1' \
+	=s    'summary=' \
 	-- "$@"
 }
 cmds=`process_options "$@"`
@@ -120,6 +122,19 @@ if test $# -eq 0; then
     exit 1
 fi
 
+# -s
+if test -n "$summary"; then
+    case "$summary" in
+	*.gz)
+	    PKG_SUMMARY="$tmp_dir/pkg_summary.txt"
+	    gzip -dc "$summary" > "$PKG_SUMMARY";;
+	*.bz2)
+	    PKG_SUMMARY="$tmp_dir/pkg_summary.txt"
+	    bzip2 -dc "$summary" > "$PKG_SUMMARY";;
+	*)
+	    PKG_SUMMARY="$summary"
+    esac
+fi
 
 ######################################################################
 ######################################################################
