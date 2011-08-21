@@ -234,6 +234,10 @@ is saved to ~/.nih/installed_YYYYMMDD_hhmm.bz2 file unless
 variable is set in config file. The same for
 .IR uninstall " and " leaf
 commands.
+After downloading binaries the packages to be installed on the system
+are checked for common files in order to prevent failures in the middle of update.
+Normally CONFLICTS variable should be set but who knows. Setting NO_PLIST_CHECK
+variable to non-empry string disables this behaviour.
 .P
 .RS
 .B "nih install"

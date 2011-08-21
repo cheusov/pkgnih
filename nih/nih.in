@@ -717,7 +717,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     # Ensure that packages that will be be installed do not have
     # common files
-    if test -n "$inst_pkgs"; then
+    if test -z "$NO_PLIST_CHECK" -a -n "$inst_pkgs"; then
 	echo "Checking packages from update plan for common files..." 1>&2
 	plist_summary="$tmp_dir/plist_summary"
 
