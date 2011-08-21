@@ -256,6 +256,10 @@ Do not update installed packages, download binaries only.
 .B -k
 Continue downloading packages after errors are encountered.
 .TP
+.B -l
+Do not remove auto-removable leaf packages. Bear in mind that
+this may cause problems in creating a non-conflicting update plan.
+.TP
 .B -B
 Consider packages different if their BUILD_DATE differ.
 .TP
@@ -314,6 +318,9 @@ Display help message.
 .B -n
 Don't actually remove a package, just report the steps that
 would be taken if it were.
+.TP
+.B -l
+Do not remove auto-removable leaf packages.
 .TP
 .B -t
 Uninstall "try out" packages.

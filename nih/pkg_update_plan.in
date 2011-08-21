@@ -46,6 +46,7 @@
 #   -v        verbose mode
 #   -i        obtains packages specifications from stdin
 #   -t        mark packages to be installed with "try out" marker.
+#   -l        do not mark leaf packages installed as a dependency for removal
 # <packages> may be either PKGBASEs, PKGNAMEs or PKGPATHs,
 # optionally appended by `-' (marked for removal),
 # `+' (auto-removable), or `_' (auto-removable flag is not changed).
@@ -60,6 +61,7 @@ BEGIN {
 	verbose_mode = getarg("v")
 	from_stdin   = getarg("i")
 	try_out      = getarg("t")
+	keep_leaves  = getarg("l")
 
 	if (ARGC < 3 - from_stdin){
 		exit 45
@@ -337,7 +339,11 @@ function hash_to_indices (hash,           i,ret){
 
 function generate_plan (output,           tmpfn,ii,s1)
 {
-	s1 = tmpfile()
+	if (keep_leaves)
+		s1 = output
+	else
+		s1 = tmpfile()
+
 	rem_packages_from_summary(inst_summary, s1)
 
 	for (ii in add_pkgs){
@@ -361,9 +367,11 @@ function generate_plan (output,           tmpfn,ii,s1)
 		break
 	}
 
-	cmd = "pkg_summary2leaves -vra " s1 " > " output
-	system(cmd)
-	rm(s1)
+	if (!keep_leaves){
+		cmd = "pkg_summary2leaves -vra " s1 " > " output
+		system(cmd)
+		rm(s1)
+	}
 }
 
 function get_imghash (){

@@ -458,6 +458,7 @@ nih install [options] <packages>
              would be taken if it were.
       -d     download binaries only, do not update installed packages
       -B     consider packages different if their BUILD_DATE differ
+      -l     do not remove auto-removable leaf packages
       -k     continue downloading packages after errors are encountered
       -t     install packages and mark them as "try out"
 
@@ -538,7 +539,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     cmd="$1"
     shift
 
-    while getopts hndkBtD f; do
+    while getopts hndkBtDl f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -554,7 +555,9 @@ if test "_$1" = _install -o "_$1" = _update; then
 	    B)
 		cmp_opts='-b';;
 	    t)
-		try_out_opt='-t';;
+		update_plan_opts="$update_plan_opts -t";;
+	    l)
+		update_plan_opts="$update_plan_opts -l";;
 	    D)
 		debug=1;;
 	    *)
@@ -620,7 +623,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 	debug_opt=-v
     fi
 
-    if ! $PKG_UPDATE_PLAN_CMD -iv $try_out_opt $debug_opt \
+    if ! $PKG_UPDATE_PLAN_CMD -iv $update_plan_opts $debug_opt \
 	"$installed_summary" "$PKG_SUMMARY" \
 	> "$plan_summary" < "$update_pkgs_fn"
     then
@@ -831,6 +834,7 @@ nih remove    <PKGBASEs>
       -h     display this help message
       -n     don't actually deinstall a package, just report the steps that
              would be taken if it were.
+      -l     do not remove auto-removable leaf packages
       -t     remove "try out" packages
 Examples:
    nih uninstall libgnome python26 kdelibs4
@@ -839,12 +843,12 @@ EOF
 
 if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
     shift
-    while getopts hnt f; do
+    while getopts hnlt f; do
 	case "$f" in
 	    '?')
 		exit 1;;
-	    n)
-		pkg_delete_opts='-n';;
+	    n|l)
+		pkg_delete_opts="$pkg_delete_opts -$f";;
 	    h)
 		usage_uninstall
 		exit 0;;
@@ -860,7 +864,7 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
 	tryout_pkgs="$tmp_dir/tryout"
 	pkg_bin_summary -f PKGNAME,try_out |
 	pkg_grep_summary -s try_out yes |
-	sed -n 's/^PKGNAME=//p' > "$tryout_pkgs"
+	awk '/^PKGNAME=/ {print substr($0, 9) "--"}' > "$tryout_pkgs"
 	plan=`cat "$tryout_pkgs"`
     fi
 
