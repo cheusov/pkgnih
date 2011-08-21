@@ -6,17 +6,14 @@
 - nih install: ipp -- default repository for OI
 - nih status: -N   -- check installed(?) packages
                       against build-time dependencies
-  nih status: -S   -- analyse symbols?
 - nih install: working with ALL binaries available in $CACHEDIR
 - nih install: direct invocation of pkg_add
-- nih clean-cache:    use FILE_NAME
 - nih clean-distdir
 
 - nih try
 - nih history [+-<>=]aAuUhHtT
 
 - nih install: option for not removing auto-installed leaf packages
-- nih install: a way to download ALL packages at once
 - autoverifying pkgdb after installation
 - optionally disable REQUIRES/PROVIDES checks
 - separate pkg_install_plan script from nih
@@ -29,3 +26,7 @@
 
 plan2:
 - nih remove/install: syslog (idea belongs to Marc Espie)
+- nih install: a way to download ALL packages at once
+  using different mirrors (for those who have very fast internet connection).
+- nih status: -S   -- analyse symbols?
+- nih clean-cache:    use FILE_NAME
