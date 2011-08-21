@@ -13,7 +13,6 @@
 - nih try
 - nih history [+-<>=]aAuUhHtT
 
-- nih install: option for not removing auto-installed leaf packages
 - autoverifying pkgdb after installation
 - optionally disable REQUIRES/PROVIDES checks
 - separate pkg_install_plan script from nih
