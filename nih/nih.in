@@ -568,7 +568,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     verbose "Getting a list of installed packages..."
     installed_summary="$tmp_dir/installed_summary"
     pkg_bin_summary \
-	-fPROVIDES,REQUIRES,PKGNAME,PKGPATH,COMMENT,automatic,CONFLICTS,DEPENDS,BUILD_DATE \
+	-fPROVIDES,REQUIRES,PKGNAME,PKGPATH,COMMENT,automatic,CONFLICTS,DEPENDS,BUILD_DATE,try_out \
 	> "$installed_summary"
 
     cmp_summary="$tmp_dir/cmp_summary"
@@ -788,7 +788,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 		if ((i in automatic_o) && automatic_o [i] != automatic_n [i])
 		    print i, "automatic", automatic_n [i]
 	    for (i in try_out_n)
-		if (try_out_n [i])
+		if (try_out_n [i] || try_out_o [i])
 		    print i, "try_out", 1
 	}' "$installed_summary" - < "$plan_summary" |
     while read pkg marker m; do
