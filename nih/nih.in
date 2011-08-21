@@ -789,8 +789,8 @@ if test "_$1" = _install -o "_$1" = _update; then
 		if ((i in automatic_o) && automatic_o [i] != automatic_n [i])
 		    print i, "automatic", automatic_n [i]
 	    for (i in try_out_n)
-		if ((i in try_out_o) && try_out_o [i] != try_out_n [i])
-		    print i, "try_out", try_out_n [i]
+		if (try_out_n [i])
+		    print i, "try_out", 1
 	}' "$installed_summary" - < "$plan_summary" |
     while read pkg marker m; do
 	if test "$m" -eq 0; then
