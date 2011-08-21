@@ -769,10 +769,9 @@ if test "_$1" = _install -o "_$1" = _update; then
 	fi
     done
 
-    cleanup_db
-
     ##################################################################
     ###### Marking packages that were not installed or updated #######
+    echo "Updating installed information..." 1>&2
     awk -v auto=0 -v try_out=0 '
 	FILENAME != "-" && $0 ~ /^PKGNAME=/ {pkgname = substr($0, 9)}
 	FILENAME != "-" && $0 ~ /^automatic/ {auto = 1}
@@ -809,6 +808,9 @@ if test "_$1" = _install -o "_$1" = _update; then
 	    fi
 	fi
     done
+
+    cleanup_db
+
     exit 0
 fi
 
