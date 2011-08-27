@@ -6,7 +6,6 @@
 - nih status: -N   -- check installed(?) packages
                       against build-time dependencies
 - nih install: working with ALL binaries available in $CACHEDIR
-- nih install: direct invocation of pkg_add
 - nih clean-distdir
 
 - nih try
