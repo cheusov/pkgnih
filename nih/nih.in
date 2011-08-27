@@ -476,6 +476,9 @@ nih install [options] <packages>
       -l     do not remove auto-removable leaf packages
       -k     continue downloading packages after errors are encountered
       -t     install packages and mark them as "try out"
+      -a <val>    set PKG_PATH and run pkg_add(8) directly
+             val=1 ==> PKG_PATH=$CACHEDIR/All
+             val=2 ==> PKG_PATH=$REPOSITORY/All
 
       -D     For debugging purposes
 
@@ -496,6 +499,8 @@ Examples:
    nih install gmake- autoconf- automake- libtool-base-
    nih install textproc/dict-client wip/dict-client-
    nih install -t xfce4 fvwm openbox ctwm wmii fluxbox sawfish
+   nih install -a1 firefox
+   nih install -a2 -- -UA xulrunner
 EOF
 }
 
@@ -554,7 +559,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     cmd="$1"
     shift
 
-    while getopts hndkBtDl f; do
+    while getopts hndkBtDla: f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -575,12 +580,33 @@ if test "_$1" = _install -o "_$1" = _update; then
 		update_plan_opts="$update_plan_opts -l";;
 	    D)
 		debug=1;;
+	    a)
+		pkg_add_local=$OPTARG;;
 	    *)
 		opts="${opts}$f";;
 	esac
     done
     shift `expr $OPTIND - 1`
 
+    # -a
+    if test -n "$pkg_add_local"; then
+	echo "Installing packages $*" 1>&2
+	save_installed_packages
+	case "$pkg_add_local" in
+	    1)
+		export PKG_PATH=$CACHEDIR/All;;
+	    2)
+		export PKG_PATH=$REPOSITORY/All;;
+	    *)
+		echo 'Bad argument for -a option' 1>&2
+		echo 'See nih install -h for details' 1>&2
+		exit 1;;
+	esac
+	$PKG_ADD_CMD "$@"
+	exit 0
+    fi
+
+    # 
     refresh_summary
 
     verbose "Getting a list of installed packages..."

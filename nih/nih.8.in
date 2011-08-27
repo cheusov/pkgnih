@@ -268,6 +268,25 @@ this may cause problems in creating a non-conflicting update plan.
 .B -B
 Consider packages different if their BUILD_DATE differ.
 .TP
+.BI -a " val"
+Set
+.I PKG_PATH
+and run
+.B pkg_add(8)
+directly.
+Update plan is not generated, packages are not
+checked for PLIST conflicts, suffixes '+', '-', '--', '_' etc. are
+not supported, packages installed as a dependency are not removed,
+downloaded binaries are not saved in
+.IR $CACHEDIR ...
+If
+.I val
+is 1, PKG_PATH is set to
+.IR $CACHEDIR/All ,
+if it is 2, PKG_PATH is set to
+.IR $REPOSITORY/All .
+Use this option with caution.
+.TP
 .B -t
 Install packages and mark them as "try out".
 Later, such packages may be listed using
@@ -277,7 +296,8 @@ or uninstalled with a help of
 One can also manually mark/unmark packages as "try out" using
 .IR "nih mark -t/-T" .
 .br
-NOTE: "try out" marker is set with a help of
+.B NOTE:
+"try out" marker is set with a help of
 .br
 .I pkg_admin set try_out=yes <packages>.
 .TP
