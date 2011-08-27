@@ -844,7 +844,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 		echo '   skipped'
 	    fi
 	else
-	    echo "Marking $pkg as installed as a dependency"
+	    echo "Marking $pkg as \"try_out\""
 	    if test -z "$pkg_opts"; then
 		$PKG_ADMIN_CMD set "$marker"=yes "$pkg"
 	    else
