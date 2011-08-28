@@ -1,3 +1,7 @@
+plan0:
+- use distbb for source-based update
+
+plan1:
 - configuration variable for ~/.nih
 - nih status: -v analyse vulnerable packages against binary or pkgsrc tree
 - nih install: ability to check a number bytes to download and
@@ -25,5 +29,4 @@ plan2:
 - nih clean-cache:    use FILE_NAME
 - autoverifying pkgdb after installation
 - separate pkg_install_plan script from nih
-- use distbb for source-based update
 - optionally disable REQUIRES/PROVIDES checks
