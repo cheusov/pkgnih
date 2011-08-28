@@ -26,29 +26,100 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#
-# convert output of pkg_cmp_summary(1) to human readable format
-#
+#use "alt_assert.awk"
+#use "power_getopt.awk"
 
-{
-	pkgpath = pkgname = ver1 = ver2 = ua = ""
+#.begin-str help
+# convert output of pkg_cmp_summary(1) to human readable format
+# -h    display help message
+# -0    output neither prefixes nor suffixes
+# -1    output prefixes
+# -2    output suffixes
+# -3    output prefixes and suffixes (the default)
+#.end-str
+
+function print_res (){
+	if (op != "=" || pref || suff)
+		print pref op suff "\t" pkgpath "\t" pkgname "\t" ver1 "\t" ver2 | \
+		"sort -k3 | awk -F'\t' '{sub(/  <  /, \" \", $1); printf \"%6s %-30s %-15s %-12s %-12s\\n\", $1, $2, $3, $4, $5}'"
+}
+
+BEGIN {
+	if (getarg("h")){
+		print_help()
+		exitnow(1)
+	}
+
+	out_pref = out_suff = 1
+	if (getarg("1") || getarg("0"))
+		out_suff = 0
+	if (getarg("2") || getarg("0"))
+		out_pref = 0
+}
+
+/^[^ ]/ {
+	pkgpath = pkgname = ver1 = ver2 = ""
 	pkgpath = $2
 	pkgname = $3
 	if ($1 ~ /^[<>=!]$/){
 		ver1    = $4
 		ver2    = $5
-		ua      = $6
 	}else if ($1 == "-"){
 		ver1    = $4
-		ua      = $5
 	}else if ($1 == "+"){
 		ver2    = $4
 	}
 
-	if ($1 == "<") op = ""
-	else op = $1
+	op = $1
+	pref = ""
+	suff = ""
 
-	if (ua == "U") op = op "U"
+	getline
+	while (NF > 0){
+		assert(/^ /)
 
-	printf "%3s %-30s %-15s %-12s %-12s\n", op, pkgpath, pkgname, ver1, ver2
+		val1 = (out_pref ? $2 : "SUBSEP")
+		getline
+		val2 = (out_suff ? $2 : "SUBSEP")
+
+		if ($1 == "automatic"){
+			if (out_pref && op != "+"){
+				addon = (val1 == "yes" ? "" : "u")
+				if (val1 != val2 || op == "-")
+					pref = addon pref
+			}
+
+			if (out_suff && op != "-"){
+				addon = (val2 == "yes" ? "" : "u")
+				if (val1 != val2 || op == "+")
+					suff = suff addon
+			}
+		}
+
+		if ($1 == "try_out"){
+			if (out_pref && op != "+"){
+				addon = (val1 == "yes" ? "t" : "")
+				if (val1 != val2 || op == "-")
+					pref = addon pref
+			}
+
+			if (out_suff && op != "-"){
+				addon = (val2 == "yes" ? "t" : "")
+				if (val1 != val2 || op == "+")
+					suff = suff addon
+			}
+		}
+
+		getline
+	}
+
+	len = length(pref)
+	if (len == 1) pref = " " pref
+	else if (len == 0) pref = "  " pref
+
+	len = length(suff)
+	if (len == 1) suff = suff " "
+	else if (len == 0) suff = suff "  "
+
+	print_res()
 }

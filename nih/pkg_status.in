@@ -131,6 +131,9 @@ EOF
 
 pkg_cmp_opts='-p'
 
+opt_u=
+opt_a=
+
 process_args (){
     while getopts hVsbrAuaQqDp:0kmULcdltRnTBS f; do
 	case $f in
@@ -140,9 +143,9 @@ process_args (){
 	    b)    mode_bin=1; mode_src=;;
 	    r)    submode_raw=1;;
 	    A)    submode_all=1;;
-	    u)    pkg_info_opts="$pkg_info_opts -u";;
-	    a)    pkg_info_opts="$pkg_info_opts -a";;
-	    T)    pkg_cmp_opts="$pkg_cmp_opts -u";;
+	    u)    unset opt_a; opt_u=1;;
+	    a)    unset opt_u; opt_a=1;;
+	    T)    pkg_cmp_opts="$pkg_cmp_opts";;
 	    B)    pkg_cmp_opts="$pkg_cmp_opts -b";;
 	    Q)    quiet=1; echo '-Q is deprecated, please use -q' 1>&2;;
 	    q)    quiet=1;;
@@ -170,6 +173,7 @@ process_args "$@"
 shift `expr $OPTIND - 1`
 
 ######################################################################
+#
 bsd_xargs (){
     if read a; then
 	{ printf '%s\n' "$a"; cat; } | xargs "$@"
@@ -208,11 +212,6 @@ test "$tmp_dir" || exit 1
 if test -z "${mode_src}${mode_bin}${mode_leaves}${mode_checks}"; then
     echo 'Either of the following options must be applied: -s, -b, -k or -l' 1>&2
     exit 1
-fi
-
-#
-if test $# -eq 0 -a -z "$pkg_info_opts"; then
-    pkg_info_opts=-u
 fi
 
 ######################################################################
@@ -312,7 +311,7 @@ if test -n "$submode_raw"; then
     }
 else
     raw2hr (){
-	sort -k3 -t' ' | @libexecdir@/nih/cmp2hr
+	@libexecdir@/nih/cmp2hr -1
     }
 fi
 
@@ -323,7 +322,8 @@ if test -n "$submode_all"; then
     }
 else
     skip_uptodate (){
-	grep -v '^= ' || true
+#	grep -v '^[+=] ' || true
+	awk '/^[=+] /, NF == 0 {next} {print}'
     }
 fi
 
@@ -374,16 +374,34 @@ output_results (){
     fi
 }
 
+# -s|-b
+if test -n "$mode_src$mode_bin"; then
+    if test $# -ne 0; then
+	:
+    elif test -z "$opt_u$opt_a" -o -n "$opt_u"; then
+	pkg_info_opts=-u
+    else
+	pkg_info_opts=-a
+    fi
+
+    if test -n "$opt_a" -o $# -ne 0; then
+	pkg_cmp_opts="$pkg_cmp_opts -Oautomatic,try_out"
+    else
+	pkg_cmp_opts="$pkg_cmp_opts -Otry_out"
+    fi
+fi
+
 ########################################
 # -s
 if test -n "$mode_src"; then
-    pkg_bin_summary -f PKGPATH,PKGNAME,automatic -- $pkg_info_opts "$@" \
+    pkg_bin_summary -f PKGPATH,PKGNAME,automatic,try_out -- $pkg_info_opts "$@" \
 	> "$bin_summary_fn"
     generate_pkgpaths "$@"
 
     $PKG_SRC_SUMMARY_CMD < "$pkgpaths_fn" > "$src_summary_fn"
     runpipe0 \
-	pkg_cmp_summary $pkg_cmp_opts "$bin_summary_fn" "$src_summary_fn" '|' \
+	pkg_cmp_summary $pkg_cmp_opts \
+	    "$bin_summary_fn" "$src_summary_fn" '|' \
 	skip_uptodate '|' \
 	raw2hr > "$res_fn"
 
@@ -405,12 +423,12 @@ cat_ext_summary (){
 }
 
 if test -n "$mode_bin"; then
-    pkg_bin_summary -f PKGPATH,PKGNAME,automatic,BUILD_DATE -- $pkg_info_opts "$@" \
+    pkg_bin_summary -f PKGPATH,PKGNAME,automatic,try_out,BUILD_DATE -- $pkg_info_opts "$@" \
 	> "$bin_summary_fn"
     cat_ext_summary | pkg_refresh_summary > "$ext_summary_fn"
     runpipe0 \
-	pkg_cmp_summary $pkg_cmp_opts "$bin_summary_fn" "$ext_summary_fn" '|' \
-	sed '/^[+]/ d' '|' \
+	pkg_cmp_summary $pkg_cmp_opts \
+	    "$bin_summary_fn" "$ext_summary_fn" '|' \
 	skip_uptodate '|' \
 	raw2hr > "$res_fn"
 

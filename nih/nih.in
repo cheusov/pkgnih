@@ -301,9 +301,9 @@ save_installed_packages (){
 	counter=$(($counter+1))
     done
 
-    installed_fn="${installed_fn}$counter.txt"
+    installed_fn="${installed_fn}$counter.bz2"
     pkg_bin_summary -f \
-	PKGNAME,PKGPATH,DEPENDS,COMMENT,automatic,try_out,nih_hold,BUILD_DATE |
+	PKGNAME,PKGPATH,automatic,try_out,nih_hold,BUILD_DATE |
     bzip2 > "$installed_fn"
 }
 
@@ -1426,6 +1426,7 @@ if test "$1" = mark; then
 	exit 
     fi
 
+    save_installed_packages
     $PKG_ADMIN_CMD $cmd "$@"
     exit 0
 fi
@@ -1696,7 +1697,7 @@ if test "$1" = history; then
     fi
 
     installed_fn="$tmp_dir/install"
-    pkg_bin_summary -f PKGNAME,PKGPATH,BUILD_DATE,automatic > "$installed_fn"
+    pkg_bin_summary -f PKGNAME,PKGPATH,automatic,try_out,nih_hold,BUILD_DATE > "$installed_fn"
 
     last_fn="$installed_fn"
     last=current
@@ -1720,8 +1721,9 @@ if test "$1" = history; then
 	    curr_fn="$tmp_fn"
 	fi
 
-	pkg_cmp_summary $cmp_summary_opts -p "$curr_fn" "$last_fn" |
-	awk '$1 != "="' | sort -k3 -t' ' | @libexecdir@/nih/cmp2hr
+	pkg_cmp_summary -EA automatic,try_out $cmp_summary_opts -p \
+	    "$curr_fn" "$last_fn" |
+	awk '$1 != "="' | @libexecdir@/nih/cmp2hr
 
 	last="$curr"
 	last_fn="$curr_fn"
