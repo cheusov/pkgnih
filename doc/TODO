@@ -13,7 +13,6 @@ plan1:
 - nih clean-distdir
 
 - nih try
-- nih history [+-<>=]aAuUhHtT
 
 - nih install: use pkg_summary-YYYYMMDD.txt?
 - Use pkg_summary-YYYYMMDD.txt
