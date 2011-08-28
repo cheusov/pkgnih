@@ -1,4 +1,36 @@
 ======================================================================
+Version 0.9.0, by Aleksey Cheusov, Sun, 28 Aug 2011 15:29:01 +0300
+
+  Support for "try_out" marker was added. New options for subcommands:
+  nih install -t, nih remove -t, nih list -t and nih mark -t/-T.
+  See manual page for details.
+
+  nih install:
+    - after downloading binary packages it checks for common files in
+      PLIST fields. If unregistered conflicts are detected, nih exits
+      with error. This can be disabled using NO_PLIST_CHECK variable.
+    - New option -a was added for running pkg_add(8) directly.
+
+  nih history:
+    - changes in "automatic" and "try_out" flags are registsred and
+      output.
+    - outputs a warning message if NO_INSTALLED_COPY is set.
+
+  nih install|remove:
+    - New option -l was added for keeping auto-removable leaf
+      packages.
+
+  nih verify:
+    - New option -s was added for comparing running OS and OS packages
+      were built for.
+
+  nih:
+    - New global option -s was added for specifying path to
+      pkg_summary(5).
+
+  ~/.nih/installed_* files are compressed by bzip2 at creation time.
+
+======================================================================
 Version 0.8.0, by Aleksey Cheusov, Sat, 30 Jul 2011 13:38:05 +0300
 
   nih remove:
