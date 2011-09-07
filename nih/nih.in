@@ -79,10 +79,10 @@ PKG_ADD_CMD=${PKG_ADD_CMD-@PKG_ADD_CMD@}
 SUFX=${SUFX-.tgz}
 
 # loading config files
-if test -r "$sysconfdir/config"; then
-    conffile="$sysconfdir/config"
-elif test -r "$confdir/config"; then
+if test -r "$confdir/config"; then
     conffile="$confdir/config"
+elif test -r "$sysconfdir/config"; then
+    conffile="$sysconfdir/config"
 else
     cat <<EOF
 Neither $sysconfdir/config nor $confdir/config are readable.
