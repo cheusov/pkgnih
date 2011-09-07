@@ -1483,7 +1483,8 @@ if test "$1" = deps; then
 	    l)
 		sb_opts="$sb_opts -n";;
 	    t)
-		pn_opts="$pn_opts -t";;
+		pn_addon_opts="$pn_addon_opts -t"
+		sb_opts="$sb_opts -t";;
 	    B)
 		pn_opts="$pn_opts -n";;
 	    N)
@@ -1496,7 +1497,7 @@ if test "$1" = deps; then
     done
     shift `expr $OPTIND - 1`
 
-    pn_opts=${pn_opts:--n}
+    pn_opts="${pn_opts:--n}${pn_addon_opts}"
 
     if test -n "$installed_summary"; then
 	pkg_bin_summary -fPKGNAME,PKGPATH,DEPENDS
