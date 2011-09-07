@@ -91,10 +91,11 @@ EOF
     exit 1
 fi
 
-mkdir -p "$confdir"
-
 . $dfltconfdir/nih.default.conf
 . "$conffile"
+
+mkdir -p "$confdir"
+mkdir -p "$CACHEDIR/All"
 
 # handling global options
 process_options (){
