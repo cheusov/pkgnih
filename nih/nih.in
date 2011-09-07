@@ -1588,7 +1588,7 @@ if test "$1" = clean-cache; then
 
 	xargs rm -f < "$del"
     else
-	echo 'The are no binaries to remove'
+	echo 'No binaries to remove'
 	exit 0
     fi
 
