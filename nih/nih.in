@@ -41,6 +41,8 @@ Global options:
  nih -y              - Answer 'Yes' to all questions
  nih -s <summary>    - pkg_summary(5) file
 
+ nih -D              - enable debugging
+
 Commands:
  nih <command> -h    - Display help message for a <command>
  nih help            - Display help message

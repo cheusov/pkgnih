@@ -45,7 +45,7 @@ Why NIH:
     stable.
 
   - I've got pkg_digger and pkg_online_find, very powerful and quality
-    tools for searching for packages. They are also small and stable.
+    tools for searching on packages. They are also small and stable.
 
   - NIH = pkg_summary-utils + distbb + pkg_status + pkg_digger
 
