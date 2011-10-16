@@ -678,6 +678,23 @@ Consider packages different if their BUILD_DATE differ.
 Configuration file for nih.
 .br
 See @dfltconfdir@/nih.default.conf for details.
+.SH BUGS
+Sometimes
+.I nih
+fails to find dependencies correctly, for example,
+.VB
+
+   nih install www/apache2
+
+.VE
+fails to find correct version of package
+.IR apr .
+In order to fix this kind of issues, specify dependency manually like th following
+.VB
+
+   nih install www/apache2 devel/apr0+
+
+.VE
 .SH SEE ALSO
 .BR pkg_status(1) ,
 .BR pkg_digger(1) ,

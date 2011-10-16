@@ -1,4 +1,21 @@
 ======================================================================
+Version 0.9.1, by Aleksey Cheusov, Sat, 10 Sep 2011 00:46:02 +0300
+
+  fix in nih deps: option -t now works correctly
+
+  fix: ~/.nih/config has higher priority than @sysconfdir@/nih/config
+       Thanks to Jan Smydke for the report!
+
+  fix: Create "$CACHEDIR/All" on startup.
+       Thanks to Zafer Aydogan for the report.
+
+  nih.default.conf:
+    - REPOSITORY defaults to ftp://ftp.NetBSD.org/...
+
+  Default nih.conf:
+    - One more example of use
+
+======================================================================
 Version 0.9.0, by Aleksey Cheusov, Sun, 28 Aug 2011 15:29:01 +0300
 
   Support for "try_out" marker was added. New options for subcommands:
@@ -12,8 +29,7 @@ Version 0.9.0, by Aleksey Cheusov, Sun, 28 Aug 2011 15:29:01 +0300
     - New option -a was added for running pkg_add(8) directly.
 
   nih history:
-    - changes in "automatic" and "try_out" flags are registsred and
-      output.
+    - "automatic" and "try_out" flags are registered and output.
     - outputs a warning message if NO_INSTALLED_COPY is set.
 
   nih install|remove:

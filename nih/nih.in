@@ -81,10 +81,10 @@ PKG_ADD_CMD=${PKG_ADD_CMD-@PKG_ADD_CMD@}
 SUFX=${SUFX-.tgz}
 
 # loading config files
-if test -r "$sysconfdir/config"; then
-    conffile="$sysconfdir/config"
-elif test -r "$confdir/config"; then
+if test -r "$confdir/config"; then
     conffile="$confdir/config"
+elif test -r "$sysconfdir/config"; then
+    conffile="$sysconfdir/config"
 else
     cat <<EOF
 Neither $sysconfdir/config nor $confdir/config are readable.
@@ -93,10 +93,11 @@ EOF
     exit 1
 fi
 
-mkdir -p "$confdir"
-
 . $dfltconfdir/nih.default.conf
 . "$conffile"
+
+mkdir -p "$confdir"
+mkdir -p "$CACHEDIR/All"
 
 # handling global options
 process_options (){
@@ -1484,7 +1485,8 @@ if test "$1" = deps; then
 	    l)
 		sb_opts="$sb_opts -n";;
 	    t)
-		pn_opts="$pn_opts -t";;
+		pn_addon_opts="$pn_addon_opts -t"
+		sb_opts="$sb_opts -t";;
 	    B)
 		pn_opts="$pn_opts -n";;
 	    N)
@@ -1497,7 +1499,7 @@ if test "$1" = deps; then
     done
     shift `expr $OPTIND - 1`
 
-    pn_opts=${pn_opts:--n}
+    pn_opts="${pn_opts:--n}${pn_addon_opts}"
 
     if test -n "$installed_summary"; then
 	pkg_bin_summary -fPKGNAME,PKGPATH,DEPENDS
@@ -1589,7 +1591,7 @@ if test "$1" = clean-cache; then
 
 	xargs rm -f < "$del"
     else
-	echo 'The are no binaries to remove'
+	echo 'No binaries to remove'
 	exit 0
     fi
 
