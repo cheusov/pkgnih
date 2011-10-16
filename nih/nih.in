@@ -41,6 +41,8 @@ Global options:
  nih -y              - Answer 'Yes' to all questions
  nih -s <summary>    - pkg_summary(5) file
 
+ nih -D              - enable debugging
+
 Commands:
  nih <command> -h    - Display help message for a <command>
  nih help            - Display help message
@@ -471,7 +473,7 @@ nih install [options] <packages>
 
       -n     don't actually install a package, just report the steps that
              would be taken if it were.
-      -d     download binaries only, do not update installed packages
+      -d     download binaries only, do not install packages
       -B     consider packages different if their BUILD_DATE differ
       -l     do not remove auto-removable leaf packages
       -k     continue downloading packages after errors are encountered
