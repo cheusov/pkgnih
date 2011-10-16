@@ -47,6 +47,8 @@
 #   -i        obtains packages specifications from stdin
 #   -t        mark packages to be installed with "try out" marker.
 #   -l        do not mark leaf packages installed as a dependency for removal
+#   -r        mark dependencies for install/update
+#   -R        mark dependent packages for install/update
 # <packages> may be either PKGBASEs, PKGNAMEs or PKGPATHs,
 # optionally appended by `-' (marked for removal),
 # `+' (auto-removable), or `_' (auto-removable flag is not changed).
@@ -62,6 +64,8 @@ BEGIN {
 	from_stdin   = getarg("i")
 	try_out      = getarg("t")
 	keep_leaves  = getarg("l")
+	with_deps1   = getarg("r")
+	with_deps2   = getarg("R")
 
 	if (ARGC < 3 - from_stdin){
 		exit 45
@@ -78,7 +82,10 @@ BEGIN {
 
 ############################################################
 # preparations
-function process_pkg (pkg, reqd,           base,suff,pair,rempair,pipe){
+function process_pkg (pkg, try_out, hash_val,               base,suff,pair,rempair,pipe){
+	if (!hash_val)
+		hash_val = 0
+
 	if (match(pkg, /([-+_]|--)$/)){
 		suff = substr(pkg, RSTART)
 		base = substr(pkg, 1, RSTART-1)
@@ -151,16 +158,18 @@ function process_pkg (pkg, reqd,           base,suff,pair,rempair,pipe){
 		rem_pkgs [rempair] = 0
 	}else if (suff == "+"){
 		if (! (pair in add_pkgs)){
-			add_auto_pkgs [pair] = 0
-			rem_pkgs [rempair] = 0
-			add_base [base] = 0
+			if (! (pair in add_auto_pkgs))
+				add_auto_pkgs [pair] = hash_val
+			rem_pkgs [rempair] = hash_val
+			add_base [base] = hash_val
 		}
 	}else{
 		delete add_auto_pkgs [pair]
-		add_pkgs [pair] = 0
-		rem_pkgs [rempair] = 0
-		add_base [base] = 0
-		if (reqd)
+		if (! (pair in add_pkgs))
+			add_pkgs [pair] = hash_val
+		rem_pkgs [rempair] = hash_val
+		add_base [base] = hash_val
+		if (try_out)
 			try_out_pkgbase [base] = 0
 	}
 }
@@ -223,6 +232,7 @@ BEGIN {
 			}
 			avail_path2pair [pkgpath] = pkgpair
 			avail_name2pair [pkgname] = pkgpair
+			avail_pair [pkgpair] = 0
 
 			pkgname = pkgpath = ""
 
@@ -257,6 +267,27 @@ BEGIN {
 	xclose(avail_summary)
 }
 
+function add_deps (summary_fn, dependent,             depsfn){
+	depsfn = tmpfile()
+	xsystem("pkg_summary2deps -dpnr " summary_fn " > " depsfn)
+
+	cmd = "pkg_subgraph_deps -n " (dependent ? "" : "-r ") " -p ' "
+	for (p in add_auto_pkgs){
+		if (!add_auto_pkgs [p])
+			cmd = (cmd " " p)
+	}
+	for (p in add_pkgs){
+		if (!add_pkgs [p])
+			cmd = (cmd " " p)
+	}
+	cmd = cmd "' " depsfn
+	while (0 < (cmd | getline)){
+		if (summary_fn == avail_summary || ($1 in avail_pair))
+			process_pkg($1 "_", 0, 1)
+	}
+	xsystem("rm " depsfn)
+}
+
 BEGIN {
 	update_pkgpath_list = ""
 	if (from_stdin){
@@ -272,8 +303,13 @@ BEGIN {
 	if (ex)
 		exitnow(ex)
 
-#	show_progress()
-#	exit 13
+	# -r
+	if (with_deps1)
+		add_deps(avail_summary, 0)
+
+	# -R
+	if (with_deps2)
+		add_deps(inst_summary, 1)
 }
 
 ############################################################

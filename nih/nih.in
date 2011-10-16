@@ -472,14 +472,21 @@ nih install [options] <packages>
 
       -n     don't actually install a package, just report the steps that
              would be taken if it were.
-      -d     download binaries only, do not update installed packages
-      -B     consider packages different if their BUILD_DATE differ
-      -l     do not remove auto-removable leaf packages
-      -k     continue downloading packages after errors are encountered
-      -t     install packages and mark them as "try out"
+
+      -r     update specified packages and their dependencies
+      -R     update specified packages and their dependent packages
+
       -a <val>    set PKG_PATH and run pkg_add(8) directly
              val=1 ==> PKG_PATH=$CACHEDIR/All
              val=2 ==> PKG_PATH=$REPOSITORY/All
+
+      -B     consider packages different if their BUILD_DATE differ
+      -l     do not remove auto-removable leaf packages
+
+      -t     install packages and mark them as "try out"
+
+      -d     download binaries only, do not update installed packages
+      -k     continue downloading packages after errors are encountered
 
       -D     For debugging purposes
 
@@ -560,7 +567,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     cmd="$1"
     shift
 
-    while getopts hndkBtDla: f; do
+    while getopts hndkBtDla:rR f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -583,6 +590,10 @@ if test "_$1" = _install -o "_$1" = _update; then
 		debug=1;;
 	    a)
 		pkg_add_local=$OPTARG;;
+	    r)
+		update_plan_opts="$update_plan_opts -r";;
+	    R)
+		update_plan_opts="$update_plan_opts -R";;
 	    *)
 		opts="${opts}$f";;
 	esac
