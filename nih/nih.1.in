@@ -15,7 +15,7 @@
 .fi
 ..
 .\" ------------------------------------------------------------------
-.TH NIH 8 "Dec 28, 2010" "" ""
+.TH NIH 1 "Oct 16, 2011" "" ""
 .SH NAME
 nih \- package manager for pkgsrc
 .SH SYNOPSIS
@@ -267,6 +267,12 @@ this may cause problems in creating a non-conflicting update plan.
 .TP
 .B -B
 Consider packages different if their BUILD_DATE differ.
+.TP
+.B -r
+Update specified packages and all their dependencies.
+.TP
+.B -R
+Update specified packages and all dependent packages.
 .TP
 .BI -a " val"
 Set
