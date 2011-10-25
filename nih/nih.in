@@ -97,7 +97,10 @@ fi
 . "$conffile"
 
 mkdir -p "$confdir"
-mkdir -p "$CACHEDIR/All"
+
+create_cachedir (){
+    mkdir -p "$CACHEDIR/All"
+}
 
 # handling global options
 process_options (){
@@ -561,6 +564,8 @@ rev_lines (){
 if test "_$1" = _install -o "_$1" = _update; then
     cmd="$1"
     shift
+
+    create_cachedir
 
     while getopts hndkBtDla: f; do
 	case "$f" in
@@ -1560,6 +1565,7 @@ if test "$1" = clean-cache; then
     done
     shift `expr $OPTIND - 1`
 
+    create_cachedir
     cd $CACHEDIR/All
 
     present=$tmp_dir/present
