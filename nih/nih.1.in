@@ -40,7 +40,7 @@ Display nih version.
 Answer 'Yes' to all questions.
 .TP
 .BI "-s" " summary_file"
-Specify path to pkg_summary(5) file for use instead of downloaded one
+Specify the path to pkg_summary(5) file for use instead of downloaded one
 or specified in a config file. Plain text, gzip-ed of bzip2-ed files
 are supported.
 .SH COMMANDS
@@ -50,18 +50,18 @@ The following commands are provided.
 Display help message
 .TP
 .B  refresh
-Download pkg_summary(5) and SHA512 files from remote repository and
-unpack them to ~/.nih/. URL for these files is specified in
+Download pkg_summary(5) and SHA512 files from the remote repository and
+unpack them to ~/.nih/. The URL for these files is specified in
 REPOSITORY configuration variable. Unless
 .I NO_SUMMARY_COPY
-variable is set in configuration file, pkg_summary.txt and SHA512.txt
+variable is set in the configuration file, pkg_summary.txt and SHA512.txt
 files are copied to "pkg_summary_YYYYMMDD_hhmm.txt" and "SHA512_YYYYMMDD_hhmm.txt"
 respectively. So, you can restore them and use in the future.
 If
 .I IGNORE_CKSUMS
 variable
-is set to non-empty string, SHA512.txt file is not downloaded and cksums
-of binary packages are not ckecked.
+is set to a non-empty string, SHA512.txt file is not downloaded and cksums
+of binary packages are not checked.
 .P
 .RS
 .B "nih refresh"
@@ -82,7 +82,7 @@ accepts the following options:
 Display help message.
 .TP
 .B -b
-Query binary repository (the default).
+Query binary repository. This is the default.
 .TP
 .B -o
 Query pkg_online database.
@@ -118,7 +118,7 @@ accepts the following options:
 Display help message.
 .TP
 .B -b
-Query binary repository (the default).
+Query the binary repository. This is the default.
 .TP
 .B -o
 Query pkg_online database.
@@ -142,9 +142,8 @@ Examples:
    nih meta -oq
 .VE
 .P
-One can change format of the output
-with a help of shell
-functions 'summary2meta_packages' in configuration file.
+One can change the format of the output with a help of the shell
+function 'summary2meta_packages' in the configuration file.
 See @dfltconfdir@/nih.default.conf for details.
 The default format may be changed in future releases.
 .RE
@@ -161,7 +160,7 @@ accepts the following options:
 Display help message.
 .TP
 .B -b
-Search in binary repository (the default).
+Search in the binary repository (the default).
 .TP
 .B -o
 Search using pkg_online provided by wip/pkg_online-client package.
@@ -186,7 +185,7 @@ Display full information about packages.
 .TP
 .B -r
 Raw output in pkg_summary(5) format. This option requires either
-.IR -3 " or " -9 .
+.BR -3 " or " -9 " option.
 .TP
 .B -q
 Quiet mode, do not print "No matches found" to stderr.
@@ -219,15 +218,15 @@ Examples:
 .BR  install " and " update
 Install or update specified packages. Packages may be specified as
 PKGBASE, PKGNAME, PKGPATH or a filename with optional suffix "-"
-(marker for removal), "--" (marker for removal with dependent packages), "+"
-(marker for auto-removable), or "_"
-(auto-removable flag is not changed).  Packages without suffix will be
+(a marker for removal), "--" (a marker for removal with dependent packages), "+"
+(a marker for auto-installed), or "_"
+(auto-installed flag is not changed).  Packages without suffix will be
 marked as installed by user. Automatically installed leaf packages are
 removed automatically.
 .B nih
-tries to resolve conflicts and to satisfy dependencies automatically.
+tries to resolve conflicts and satisfy dependencies automatically.
 If it fails, one can do this manually. By default PKGPATH of installed
-packages remain unchanged, that is if, for example, emacs-21 was installed
+packages remains unchanged, that is if, for example, emacs-21 was installed
 from editors/emacs21, it will not be updated to emacs-23 from editors/emacs23.
 If you want to do this, run the following:
 .VB
@@ -236,13 +235,13 @@ If you want to do this, run the following:
 Before package installation or removal a list of installed packages
 is saved to ~/.nih/installed_YYYYMMDD_hhmm.bz2 file unless
 .I NO_INSTALLED_COPY
-variable is set in config file. The same for
+variable is set in the config file. The same applies to
 .IR uninstall " and " leaf
 commands.
 After downloading binaries the packages to be installed on the system
-are checked for common files in order to prevent failures in the middle of update.
+are checked for common files in order to prevent failures in the middle of the update process.
 Normally CONFLICTS variable should be set but who knows. Setting NO_PLIST_CHECK
-variable to non-empry string disables this behaviour.
+variable to a non-empty string disables this behaviour.
 .P
 .RS
 .B "nih install"
@@ -262,7 +261,7 @@ Do not update installed packages, download binaries only.
 Continue downloading packages after errors are encountered.
 .TP
 .B -l
-Do not remove auto-removable leaf packages. Bear in mind that
+Do not remove auto-installed leaf packages. Bear in mind that
 this may cause problems in creating a non-conflicting update plan.
 .TP
 .B -B
@@ -294,7 +293,8 @@ Later, such packages may be listed using
 or uninstalled with a help of
 .IR "nih remove -t" .
 One can also manually mark/unmark packages as "try out" using
-.IR "nih mark -t/-T" .
+.IR "nih mark -t/-T"
+respectively.
 .br
 .B NOTE:
 "try out" marker is set with a help of
@@ -322,10 +322,9 @@ Examples:
    nih install -t xfce4 fvwm openbox ctwm wmii fluxbox sawfish
 .VE
 .P
-One can change format of the output
-with a help of shell
+One can change format of the output with a help of shell
 functions 'summary2packages_to_be_removed', 'summary2packages_to_be_installed'
-or 'summary2packages_to_be_installed_as_dep'  in configuration file.
+or 'summary2packages_to_be_installed_as_dep'  in the configuration file.
 See @dfltconfdir@/nih.default.conf for details.
 The default format may be changed in future releases.
 .RE
@@ -345,7 +344,7 @@ Don't actually remove a package, just report the steps that
 would be taken if it were.
 .TP
 .B -l
-Do not remove auto-removable leaf packages.
+Do not remove auto-installed leaf packages.
 .TP
 .B -t
 Uninstall "try out" packages.
@@ -384,7 +383,7 @@ Check for presence of dependencies and their versions.
 .TP
 .B -s
 Compare "uname -r" output
-and version of an OS packages were built on.
+and the version of the OS on which the packages were built.
 .RE
 .P
 .RS
@@ -409,7 +408,7 @@ accepts the following options:
 Display help message.
 .TP
 .B -b
-Compare installed packages against pkg_summary(5) (the default).
+Compare installed packages against pkg_summary(5). This is the default.
 .TP
 .B -s
 Compare installed packages against pkgsrc tree.
@@ -418,18 +417,26 @@ Compare installed packages against pkgsrc tree.
 Raw output (pkg_summary format).
 .TP
 .B -u
-Analyse packages marked as installed by user (the default, see -a).
+Analyse packages marked as installed by user (contrast with
+.B -a 
+option). This is the default.
 .TP
 .B -a
-Analyse all packages (see -u).
+Analyse all packages (contrast with 
+.B -u 
+option).
 .TP
 .B -A
 By default up-to-date packages are not output,
-with -A they are output too.
+with
+.B -A 
+they are output too.
 .TP
 .B -B
 Consider packages different if their BUILD_DATE differ.
-This option works with -b only.
+This option works in conjunction with 
+.B -b 
+option only.
 .TP
 .B -q
 No noisy reminder about output format.
@@ -476,7 +483,7 @@ Examples:
 .RE
 .TP
 .B  leaf
-Output or remove auto-removed leaf packages.
+Output or remove auto-installed leaf packages.
 .P
 .RS
 .B "nih leaf"
@@ -489,10 +496,10 @@ Display help message.
 Output only PKGNAME.
 .TP
 .B -R
-Remove auto-removed leaf packages.
+Remove auto-installed leaf packages.
 .TP
 .B -n
-Don't actually deinstall packages,
+Don't actually uninstall packages,
 just report the steps that would be taken.
 .RE
 .P
@@ -543,17 +550,17 @@ Examples:
    nih list -ur
 .VE
 .P
-One can change format of the output with a help of shell
+One can change format of the output with a help of the shell
 functions 'summary2available_packages'
-or 'summary2installed_packages'  in configuration file.
+or 'summary2installed_packages' defined in the configuration file.
 See @dfltconfdir@/nih.default.conf for details.
 The default format may be changed in future releases.
 .RE
 .TP
 .B  mark
 Output markers of the specified packages (the default) or
-mark/unmark packages as auto-removed or as installed by user.
-If no packages are specified markers of all installed packages are output.
+mark/unmark packages as auto-installed or as installed by user.
+If no packages are specified the markers of all installed packages are output.
 .P
 .RS
 .B "nih mark"
@@ -566,12 +573,12 @@ Display help message.
 Mark/unmark packages as "installed by user".
 .TP
 .B -a/-A
-Mark/unmark packages as "installed as a dependency".
+Mark/unmark packages as "auto-installed".
 .TP
 .B -t/-T
 Mark/unmark packages as "try out".
 .P
-NOTES: -a and -U are synonyms, -u and -A are synonyms
+NOTES: in effect, -a and -U are synonyms, -u and -A are synonyms
 .RE
 .P
 .RS
@@ -583,9 +590,9 @@ Examples:
    nih mark -u ffmpeg gsed
 .VE
 .P
-One can change format of the output
-with a help of shell
-functions 'summary2markers' in configuration file.
+One can change the format of the output
+with a help of the shell
+function 'summary2markers' in the configuration file.
 See @dfltconfdir@/nih.default.conf for details.
 The default format may be changed in future releases.
 .RE
@@ -605,10 +612,10 @@ Output dependencies, by default
 dependent packages are output.
 .TP
 .B -l
-Output list of packages instead of graph.
+Output a list of packages instead of a graph.
 .TP
 .B -B
-Output PKGBASE (the default).
+Output PKGBASE. This is the default.
 .TP
 .B -P
 Output PKGPATH.
@@ -637,7 +644,7 @@ Examples:
 .RE
 .TP
 .B clean-cache
-Clean-up CACHEDIR directory. By default all binaries
+Clean up CACHEDIR directory. By default all binaries
 except those of installed packages are removed.
 .P
 .RS
@@ -648,7 +655,7 @@ accepts the following options:
 Display help message.
 .TP
 .B -n
-Output files to be removed, do not remove them.
+Output files to be removed, do not actually remove them.
 .TP
 .B -a
 Remove all binaries.
@@ -689,7 +696,7 @@ fails to find dependencies correctly, for example,
 .VE
 fails to find correct version of package
 .IR apr .
-In order to fix this kind of issues, specify dependency manually like th following
+In order to fix this kind of issues, specify dependency manually like the following
 .VB
 
    nih install www/apache2 devel/apr0+
