@@ -12,8 +12,6 @@ plan1:
 - nih install: working with ALL binaries available in $CACHEDIR
 - nih clean-distdir
 
-- nih try
-
 - nih install: use pkg_summary-YYYYMMDD.txt?
 - Use pkg_summary-YYYYMMDD.txt
   and use such summaries for in 'nih clean-cache' and 'nih install'
