@@ -216,7 +216,10 @@ Examples:
 .RE
 .TP
 .BR  install " and " update
-Install or update specified packages. Packages may be specified as
+Install or update specified packages. If no packages are specified
+full update is done. Packages with "keep" flag (see "nih mark -k" and
+"nih list -k" for details) are not updated.
+Packages may be specified as
 PKGBASE, PKGNAME, PKGPATH or a filename with optional suffix "-"
 (a marker for removal), "--" (a marker for removal with dependent packages), "+"
 (a marker for auto-installed), or "_"
@@ -239,7 +242,8 @@ variable is set in the config file. The same applies to
 .IR uninstall " and " leaf
 commands.
 After downloading binaries the packages to be installed on the system
-are checked for common files in order to prevent failures in the middle of the update process.
+are checked for common files in order to prevent failures in the middle
+of the update process.
 Normally CONFLICTS variable should be set but who knows. Setting NO_PLIST_CHECK
 variable to a non-empty string disables this behaviour.
 .P
@@ -542,7 +546,10 @@ All installed packages are output.
 Packages installed by user are output.
 .TP
 .B -t
-"try out" packages are output.
+Packages having "try out" marker are output. See "nih mark -t" for details.
+.TP
+.B -k
+Packages having "keep" marker are output.  See "nih mark -k" for details.
 .TP
 .B -r
 Raw summaries are output.
@@ -582,7 +589,13 @@ Mark/unmark packages as "installed by user".
 Mark/unmark packages as "auto-installed".
 .TP
 .B -t/-T
-Mark/unmark packages as "try out".
+Mark/unmark packages with "try out" flag.
+.TP
+.B -k/-K
+Mark/unmark packages with "keep" flag.  "keep" marker means that a
+package can't be updated by "nih update" command.  This marker is
+particularly useful to mark packages that the user compiled manually
+from pkgsrc.
 .P
 NOTES: in effect, -a and -U are synonyms, -u and -A are synonyms
 .RE
@@ -592,8 +605,11 @@ Examples:
 .VB
    nih mark -h
    nih mark
-   nih mark -a libmaa libpng
-   nih mark -u ffmpeg gsed
+   nih mark -a libmaa
+   nih mark -u ffmpeg # we use ffmpeg(1)
+   nih mark -t wmii openbox fluxfox sawfish xfce4
+   nih mark -T ctwm # my primary window manager
+   nih mark -k lua-mode ruby-mode dictem # manually built for emacs-22
 .VE
 .P
 One can change the format of the output

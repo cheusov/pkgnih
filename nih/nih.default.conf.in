@@ -120,7 +120,7 @@ summary2leaf_packages (){
 }
 summary2markers (){
     # input: pkg_summary
-    grep -E '^(PKGNAME|PKGPATH|COMMENT|automatic|try_out)=|^$' "$@"
+    grep -E '^(PKGNAME|PKGPATH|COMMENT|automatic|try_out|keep)=|^$' "$@"
 }
 
 # Uncomment the folowing line if you want to ignore SHA512 file.

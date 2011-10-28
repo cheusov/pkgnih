@@ -112,6 +112,9 @@ function process_pkg (pkg, try_out, hash_val,               base,suff,pair,rempa
 		return
 	}
 
+	if (pkgpana2pkgbase(rempair) in inst_base2keep)
+		return
+
 	if (suff == "--"){
 		if (!inst_deps_ok){
 			xsystem("pkg_summary2deps -dpnr " inst_summary " > " inst_deps)
@@ -181,7 +184,7 @@ function pair2name (pair){
 ############################################################
 # reading and analysing installed and available summaries
 BEGIN {
-	auto = 0
+	keep = auto = 0
 	while (xgetline0(inst_summary)){
 		if ($0 ~ /^PKGNAME=/){
 			pkgname = substr($0, 9)
@@ -189,6 +192,8 @@ BEGIN {
 			pkgpath = substr($0, 9)
 		}else if ($0 ~ /^automatic=/){
 			auto = (substr($0, 11) != "")
+		}else if ($0 ~ /^keep=/){
+			keep = (substr($0, 6) != "")
 		}else if (NF == 0){
 			pkgbase = pkgname
 			sub(/-[^-]*$/, "", pkgbase)
@@ -198,9 +203,11 @@ BEGIN {
 			inst_base2pair [pkgbase] = pkgpair
 			inst_path2pair [pkgpath] = pkgpair
 			inst_base2auto [pkgbase] = auto
+			if (keep)
+				inst_base2keep [pkgbase] = 1
 
 			pkgname = pkgpath = ""
-			auto = 0
+			keep = auto = 0
 		}
 	}
 	xclose(inst_summary)

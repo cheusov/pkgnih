@@ -110,6 +110,20 @@ BEGIN {
 			}
 		}
 
+		if ($1 == "keep"){
+			if (out_pref && op != "+"){
+				addon = (val1 == "yes" ? "k" : "")
+				if (val1 != val2 || op == "-")
+					pref = addon pref
+			}
+
+			if (out_suff && op != "-"){
+				addon = (val2 == "yes" ? "k" : "")
+				if (val1 != val2 || op == "+")
+					suff = suff addon
+			}
+		}
+
 		getline
 	}
 
