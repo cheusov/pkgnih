@@ -56,6 +56,8 @@ PKGBASEs (e.g. emacs), PKGNAMEs (e.g. emacs-22.3nb12) or PKGPATHs (editors/emacs
 optionally prepended by `-' (marker
 for removal), `+' or `*' (marker for auto-removable), `_' or `?'
 (auto-removable flag is not changed) or `/' (marker that means "do not update").
+If "_" is specified  as a  package,
+all  packages for which update is available will be updated.
 Packages without prefix
 are marked as installed by user.
 .B pkg_update_plan
@@ -66,12 +68,15 @@ packages remains unchanged, that is, if, for example, emacs-21 was installed
 from editors/emacs21, it will not be updated to emacs-23 from editors/emacs23.
 If you want to do this, run the following:
 .VB
-   pkg_update_plan inst_summary avail_summary editors/emacs23 -emacs
+   pkg_update_plan inst_summary avail_summary editors/emacs23 emacs-
 .VE
 .SH EXAMPLES
-   pkg_update_plan mawk lang/gawk
-   pkg_update_plan audio/flac123 +libao-alsa -libao-oss
-   pkg_update_plan sysutils/mc -wip/mc
+   pkg_update_plan installed.txt pkg_summary.txt \\
+      mawk lang/gawk
+   pkg_update_plan installed.txt pkg_summary.txt \\
+      audio/flac123 libao-alsa+ libao-oss-
+   pkg_update_plan installed.txt pkg_summary.txt \\
+      sysutils/mc wip/mc-
 .VB
 .VE
 .SH OPTIONS

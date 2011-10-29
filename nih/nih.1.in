@@ -225,7 +225,9 @@ PKGBASE, PKGNAME, PKGPATH or a filename with optional suffix "-"
 (a marker for auto-installed), "?" or "_"
 (auto-installed flag is not changed) or "/" (a marker that mean "do not update").
 Packages without suffix will be
-marked as installed by user. Automatically installed leaf packages are
+marked as installed by user. If "_" is specified as a package, all packages
+for which update is available will be updated.
+Automatically installed leaf packages are
 removed automatically.
 .B nih
 tries to resolve conflicts and satisfy dependencies automatically.
@@ -320,17 +322,43 @@ Enable debugging output.
 Examples:
 .VB
    nih install -h
+
+   # update all packages
    nih update
+
    nih -y update -dk openoffice2 firefox midori
+
+   # install gawk and uninstall mawk
    nih install mawk_ lang/gawk
+
    nih install perl-5.12.2nb2
+
+   # replace libao-oss with libao-alsa
    nih install libao-alsa libao-oss-
+
+   # replace emacs (21,22,23,...) with editors/emacs20
    nih install editors/emacs20 emacs-
+
+   # install GConf and xproto and mark them as auto-installed
    nih install GConf+ xproto+
+
+   # uninstall four pkgs
    nih install gmake- autoconf- automake- libtool-base-
+
+   # replace wip/dict-client with textproc/dict-client
    nih install textproc/dict-client wip/dict-client-
+
+   # install package from file
    nih install /usr/pkgsrc/packages/xyz-1.2.3.tgz
+
+   # install window managers for testing/playing
    nih install -t xfce4 fvwm openbox ctwm wmii fluxbox sawfish
+
+   # update everything except two emacs pkgs
+   nih update _ lua-mode/ ruby-mode/
+
+   # uninstall all emacs modules
+   nih install emacs-- emacs/
 .VE
 .P
 One can change format of the output with a help of shell

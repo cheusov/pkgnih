@@ -588,6 +588,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 	    k)
 		export force_download=1;;
 	    B)
+		update_plan_opts="$update_plan_opts -B"
 		cmp_opts='-b';;
 	    t)
 		update_plan_opts="$update_plan_opts -t";;
@@ -639,12 +640,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     update_pkgs_fn="$tmp_dir/pkgs_specs.txt"
     printf '' > "$update_pkgs_fn"
     if test $# -eq 0; then
-	pkg_cmp_summary -p $cmp_opts "$installed_summary" "$refreshed_summary" \
-	    > "$cmp_summary"
-	awk '$1 ~ /^[<!]/ {
-		print $3 "-"
-		print $3 "-" $5 "_"
-	}' "$cmp_summary" > "$update_pkgs_fn"
+	echo _ > "$update_pkgs_fn"
     else
 	for i; do
 	    if echo "$i" | grep '^/' > /dev/null; then

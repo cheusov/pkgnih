@@ -49,6 +49,7 @@
 #   -l        do not mark leaf packages installed as a dependency for removal
 #   -r        mark dependencies for install/update
 #   -R        mark dependent packages for install/update
+#   -B        consider packages different if their BUILD_DATE differ
 # <packages> may be either PKGBASEs, PKGNAMEs or PKGPATHs,
 # optionally appended by `-' (marked for removal),
 # `+' (auto-removable), or `_' (auto-removable flag is not changed).
@@ -66,6 +67,8 @@ BEGIN {
 	keep_leaves  = getarg("l")
 	with_deps1   = getarg("r")
 	with_deps2   = getarg("R")
+	if (getarg("B"))
+		cmp_summary_opts = "-b"
 
 	if (ARGC < 3 - from_stdin){
 		exit 45
@@ -82,14 +85,28 @@ BEGIN {
 
 ############################################################
 # preparations
-function process_pkg (pkg, try_out, hash_val,               base,suff,pair,rempair,pipe){
+function process_pkg (pkg, try_out, hash_val,       base,suff,pair,rempair,pipe,arr,cmp){
 	if (!hash_val)
 		hash_val = 0
 
+	if (pkg == "_"){
+		# _ means update all package update is available for
+		pipe = "pkg_cmp_summary -p " cmp_summary_opts " " inst_summary " " avail_summary
+		while (0 < (pipe | getline cmp)){
+			if (cmp ~ /^[<!]/){
+				split(cmp, arr)
+				process_pkg(arr [3] "_")
+			}
+		}
+		return
+	}
+
 	if (match(pkg, /([-+_\/]|--)$/)){
+		# suffix presents
 		suff = substr(pkg, RSTART)
 		base = substr(pkg, 1, RSTART-1)
 	}else{
+		# suffix is absent
 		suff = ""
 		base = pkg
 	}
