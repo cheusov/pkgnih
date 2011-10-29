@@ -86,7 +86,7 @@ function process_pkg (pkg, try_out, hash_val,               base,suff,pair,rempa
 	if (!hash_val)
 		hash_val = 0
 
-	if (match(pkg, /([-+_]|--)$/)){
+	if (match(pkg, /([-+_\/]|--)$/)){
 		suff = substr(pkg, RSTART)
 		base = substr(pkg, 1, RSTART-1)
 	}else{
@@ -141,6 +141,16 @@ function process_pkg (pkg, try_out, hash_val,               base,suff,pair,rempa
 			ex = 1
 			return
 		}
+	}
+
+	if (suff == "/"){
+		# do not update
+		delete rem_pkgs [pair]
+		delete add_pkgs [pair]
+		delete add_auto_pkgs [pair]
+		delete add_auto_pkgs [pair]
+		delete add_base [pkgpana2pkgbase(pair)]
+		return
 	}
 
 	if (ex)

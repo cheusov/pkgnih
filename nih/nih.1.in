@@ -222,8 +222,9 @@ full update is done. Packages with "keep" flag (see "nih mark -k" and
 Packages may be specified as
 PKGBASE, PKGNAME, PKGPATH or a filename with optional suffix "-"
 (a marker for removal), "--" (a marker for removal with dependent packages), "+"
-(a marker for auto-installed), or "_"
-(auto-installed flag is not changed).  Packages without suffix will be
+(a marker for auto-installed), "?" or "_"
+(auto-installed flag is not changed) or "/" (a marker that mean "do not update").
+Packages without suffix will be
 marked as installed by user. Automatically installed leaf packages are
 removed automatically.
 .B nih
