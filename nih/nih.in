@@ -467,7 +467,7 @@ refresh_summary (){
 # install | update
 usage_install (){
     cat <<'EOF'
-nih update  [options] <packages>
+nih install -h
 nih install [options] <packages>
 
       Install or update specified packages. These commands are the same.
@@ -891,9 +891,8 @@ fi
 # uninstall | remove | delete
 usage_uninstall (){
     cat <<'EOF'
-nih uninstall <PKGBASEs>
-nih delete    <PKGBASEs>
-nih remove    <PKGBASEs>
+nih uninstall -h
+nih uninstall [options] <packages>
 
       Remove specified packages, dependent packages and automatically installed
       leaf packages. These three command are the same.
@@ -1015,18 +1014,23 @@ fi
 # status
 usage_status (){
     cat <<'EOF'
-nih status [options] [PKGBASEs]
+nih status -h
+nih status [-b] [-a|-u] [-r|-q|-A|-B] [PKGBASEs]
+nih status -s           [-r|-q|-A|-B] [PKGBASEs]
 
       Compare installed packages with pkg_summary.txt (default) or
       pkgsrc tree.
 
    options:
       -h     display this help message
+
       -b     compare installed packages against pkg_summary.txt (default)
       -s     compare installed packages against pkgsrc tree
-      -r     raw output (pkg_summary format)
+
       -u     analyse packages marked as installed by user (the default, see -a)
-      -a     analyse all packages (see -u)
+      -a     analyse all installed packages (see -u)
+
+      -r     raw output (pkg_summary format)
       -B     consider packages different if their BUILD_DATE differ
       -A     by default up-to-date packages are skipped,
              with -A they are output too
