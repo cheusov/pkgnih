@@ -522,7 +522,9 @@ function resolve (flags){
 			}else if (($3 in avail_provides) &&
 					  !index(avail_provides [$3], " "))
 			{
-				addme [avail_provides [$3]] = 0
+				# mark package as installed by user, otherwise it will be removed
+				# from update plan as an auto-installed leaf
+				addme [avail_provides [$3]] = 1
 			}else{
 				if ($3 in avail_provides){
 					printf "%s is provided by the following packages: %s\n", $3, avail_provides [$3]
@@ -566,8 +568,12 @@ BEGIN {
 		if (ex)
 			break
 
-		for (pkg in addme)
-			process_pkg(pkg "_")
+		for (pkg in addme){
+			if (addme [pkg])
+				process_pkg(pkg)
+			else
+				process_pkg(pkg "_")
+		}
 		delete addme
 
 		new_imghash = get_imghash()
