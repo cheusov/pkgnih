@@ -233,7 +233,7 @@ PKGBASE, PKGNAME, PKGPATH or a filename, optionally with one of the following su
  "_" (tells to install/update the package without altering auto-installed flag).
  "/" (tells to not update or uninstall the package).
 When installing, packages without a suffix are marked as installed by user.
-When uninstalling, automatically installed leaf packages are removed automatically.
+Automatically installed leaf packages are removed automatically.
 If "_" is specified as a package, all packages
 for which update is available will be updated.
 .B nih
@@ -245,7 +245,7 @@ packages remains unchanged. This has an effect that if, for example, emacs-21 wa
 from editors/emacs21, running the command
 .VB
 
-   nih install editors/emacs23
+   nih install emacs
 
 .VE
 will not update it to emacs-23 from editors/emacs23.
@@ -386,8 +386,8 @@ Examples:
 .VE
 .P
 The output format can be changed with a help of shell functions
-'summary2packages_to_be_removed', 'summary2packages_to_be_installed'
-or 'summary2packages_to_be_installed_as_dep' defined in the configuration file.
+"summary2packages_to_be_removed", "summary2packages_to_be_installed"
+or "summary2packages_to_be_installed_as_dep" defined in the configuration file.
 See @dfltconfdir@/nih.default.conf for details.
 The default format may change in future releases.
 .RE
@@ -436,7 +436,7 @@ Display help message.
 .B -m
 Check checksums of installed files.
 .TP
-.B -U
+.B -l|-U
 Check for REQUIRES/PROVIDES coherence.
 .TP
 .B -L
@@ -453,7 +453,7 @@ and the version of the OS on which the packages were built.
 .RS
 Examples:
 .VB
-   nih verify -dLUs
+   nih verify -dLls
    nih verify -m
    nih verify -m 'lib*' gawk
    nih verify -s midori
@@ -478,10 +478,10 @@ Compare installed packages against pkg_summary(5). This is the default.
 Compare installed packages against pkgsrc tree.
 .TP
 .B -r
-Output in raw format (the one of pkg_summary).
+Output in raw format (the one of pkg_cmp_summary(1)).
 .TP
 .B -u
-Analyse packages marked as installed by user (contrast with
+Analyse packages installed by user (contrast with
 .B -a 
 option). This is the default.
 .TP
@@ -548,8 +548,6 @@ Examples:
 .TP
 .B  leaf
 Show or uninstall all auto-installed leaf packages.
-With no options, show.
-??? explain here what a leaf package is.
 .P
 .RS
 .B "nih leaf"
@@ -567,10 +565,6 @@ Remove auto-installed leaf packages.
 .B -n
 Don't actually uninstall packages,
 just report the steps that would be taken.
-This option requires -R option.
-Without -R option, the command simply lists all auto-installed leaf packages,
-the same as with no options at all.
-This behaviour may change in the future.
 .RE
 .P
 .RS
@@ -663,7 +657,7 @@ NOTES: in effect, -a and -U are synonyms, -u and -A are synonyms.
 Examples:
 .VB
    nih mark -h
-   nih mark
+   nih mark mplayer
    nih mark -a libmaa
    nih mark -u ffmpeg # we use ffmpeg(1)
    nih mark -t wmii openbox fluxfox sawfish xfce4
@@ -793,8 +787,8 @@ like this:
 .SH SEE ALSO
 .BR pkg_status(1) ,
 .BR pkg_digger(1) ,
+.BR pkg_online-find(1) ,
 .BR pkg_summary(5) ,
-.BR pkg_online(7??????) ,
 .B pkg_summary-utils(7)
 .SH AUTHOR
 Aleksey Cheusov <vle@gmx.net>
