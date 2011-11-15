@@ -1,4 +1,34 @@
 ======================================================================
+Version 0.10.0, by Aleksey Cheusov, Tue, 15 Nov 2011 23:02:35 +0300
+
+  A lot of improvements and grammar fixes in manual page
+  by Nikolai Krot.
+
+  Support for marker "keep" was implemented.
+  (nih mark -k|-K, nih list -k, nih install).
+  "keep" marker means that a package can't be updated by "nih update"
+  command.  This marker is particularly useful to mark packages that
+  the user compiled manually from pkgsrc.
+  Original idea belongs to Debian APT.
+
+  nih install:
+    - Options -r and -R options were added
+      for installing dependencies or dependent packages.
+      Sometimes they may fix mysterious segfaults.
+    - Support for package suffix `/' was added that means "remove
+      update". See the manual page for details.
+    - A virtual package "_" was implemented that means "all packages"
+      for which update is available".
+    - Fixed: bug in REQUIRES/PROVIDES problem resolver.  Now packages
+      that solve REQUIRES/PROVIDES problems are marked as installed by
+      user.  Thanks to Jan Smydke for the report.
+    - Library files including system libraries that packages require
+      through REQUIRES field are also checked during update plan
+      generation.
+
+  fix: $CACHEDIR/All directory is created only when it is really necessary.
+
+======================================================================
 Version 0.9.1, by Aleksey Cheusov, Sat, 10 Sep 2011 00:46:02 +0300
 
   fix in nih deps: option -t now works correctly
