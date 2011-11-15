@@ -495,13 +495,21 @@ nih install [options] <packages>
 
       -D     For debugging purposes
 
-Packages may be specified as PKGBASE, PKGNAME, PKGPATH or a filename
-with optional suffix `-' (marker for removal), `+' (marker for
-auto-removable), or `_' (auto-removable flag will not be changed).
-Packages without suffix will be marked as installed by user.
-Marker `-' may be useful for resolving conflicts between installed
-and new packages. Automatically installed leaf packages are removed
-automatically.
+Install, uninstall or update specified packages.
+If no packages are specified
+full update is done. Packages with "keep" flag (see "nih mark -k" and
+"nih list -k" for details) are not updated.
+Packages may be specified as
+PKGBASE, PKGNAME, PKGPATH or a filename, optionally with one of the following suffixes:
+ "-" (tells to uninstall the package),
+ "--" (tells to uninstall the package with all dependent packages),
+ "+" (tells to install/update the package and mark it as auto-installed), or
+ "_" (tells to install/update the package without altering auto-installed flag).
+ "/" (tells not to update nor uninstall the package if it is possible).
+When installing, packages without a suffix are marked as installed by user.
+Automatically installed leaf packages are removed automatically.
+If "_" is specified as a package, all packages
+for which update is available will be updated.
 
 Examples:
    nih update
@@ -514,6 +522,7 @@ Examples:
    nih install -t xfce4 fvwm openbox ctwm wmii fluxbox sawfish
    nih install -a1 firefox
    nih install -a2 -- -UA xulrunner
+   nih install emacs-- emacs/
 EOF
 }
 

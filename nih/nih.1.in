@@ -231,7 +231,7 @@ PKGBASE, PKGNAME, PKGPATH or a filename, optionally with one of the following su
  "--" (tells to uninstall the package with all dependent packages),
  "+" (tells to install/update the package and mark it as auto-installed), or
  "_" (tells to install/update the package without altering auto-installed flag).
- "/" (tells to not update or uninstall the package).
+ "/" (tells not to update nor uninstall the package if it is possible).
 When installing, packages without a suffix are marked as installed by user.
 Automatically installed leaf packages are removed automatically.
 If "_" is specified as a package, all packages
