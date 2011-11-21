@@ -564,7 +564,7 @@ BEGIN {
 		}
 
 		generate_plan(planfn)
-		if (!resolve("dcu") && !resolve("lL"))
+		if (!resolve("dcu") && !resolve("l"))
 			break
 
 		if (ex)
