@@ -1,3 +1,8 @@
+plan -1:
+- fix for -L 
+- SHA512 with All/ prefix
+- option for "install" for disabling -Ll
+
 plan0:
 - use distbb for source-based update
 
