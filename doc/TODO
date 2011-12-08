@@ -1,5 +1,6 @@
 plan -1:
-- fix for -L 
+- fix for -L
+- fix for wildcard in DEPENDS
 - SHA512 with All/ prefix
 - option for "install" for disabling -Ll
 
