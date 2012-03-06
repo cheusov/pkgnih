@@ -1,4 +1,5 @@
 plan -1:
+- nih leaf -a: ALL leaf packages
 - nih uninstall: do not require .nih/pkg_summary.txt (ano)
 - nih install -u mark as installed -a autoinstalled
 - fix for -L
