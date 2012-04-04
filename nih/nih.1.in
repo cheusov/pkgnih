@@ -424,7 +424,7 @@ Examples:
 .RE
 .TP
 .B  verify
-Verify package integrity.
+Verify integrity of installed packages.
 .P
 .RS
 .B "nih verify"
