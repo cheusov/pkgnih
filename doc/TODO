@@ -8,6 +8,7 @@ plan -1:
 - fix for wildcard in DEPENDS
 - SHA512 with All/ prefix
 - option for "install" for disabling -Ll
+- multiple pkg_summary(5) (e.g. 5.0-indep)
 
 plan0:
 - use distbb for source-based update
