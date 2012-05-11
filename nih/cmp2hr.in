@@ -76,7 +76,7 @@ BEGIN {
 
 	getline
 	while (NF > 0){
-		assert(/^ /)
+		assert($0 ~ /^ /)
 
 		val1 = (out_pref ? $2 : "SUBSEP")
 		getline
