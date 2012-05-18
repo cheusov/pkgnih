@@ -134,30 +134,28 @@ function process_pkg (pkg, try_out, hash_val,       base,suff,pair,rempair,pipe,
 
 	if (suff == "--"){
 		if (!inst_deps_ok){
-			xsystem("pkg_summary2deps -dpnr " inst_summary " > " inst_deps)
+			xsystem("pkg_summary2deps -dnr " inst_summary " > " inst_deps)
 			inst_deps_ok = 1
 		}
-		pipe = "pkg_subgraph_deps -np '" rempair "' < " inst_deps
+		pipe = "pkg_subgraph_deps -np '" pair2name(rempair) "' < " inst_deps
 		while (0 < (pipe | getline pkg)){
-			process_pkg(pkg "-")
+			process_pkg(pkgname2pkgbase(pkg) "-")
 		}
 		return
 	}
 
-	if (suff != "-"){
-		if (base in avail_base2pair){
-			pair = avail_base2pair [base]
-		}else if (base in avail_name2pair){
-			pair = avail_name2pair [base]
-		}else if (base in avail_path2pair){
-			pair = avail_path2pair [base]
-		}else if (index(base, ";")){
-			pair = base
-		}else{
-			print "Package " base " is not found" > "/dev/stderr"
-			ex = 1
-			return
-		}
+	if (base in avail_base2pair){
+		pair = avail_base2pair [base]
+	}else if (base in avail_name2pair){
+		pair = avail_name2pair [base]
+	}else if (base in avail_path2pair){
+		pair = avail_path2pair [base]
+	}else if (index(base, ";")){
+		pair = base
+	}else{
+		print "Package " base " is not found" > "/dev/stderr"
+		ex = 1
+		return
 	}
 
 	if (suff == "/"){
@@ -186,6 +184,9 @@ function process_pkg (pkg, try_out, hash_val,       base,suff,pair,rempair,pipe,
 
 	if (suff == "-"){
 		rem_pkgs [rempair] = 0
+		delete add_auto_pkgs [pair]
+		delete add_pkgs [pair]
+		delete add_base [base]
 	}else if (suff == "+"){
 		if (! (pair in add_pkgs)){
 			if (! (pair in add_auto_pkgs))
