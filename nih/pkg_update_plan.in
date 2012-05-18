@@ -124,6 +124,7 @@ function process_pkg (pkg, try_out, hash_val,       base,suff,pair,rempair,pipe,
 		else
 			rempair = base
 	}else if (suff == "-" || suff == "--"){
+		print_eqs(0)
 		print "Package " base " is not found" > "/dev/stderr"
 		ex = 1
 		return
@@ -153,6 +154,8 @@ function process_pkg (pkg, try_out, hash_val,       base,suff,pair,rempair,pipe,
 	}else if (index(base, ";")){
 		pair = base
 	}else{
+		bad_package = base
+		print_eqs(0)
 		print "Package " base " is not found" > "/dev/stderr"
 		ex = 1
 		return
@@ -209,6 +212,11 @@ function pair2name (pair){
 	return substr(pair, index(pair, ";") + 1)
 }
 
+function pair2hw (pair,           idx){
+	idx = index(pair, ";")
+	return substr(pair, idx+1) " (" substr(pair, 1, idx-1) ")"
+}
+
 ############################################################
 # reading and analysing installed and available summaries
 BEGIN {
@@ -222,10 +230,17 @@ BEGIN {
 			auto = (substr($0, 11) != "")
 		}else if ($0 ~ /^keep=/){
 			keep = (substr($0, 6) != "")
+		}else if ($0 ~ /^PROVIDES=/){
+			provides_arr [substr($0, 10)] = 1
 		}else if (NF == 0){
 			pkgbase = pkgname
 			sub(/-[^-]*$/, "", pkgbase)
 			pkgpair = (pkgpath ";" pkgname)
+
+			for (i in provides_arr){
+				inst_provides [i] = pkgpair
+			}
+			delete provides_arr
 
 			inst_name2pair [pkgname] = pkgpair
 			inst_base2pair [pkgbase] = pkgpair
@@ -500,10 +515,15 @@ function resolve (flags){
 			depbase = pkgname2pkgbase(dep1)
 
 			if (! (pkgbase in add_base)){
+				expl_line [pkgbase] = $0
+				expl_next [pkgbase] = depbase
 				addme [pkgbase] = 0
 			}else if (! (depbase in add_base)){
+				expl_line [depbase] = $0
+				expl_next [depbase] = pkgbase
 				addme [depbase] = 0
 			}else{
+				bad_package = pkgbase
 				ex = ex2 = 1
 			}
 		}else if ($1 == "c:" && $2 == "conflict"){
@@ -511,28 +531,38 @@ function resolve (flags){
 			cnfbase = pkgname2pkgbase($5)
 
 			if ((pkgbase in add_base) && !(cnfbase in add_base)){
+				expl_line [cnfbase] = $0
+				expl_next [cfgbase] = pkgbase
 				addme [cnfbase] = 0
 			}else{
+				bad_package = pkgbase
 				ex = ex2 = 1
 			}
 		}else if ($1 == "l:" && $2 == "not_found"){
 			pkgbase = pkgname2pkgbase($5)
 
 			if (!(pkgbase in add_base)){
+				expl_line [pkgbase] = $0
+				expl_next [pkgbase] = pkgpana2pkgbase(inst_provides [$3])
 				addme [pkgbase] = 0
 			}else if (($3 in avail_provides) &&
 					  !index(avail_provides [$3], " "))
 			{
 				# mark package as installed by user, otherwise it will be removed
 				# from update plan as an auto-installed leaf
-				addme [avail_provides [$3]] = 1
+				pkg = avail_provides [$3]
+				expl_line [pkg] = $0
+				expl_next [pkg] = pkgpana2pkgbase(inst_provides [$3])
+				addme [pkg] = 1
 			}else{
+				print_eqs(0)
 				if ($3 in avail_provides){
-					printf "%s is provided by the following packages: %s\n", $3, avail_provides [$3]
-					printf "Select one of them manually\n"
+					printf "%s is provided by the following packages: %s\n", $3, avail_provides [$3] > "/dev/stderr"
+					printf "Select one of them manually\n" > "/dev/stderr"
 				}else{
-					printf "%s is required but is not provided by any package\n", $3
+					printf "%s is required by %s\n   but is not provided by any package\n", $3, $5 > "/dev/stderr"
 				}
+				bad_package = pkgbase
 				ex = ex2 = 1
 			}
 		}else if ($1 == "L:" && $2 == "not_found"){
@@ -548,6 +578,27 @@ function resolve (flags){
 	close(errfn2)
 
 	return 1
+}
+
+function print_eqs (force){
+	if (force || !eqs_printed)
+		print "================================"
+	eqs_printed = 1
+}
+
+function show_trace (){
+	print_eqs(1)
+	print "The above problem is caused by the following" > "/dev/stderr"
+	pkg = bad_package
+	while (pkg){
+		old_name = pair2name(inst_base2pair [pkg])
+		new_name = pair2name(avail_base2pair [pkg])
+		if (!new_name)
+			new_name = "?"
+		print old_name " --> " new_name > "/dev/stderr"
+		print "   " expl_line [pkg] > "/dev/stderr"
+		pkg = expl_next [pkg]
+	}
 }
 
 BEGIN {
@@ -587,10 +638,9 @@ BEGIN {
 		old_imghash = new_imghash
 	}
 
-	show_progress()
-
 	if (ex){
-		system("cat " errfn2)
+		show_trace()
+#		system("cat " errfn2)
 		if (verbose_mode > 2){
 			system("cat " planfn " 1>&2")
 		}
