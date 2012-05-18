@@ -502,7 +502,6 @@ function resolve (flags){
 		return 0
 
 	ex = 0
-	printf "" > errfn2
 	while (xgetline0(errfn)){
 		if (verbose_mode > 1)
 			print $0 > "/dev/stderr"
@@ -570,12 +569,8 @@ function resolve (flags){
 		}else{
 			ex = ex2 = 1
 		}
-
-		if (ex2)
-			print $0 > errfn2
 	}
 	xclose(errfn)
-	close(errfn2)
 
 	return 1
 }
@@ -604,7 +599,6 @@ function show_trace (){
 BEGIN {
 	planfn = tmpfile()
 	errfn  = tmpfile()
-	errfn2 = tmpfile()
 
 	old_imghash = get_imghash()
 
@@ -640,7 +634,7 @@ BEGIN {
 
 	if (ex){
 		show_trace()
-#		system("cat " errfn2)
+
 		if (verbose_mode > 2){
 			system("cat " planfn " 1>&2")
 		}
