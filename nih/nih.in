@@ -487,6 +487,7 @@ nih install [options] <packages>
 
       -B     consider packages different if their BUILD_DATE differ
       -l     do not remove auto-removable leaf packages
+      -p     do not run a REQUIRES/PROVIDES consistency check
 
       -t     install packages and mark them as "try out"
 
@@ -583,7 +584,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     create_cachedir
 
-    while getopts hndkBtDla:rR f; do
+    while getopts hndkBtDlpa:rR f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -603,6 +604,8 @@ if test "_$1" = _install -o "_$1" = _update; then
 		update_plan_opts="$update_plan_opts -t";;
 	    l)
 		update_plan_opts="$update_plan_opts -l";;
+	    p)
+		NO_REQUIRES_CHECK=1;;
 	    D)
 		debug=1;;
 	    a)
@@ -616,6 +619,11 @@ if test "_$1" = _install -o "_$1" = _update; then
 	esac
     done
     shift `expr $OPTIND - 1`
+
+    # -p
+    if test -n "$NO_REQUIRES_CHECK"; then
+	update_plan_opts="$update_plan_opts -p"
+    fi
 
     # -a
     if test -n "$pkg_add_local"; then

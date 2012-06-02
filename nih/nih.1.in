@@ -294,6 +294,10 @@ Continue downloading packages despite errors that may occur underway.
 Do not remove auto-installed leaf packages. Bear in mind that
 this may cause problems in creating a non-conflicting update plan.
 .TP
+.B -p
+Do not run REQUIRES/PROVIDES consistency check. Bear in mind that
+this may cause problems in creating a non-conflicting update plan.
+.TP
 .B -B
 Consider packages different if their BUILD_DATE differ.
 .TP

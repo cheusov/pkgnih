@@ -47,6 +47,7 @@
 #   -i        obtains packages specifications from stdin
 #   -t        mark packages to be installed with "try out" marker.
 #   -l        do not mark leaf packages installed as a dependency for removal
+#   -p        do not run REQUIRES/PROVIDES consistency check
 #   -r        mark dependencies for install/update
 #   -R        mark dependent packages for install/update
 #   -B        consider packages different if their BUILD_DATE differ
@@ -65,6 +66,7 @@ BEGIN {
 	from_stdin   = getarg("i")
 	try_out      = getarg("t")
 	keep_leaves  = getarg("l")
+	reqd_prov_check = !getarg("p")
 	with_deps1   = getarg("r")
 	with_deps2   = getarg("R")
 	if (getarg("B"))
@@ -612,7 +614,7 @@ BEGIN {
 		}
 
 		generate_plan(planfn)
-		if (!resolve("dcu") && !resolve("l"))
+		if (!resolve("dcu") && (!reqd_prov_check || !resolve("l")))
 			break
 
 		if (ex)
