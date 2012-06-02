@@ -577,11 +577,12 @@ function resolve (flags){
 
 function print_eqs (force){
 	if (force || !eqs_printed)
-		print "================================"
+		print "================================" > "/dev/stderr"
 	eqs_printed = 1
 }
 
 function show_trace (){
+	msg = ""
 	print_eqs(1)
 	print "The above problem is caused by the following" > "/dev/stderr"
 	pkg = bad_package
@@ -590,10 +591,11 @@ function show_trace (){
 		new_name = pair2name(avail_base2pair [pkg])
 		if (!new_name)
 			new_name = "?"
-		print old_name " --> " new_name > "/dev/stderr"
-		print "   " expl_line [pkg] > "/dev/stderr"
+		msg = (old_name " --> " new_name "\n" msg)
+		msg = ("   " expl_line [pkg] "\n" msg)
 		pkg = expl_next [pkg]
 	}
+	print msg
 }
 
 BEGIN {
