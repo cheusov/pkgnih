@@ -1,4 +1,5 @@
 nih search -f (description for search fields)
+nih install -N - do not alter auto-installed flag
 
 plan -1:
 - nih leaf -a: ALL leaf packages
