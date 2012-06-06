@@ -1,3 +1,5 @@
+nih install -N - do not alter auto-installed flag
+
 plan -1:
 - nih leaf -a: ALL leaf packages
 - nih uninstall: do not require .nih/pkg_summary.txt (ano)
