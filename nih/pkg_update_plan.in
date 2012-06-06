@@ -148,7 +148,7 @@ function process_pkg (pkg, try_out, hash_val,       base,suff,pair,rempair,pipe,
 	}
 
 	if (suff == "-"){
-		# nothing
+		pair = rempair
 	}else if (base in avail_base2pair){
 		pair = avail_base2pair [base]
 	}else if (base in avail_name2pair){
