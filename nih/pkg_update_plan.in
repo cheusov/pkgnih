@@ -147,9 +147,7 @@ function process_pkg (pkg, try_out, hash_val,       base,suff,pair,rempair,pipe,
 		return
 	}
 
-	if (suff == "-"){
-		pair = rempair
-	}else if (base in avail_base2pair){
+	if (base in avail_base2pair){
 		pair = avail_base2pair [base]
 	}else if (base in avail_name2pair){
 		pair = avail_name2pair [base]
@@ -157,10 +155,10 @@ function process_pkg (pkg, try_out, hash_val,       base,suff,pair,rempair,pipe,
 		pair = avail_path2pair [base]
 	}else if (index(base, ";")){
 		pair = base
-	}else{
+	}else if (suff != "-"){
 		bad_package = base
 		print_eqs(0)
-		print "Package " base " is not found" > "/dev/stderr"
+		print "Package " base " cannot not be found" > "/dev/stderr"
 		ex = 1
 		return
 	}
