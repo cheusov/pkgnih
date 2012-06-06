@@ -127,7 +127,7 @@ function process_pkg (pkg, try_out, hash_val,       base,suff,pair,rempair,pipe,
 			rempair = base
 	}else if (suff == "-" || suff == "--"){
 		print_eqs(0)
-		print "Package " base " is not found" > "/dev/stderr"
+		print "Package " base " is marked for removal but not installed" > "/dev/stderr"
 		ex = 1
 		return
 	}
@@ -147,7 +147,9 @@ function process_pkg (pkg, try_out, hash_val,       base,suff,pair,rempair,pipe,
 		return
 	}
 
-	if (base in avail_base2pair){
+	if (suff == "-"){
+		# nothing
+	}else if (base in avail_base2pair){
 		pair = avail_base2pair [base]
 	}else if (base in avail_name2pair){
 		pair = avail_name2pair [base]
