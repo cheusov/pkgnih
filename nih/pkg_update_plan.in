@@ -608,7 +608,7 @@ function show_trace (){
 	msg = ""
 	print_eqs(1)
 	print "The above problem is caused by the following" > "/dev/stderr"
-	printf "   bad_package = %s\n", bad_package > "/dev/stderr"
+#	printf "   bad_package = %s\n", bad_package > "/dev/stderr"
 	pkg = bad_package
 	while (pkg){
 		old_name = pair2name(inst_base2pair [pkg])
