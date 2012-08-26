@@ -101,9 +101,13 @@ Quiet mode, do not print "No matches found" to stderr
 .RS
 Examples:
 .VB
-   nih info -h
+   # output the packages summary from binary repository
    nih info glib2 runawk emacs
+
+   # output raw summaries of installed packages
    nih info -Ir glib2 runawk
+
+   # output raw summaries from pkg_online database
    nih info -orq glib2 runawk
 .VE
 .RE
@@ -138,10 +142,14 @@ Output raw package summaries.
 .RS
 Examples:
 .VB
-   nih meta -h
+   # output meta packages available in binary repository
    nih meta
+
+   # output installed meta packages
    nih meta -I
-   nih meta -oq
+
+   # output raw summaries for meta packages from pkg_online database
+   nih meta -or
 .VE
 .P
 The output format can be changed with a help of the shell
@@ -166,16 +174,16 @@ Search in the binary repository. This is the default.
 .TP
 .B -o
 Search in pkg_online database.
-Search is performed using pkgtools/pkg_online-client package.
+For this to work you need pkgtools/pkg_online-client package.
 .TP
 .B -I
 Search in installed packages.
 .TP
 .B -s
-List avalable search strategies.
+Output avalable search strategies.
 .TP
 .B -f
-List available search fields. Field names (e.g. PKGNAME, COMMENT, etc)
+Output available search fields. Field names (e.g. PKGNAME, COMMENT, etc)
 can be used to focus 'nih search' invocations on a specific field
 of package description. See examples below.
 .TP
@@ -199,23 +207,62 @@ Quiet mode, do not print "No matches found" to stderr.
 .RS
 Examples:
 .VB
-   nih search -h
+   # output available search strategies
+   # for searching in binary repository
    nih search -s
+
+   # output available search fields
+   # for searching in binary repository
    nih search -f
+
+   # search for packages that depends on libmaa
    nih search DEPENDS:substring:libmaa
+
+   # search for packages which name starts with "dict"
    nih search PKGNAME:prefix:dict
+
+   # search for packages with subword "dns" in COMMENT
+   # and category "net"
    nih search COMMENT:word:dns PKGPATH:prefix:net
+
+   # keyword search for packages which have words
+   # "dns" and "server" in COMMENT
    nih search c:kw:'dns server'
+
+   # search for packages that have PKGNAME beginning with "lua"
    nih search n:p:lua
+
+   # search for huge binary packages
    nih search FILE_SIZE:awk:'fvalue+0 > 100000000'
+
+   # search for packages with PKGBASE=emacs
    nih search ::emacs
+
+   # search for auto-installed packages, summaries have short format
    nih search -I3 automatic::yes
+
+   # search for packages with PKGPATH=lang/mawk, summaries have long format
    nih search -9 lang/mawk
+
+   # output available search strategies
+   # for searching in pkg_online database
    nih search -os
+
+   # output available search fields
+   # for searching in pkg_online database
    nih search -of
+
+   # search for oberon in pkg_online database
    nih search -o oberon
+
+   # search for dns servers in pkg_online database
    nih search -o dns server
+
+   # search for dictionaries excluding CJK and spell dicts
    nih search -o3 dictionary -spell -japanese -chinese -korean
+
+   # search for spreadsheets in pkg_online database,
+   # summaries have long format
    nih search -o -q9r spreadsheet
 .VE
 .RE
@@ -256,7 +303,7 @@ To get the package updated, run the following:
 
 .VE
 
-Before a package is actually altered, a list of installed packages
+Before an installation starts, a list of installed packages
 is saved to the history file ~/.nih/installed_YYYYMMDD_hhmm.bz2 unless
 .I NO_INSTALLED_COPY
 variable is set in the config file. The same applies to
@@ -266,8 +313,10 @@ commands.
 Once the binaries have been downloaded, the packages to be installed
 are checked for common files in order to prevent file name clashes and the consequent
 failures in the middle of the process. This is in addition to analysing
-the CONFLICTS variable that most (but probably not all) packages normally define.
-Setting NO_PLIST_CHECK variable to a non-empty string disables
+the CONFLICTS variable set for this purpose.
+Setting
+.I NO_PLIST_CHECK
+variable to a non-empty string disables
 the additional checking procedure,
 the CONFLICTS variable is still examined.
 .P
@@ -281,7 +330,7 @@ accepts the following options:
 Display help message.
 .TP
 .B -n
-Do not actually alter the package, just report the steps that
+Do not actually alter installed packages, just report the steps that
 would be taken if it were.
 .TP
 .B -d
@@ -349,38 +398,48 @@ Enable debugging output.
 .RS
 Examples:
 .VB
-   nih install -h
-
    # update all packages
    nih update
 
+   # update all packages and conside packages different
+   # if their BUILD_DATE differ
+   nih update
+
+   # download binary packages, but do not install them
    nih -y update -dk openoffice2 firefox midori
 
-   # install gawk and uninstall mawk
-   nih install mawk_ lang/gawk
+   # install lang/gawk and uninstall mawk
+   nih install mawk- lang/gawk
 
+   # try to guess ;-)
    nih install perl-5.12.2nb2
 
    # replace libao-oss with libao-alsa
    nih install libao-alsa libao-oss-
 
-   # replace emacs (21,22,23,...) with editors/emacs20
+   # replace emacs (21,22,23,...) with emacs-20
    nih install editors/emacs20 emacs-
 
    # install GConf and xproto and mark them as auto-installed
    nih install GConf+ xproto+
 
-   # uninstall four pkgs
+   # uninstall four packages
    nih install gmake- autoconf- automake- libtool-base-
 
    # replace wip/dict-client with textproc/dict-client
    nih install textproc/dict-client wip/dict-client-
 
-   # install package from file
-   nih install /usr/pkgsrc/packages/xyz-1.2.3.tgz
+   # install a binary package from file and mark it auto-installed
+   nih install /usr/pkgsrc/packages/xyz-1.2.3.tgz+
 
    # install window managers for testing/playing
    nih install -t xfce4 fvwm openbox ctwm wmii fluxbox sawfish
+
+   # update everything and remove emacs with its dependents
+   nih update _ emacs--
+
+   # update everything and replace installed emacs with emacs-22
+   nih update _ emacs- editors/emacs22
 
    # update everything except two emacs pkgs
    nih update _ lua-mode/ ruby-mode/
@@ -421,9 +480,15 @@ Uninstall "try out" packages.
 .RS
 Examples:
 .VB
-   nih uninstall -h
+   # uninstall mawk and gawk with their dependents
    nih remove mawk lang/gawk
-   nih delete perl
+
+   # uninstall perl with its dependents but
+   # do not remove auto-installed leaf packages
+   nih delete -l perl
+
+   # uninstall try-out packages
+   nih uninstall -t
 .VE
 .RE
 .TP
@@ -441,7 +506,7 @@ Display help message.
 Check checksums of installed files.
 .TP
 .B -l|-U
-Check for REQUIRES/PROVIDES coherence.
+Check for REQUIRES/PROVIDES consistency.
 .TP
 .B -L
 Check if library files listed in REQUIRES exist.
@@ -457,9 +522,16 @@ and the version of the OS on which the packages were built.
 .RS
 Examples:
 .VB
+   # see above
    nih verify -dLls
+
+   # Check checksums for all installed packages
    nih verify -m
+
+   # Check checksums for gawk and libraries
    nih verify -m 'lib*' gawk
+
+   # 
    nih verify -s midori
 .VE
 .RE
@@ -498,13 +570,12 @@ option).
 By default up-to-date packages are not shown,
 with
 .B -A 
-they are shown too.
+they are output too.
 .TP
 .B -B
 Consider packages different if their BUILD_DATE differ.
-This option works in conjunction with 
-.B -b 
-option only.
+This option works only with
+.BR -b .
 .TP
 .B -q
 No noisy reminder about output format.
@@ -513,8 +584,18 @@ No noisy reminder about output format.
 .RS
 Examples:
 .VB
+   # compare all installed packages with binary repository
    nih status -a
-   nih status -uq
+
+   # same as above but output status of all packages,
+   # not only changed ones
+   nih status -aA
+
+   # compare packages installed by user with binary repository,
+   # consider packages different if their BUILD_DATE differ
+   nih status -uBq
+
+   # compare pkglint with pkgsrc
    nih status -sqr pkglint
 .VE
 .RE
@@ -539,16 +620,6 @@ do not check packages.
 Check the packages for vulnerabilities
 using existing pkg-vulnerabilities file.
 .RE
-.P
-.RS
-Examples:
-.VB
-   nih audit -h
-   nih audit
-   nih audit -d
-   nih audit -c 'ffmpeg*'
-.VE
-.RE
 .TP
 .B  leaf
 Show or uninstall all auto-installed leaf packages.
@@ -570,18 +641,6 @@ Remove auto-installed leaf packages.
 Don't actually uninstall packages,
 just report the steps that would be taken.
 .RE
-.P
-.RS
-Examples:
-.VB
-   nih leaf -t
-   nih leaf -R
-   nih leaf -Rn
-.VE
-.RE
-.TP
-.B  license
-(not implemented yet)
 .TP
 .B  list
 Show packages available in the repository or installed packages.
@@ -595,32 +654,25 @@ accepts the following options:
 Display help message.
 .TP
 .B -b
-List packages available in the binary repository. This is the default.
+Output packages available in the binary repository. This is the default.
 .TP
 .B -a|-I
-List all installed packages.
+Output all installed packages.
 .TP
 .B -u
-List packages installed by user.
+Output packages installed by user.
 .TP
 .B -t
-List packages marked "try out". See "nih mark -t" for details.
+Output packages marked "try out". See "nih mark -t" for details.
 .TP
 .B -k
-List packages marked "keep".  See "nih mark -k" for details.
+Output packages marked "keep".  See "nih mark -k" for details.
 .TP
 .B -r
 Show raw package summaries.
 .RE
 .P
 .RS
-Examples:
-.VB
-   nih list -h
-   nih list
-   nih list -ur
-.VE
-.P
 Output format can be changed with a help of the shell
 functions 'summary2available_packages' and 'summary2installed_packages'
 defined in the configuration file.
@@ -629,8 +681,7 @@ The default format may change in future releases.
 .RE
 .TP
 .B  mark
-Show or modify markers of the specified packages. The dafault is to show markers.
-If no packages are specified, all installed packages with their markers are listed.
+Show or modify markers of the specified packages. The default is to show markers.
 .P
 .RS
 .B "nih mark"
@@ -660,13 +711,23 @@ NOTES: in effect, -a and -U are synonyms, -u and -A are synonyms.
 .RS
 Examples:
 .VB
-   nih mark -h
+   # output markers of mplayer
    nih mark mplayer
+
+   # mark libmaa package as auto-installed
    nih mark -a libmaa
-   nih mark -u ffmpeg # we use ffmpeg(1)
+
+   # mark ffmpeg package as installed by user
+   nih mark -u ffmpeg
+
+   # mark window managers as "try-out"
    nih mark -t wmii openbox fluxfox sawfish xfce4
-   nih mark -T ctwm # my primary window manager
-   nih mark -k lua-mode ruby-mode dictem # manually built for emacs-22
+
+   # remove try-out marker from ctwm
+   nih mark -T ctwm
+
+   # do not update the specified packages
+   nih mark -k lua-mode ruby-mode dictem
 .VE
 .P
 The output format can be changed with a help of the shell
@@ -678,7 +739,7 @@ The default format may change in future releases.
 .B  deps
 Show a dependency graph of dependent packages for the given package(s).
 This works for both the packages already installed on the system and available in the binary repository.
-If no packages specified, a graph for all repository packages is shown.
+If no packages are specified, a graph for all repository packages is shown.
 .P
 .RS
 .B "nih deps"
@@ -781,8 +842,8 @@ fails to find dependencies correctly, for example,
 .VE
 fails to find the correct version of the package.
 .IR apr .
-In order to fix this kind of issues, necessary dependencies should be given explicitly
-like this:
+In order to fix this kind of issues, required dependencies should
+be specified explicitly like the following:
 .VB
 
    nih install www/apache2 devel/apr0+
