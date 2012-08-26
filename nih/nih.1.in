@@ -1,6 +1,6 @@
 .\"     $NetBSD$
 .\"
-.\" Copyright (c) 2010-2011 by Aleksey Cheusov (vle@gmx.net)
+.\" Copyright (c) 2010-2012 by Aleksey Cheusov (vle@gmx.net)
 .\" This man page may contain portions of pkgin.1 by Emile Heitor.
 .\" Absolutely no warranty.
 .\"
@@ -15,7 +15,7 @@
 .fi
 ..
 .\" ------------------------------------------------------------------
-.TH NIH 1 "Oct 16, 2011" "" ""
+.TH NIH 1 "Aug 26, 2012" "" ""
 .SH NAME
 nih \- package manager for pkgsrc
 .SH SYNOPSIS
