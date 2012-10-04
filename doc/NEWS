@@ -1,4 +1,18 @@
 ======================================================================
+Version 0.10.1, by Aleksey Cheusov, Sun, 26 Aug 2012 18:38:19 +0300
+
+  Fix gawk warning message appeared on Linux and other systems
+
+  nih install:
+     - commands like 'nih install _ package-' now works correctly
+     - much better messages are output when update plan failed to build
+     - option -p was added in order to skip REQUIRES/PROVIDES checks
+
+  'nih status -Aa' doesn't output status of uninstalled packages
+
+  Fixes and improvements in nih.1
+
+======================================================================
 Version 0.10.0, by Aleksey Cheusov, Tue, 15 Nov 2011 23:52:35 +0300
 
   A lot of improvements and grammar fixes in manual page

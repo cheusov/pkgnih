@@ -318,11 +318,10 @@ fi
 ###
 if test -n "$submode_all"; then
     skip_uptodate (){
-	cat
+	awk '/^[+] /, NF == 0 {next} {print}'
     }
 else
     skip_uptodate (){
-#	grep -v '^[+=] ' || true
 	awk '/^[=+] /, NF == 0 {next} {print}'
     }
 fi
