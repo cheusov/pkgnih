@@ -1,6 +1,7 @@
 nih install -N - do not alter auto-installed flag
 
 plan -1:
+- nih search -sf should output both fields and search strategies
 - nih leaf -a: ALL leaf packages
 - nih uninstall: do not require .nih/pkg_summary.txt (ano)
 - nih install -u mark as installed -a autoinstalled
