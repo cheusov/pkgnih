@@ -524,7 +524,8 @@ function resolve (flags){
 				expl_next [depbase] = pkgbase
 				addme [depbase] = 0
 			}else{
-				print "Update plan cannot be built" > "/dev/stderr"
+				if (!bad_package)
+					print "Update plan cannot be built" > "/dev/stderr"
 				expl_line [depbase] = $0
 				expl_line [pkgbase] = $0
 				bad_package = pkgbase
@@ -539,12 +540,22 @@ function resolve (flags){
 				expl_next [cfgbase] = pkgbase
 				addme [cnfbase] = 0
 			}else{
-				print "Update plan cannot be built" > "/dev/stderr"
+				if (!bad_package)
+					print "Update plan cannot be built" > "/dev/stderr"
 				expl_line [cnfbase] = $0
 				expl_line [pkgbase] = $0
 				bad_package = pkgbase
 				ex = ex2 = 1
 			}
+		}else if ($1 == "u:" && $2 == "unicity"){
+			pkgbase = $3
+
+			if (!bad_package)
+				print "Update plan cannot be built" > "/dev/stderr"
+			expl_line [pkgbase] = $0
+			expl_next [pkgbase] = ""
+			bad_package = pkgbase
+			ex = ex2 = 1
 		}else if ($1 == "l:" && $2 == "not_found"){
 			pkgbase = pkgname2pkgbase($5)
 
@@ -603,6 +614,21 @@ function debug_expl (i){
 	}
 }
 
+function add_base2pair (pkgbase,                i)
+{
+	for (i in add_pkgs){
+		if (pkgpana2pkgbase(i) == pkgbase)
+			return i
+	}
+
+	for (i in add_auto_pkgs){
+		if (pkgpana2pkgbase(i) == pkgbase)
+			return i
+	}
+
+	return ""
+}
+
 function show_trace (){
 #	debug_expl()
 	msg = ""
@@ -612,7 +638,7 @@ function show_trace (){
 	pkg = bad_package
 	while (pkg){
 		old_name = pair2name(inst_base2pair [pkg])
-		new_name = pair2name(avail_base2pair [pkg])
+		new_name = pair2name(add_base2pair(pkg))
 		if (!new_name)
 			new_name = "?"
 		msg = (old_name " --> " new_name "\n" msg)
