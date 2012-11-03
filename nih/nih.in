@@ -1198,14 +1198,13 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 	    '?')
 		exit 1;;
 	    b)
-		unset PKG_DIGGER_BACKEND || true
-		unset in_installed || true;;
+		export PKG_DIGGER_BACKEND=pkg_digger_summary
+		export PKG_DIGGER_SUMMARY="$PKG_SUMMARY";;
 	    o)
-		export PKG_DIGGER_BACKEND=pkg_online_client
-		unset in_installed || true;;
+		export PKG_DIGGER_BACKEND=pkg_online_client;;
 	    I)
-		unset PKG_DIGGER_BACKEND || true
-		in_installed=1;;
+		export PKG_DIGGER_BACKEND=pkg_digger_installed
+		export PKG_DIGGER_SUMMARY="$confdir/installed_summary.txt";;
 	    r)
 		raw=1
 		opts="${opts}r";;
@@ -1218,14 +1217,7 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
     done
     shift `expr $OPTIND - 1`
 
-    if test -n "$in_installed"; then
-	export PKG_DIGGER_SUMMARY="$tmp_dir/installed_summary"
-	pkg_bin_summary -a automatic > "$PKG_DIGGER_SUMMARY"
-    fi
-
-    if test "$PKG_DIGGER_SUMMARY" = "$PKG_SUMMARY" -a \
-	"$PKG_DIGGER_BACKEND" = ''
-    then
+    if test "$PKG_DIGGER_BACKEND" = 'pkg_digger_installed'; then
 	summary_exists
     fi
 
