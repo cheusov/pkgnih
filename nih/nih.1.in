@@ -299,7 +299,7 @@ will not update it to emacs-23 from editors/emacs23.
 To get the package updated, run the following:
 .VB
 
-   nih install editors/emacs23 emacs-
+   nih install emacs- editors/emacs23
 
 .VE
 
@@ -418,7 +418,7 @@ Examples:
    nih install libao-alsa libao-oss-
 
    # replace emacs (21,22,23,...) with emacs-20
-   nih install editors/emacs20 emacs-
+   nih install emacs- editors/emacs20
 
    # install GConf and xproto and mark them as auto-installed
    nih install GConf+ xproto+

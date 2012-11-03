@@ -189,8 +189,12 @@ function process_pkg (pkg, try_out, hash_val,       base,suff,pair,rempair,pipe,
 
 	if (suff == "-"){
 		rem_pkgs [rempair] = 0
-		delete add_auto_pkgs [pair]
-		delete add_pkgs [pair]
+		for (p in add_auto_pkgs)
+			if (pkgpana2pkgbase(p) == base)
+				delete add_auto_pkgs
+		for (p in add_pkgs)
+			if (pkgpana2pkgbase(p) == base)
+				delete add_pkgs
 		delete add_base [base]
 	}else if (suff == "+"){
 		if (! (pair in add_pkgs)){
@@ -630,11 +634,14 @@ function add_base2pair (pkgbase,                i)
 }
 
 function show_trace (){
-#	debug_expl()
+	if (verbose_mode > 1){
+		printf "bad_package = %s\n", bad_package > "/dev/stderr"
+		debug_expl()
+	}
+
 	msg = ""
 	print_eqs(1)
 	print "The above problem is caused by the following" > "/dev/stderr"
-#	printf "   bad_package = %s\n", bad_package > "/dev/stderr"
 	pkg = bad_package
 	while (pkg){
 		old_name = pair2name(inst_base2pair [pkg])
