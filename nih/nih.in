@@ -1763,7 +1763,7 @@ if test "$1" = history; then
     unpacked1_fn="$tmp_dir/unpacked1.txt"
     unpacked2_fn="$tmp_dir/unpacked2.txt"
 
-    ls -r ~/.nih/installed_* |
+    ls -r $confdir/installed_* |
     while read curr_fn; do
 	curr=`echo $curr_fn | awk 'match($0, /[0-9].*[0-9]/) {
 	    print substr($0, RSTART, 4) "-" substr($0, RSTART+4, 2) "-" substr($0, RSTART+6, 2) " " substr($0, RSTART+9, 2) ":" substr($0, RSTART+11, 2)}'`
