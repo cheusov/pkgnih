@@ -486,8 +486,11 @@ nih install [options] <packages>
              val=2 ==> PKG_PATH=$REPOSITORY/All
 
       -B     consider packages different if their BUILD_DATE differ
+
       -l     do not remove auto-removable leaf packages
-      -p     do not run a REQUIRES/PROVIDES consistency check
+
+      -p     disable REQUIRES/PROVIDES consistency check
+      -P     enable REQUIRES/PROVIDES consistency check
 
       -t     install packages and mark them as "try out"
 
@@ -584,7 +587,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     create_cachedir
 
-    while getopts hndkBtDlpa:rR f; do
+    while getopts hndkBtDlpPa:rR f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -605,7 +608,9 @@ if test "_$1" = _install -o "_$1" = _update; then
 	    l)
 		update_plan_opts="$update_plan_opts -l";;
 	    p)
-		NO_REQUIRES_CHECK=1;;
+		NO_REQPROV_CHECK=1;;
+	    P)
+		unset NO_REQPROV_CHECK || true;;
 	    D)
 		debug=1;;
 	    a)
@@ -621,7 +626,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     shift `expr $OPTIND - 1`
 
     # -p
-    if test -n "$NO_REQUIRES_CHECK"; then
+    if test -n "$NO_REQPROV_CHECK"; then
 	update_plan_opts="$update_plan_opts -p"
     fi
 
