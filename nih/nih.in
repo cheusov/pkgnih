@@ -487,8 +487,8 @@ nih install [options] <packages>
 
       -B     consider packages different if their BUILD_DATE differ
 
-      -l     do not remove auto-removable leaf packages
-      -L     remove auto-removable leaf packages (the default)
+      -l     do not remove auto-installed leaf packages
+      -L     remove auto-installed leaf packages (the default)
 
       -p     disable REQUIRES/PROVIDES consistency check
       -P     enable REQUIRES/PROVIDES consistency check (the default)
@@ -783,7 +783,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     # install as a depdendency
     if test -s "$inst_auto_summary"; then
-	echo 'The following packages will be installed as auto-removable'
+	echo 'The following packages will be installed as auto-installed'
 	summary2packages_to_be_installed_as_dep "$inst_auto_summary"
     fi
 
@@ -931,7 +931,7 @@ nih uninstall [options] <packages>
       -h     display this help message
       -n     don't actually deinstall a package, just report the steps that
              would be taken if it were.
-      -l     do not remove auto-removable leaf packages
+      -l     do not remove auto-installed leaf packages
       -t     remove "try out" packages
 Examples:
    nih uninstall libgnome python26 kdelibs4

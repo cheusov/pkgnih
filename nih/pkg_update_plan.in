@@ -53,7 +53,7 @@
 #   -B        consider packages different if their BUILD_DATE differ
 # <packages> may be either PKGBASEs, PKGNAMEs or PKGPATHs,
 # optionally appended by `-' (marked for removal),
-# `+' (auto-removable), or `_' (auto-removable flag is not changed).
+# `+' (auto-installed), or `_' (auto-installed flag is not changed).
 # Packages without suffix will be marked as installed by user.
 #.end-str
 
@@ -450,7 +450,7 @@ function generate_plan (output,           tmpfn,ii,s1)
 	}
 
 	for (ii in add_auto_pkgs){
-		# add specified packages as auto-removable to inst_summary
+		# add specified packages as auto-installed to inst_summary
 		tmpfn = tmpfile()
 		create_packages_summary(tmpfn, add_auto_pkgs)
 
