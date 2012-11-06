@@ -1,4 +1,14 @@
+nih update -L remove auto-removable leaf packages, this is the default
+unless variable XX is set in config file.
+
+auto-removed -> auto-installed
+nih verify -s vs. 6.0_STABLE/6.0_RELEASE
 nih install -N - do not alter auto-installed flag
+If CACHEDIR is equal to REPOSITORY, redefine fetch () { :; }
+
+to fix: "Checking packages from update plan for common files..."
+  tries to find packages in current directory even if
+  package was installed using full path.
 
 plan -1:
 - nih search -sf should output both fields and search strategies
