@@ -340,20 +340,30 @@ Do not update installed packages, download binaries only.
 Continue downloading packages despite errors that may occur underway.
 .TP
 .B -l
-Do not remove auto-installed leaf packages. Bear in mind that
+Do not remove auto-installed leaf packages.
+Bear in mind that
 this may cause problems in creating a non-conflicting update plan.
+The default is to remove such packages unless
+.I NO_REMOVE_LEAVES
+configuration variable is set to
+.IR yes " or " 1 .
+.TP
+.B -L
+Remove auto-installed leaf packages. See
+.B -l
+for more information.
 .TP
 .B -p
-Disables REQUIRES/PROVIDES consistency checks which are
-enabled by default unless
+Disable REQUIRES/PROVIDES consistency checks.
+Bear in mind that
+this may cause problems in creating a non-conflicting update plan.
+By default this check is enabled unless
 .I NO_REQPROV_CHECK
 configuration variable is set to
 .IR yes " or " 1 .
-Bear in mind that
-this may cause problems in creating a non-conflicting update plan.
 .TP
 .B -P
-Enables REQUIRES/PROVIDES consistency checks. See
+Enable REQUIRES/PROVIDES consistency checks. See
 .B -p
 for more information.
 .TP

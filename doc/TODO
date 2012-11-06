@@ -6,9 +6,6 @@ nih update: R:0 U:0 A:0 -- nothing to do
 mkdir: /srv/pkgsrc_bin/DragonFly/All: No such file or directory
 pkg_refresh_summary needs to be speeded-up
 
-nih update -L remove auto-removable leaf packages, this is the default
-unless variable XX is set in config file.
-
 auto-removed -> auto-installed
 nih verify -s vs. 6.0_STABLE/6.0_RELEASE
 nih install -N - do not alter auto-installed flag

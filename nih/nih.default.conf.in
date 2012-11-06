@@ -73,6 +73,10 @@ fetch (){
 # a REQUIRES/PROVIDES consistency check.
 #NO_REQPROV_CHECK=1
 
+# Uncomment the following line if you don't want to remove
+# auto-installed leaf packages.
+#NO_REMOVE_LEAVES=1
+
 # If your machine is multi-CPU, it makes sense to uncomment the following
 # line in order to make some operations faster. See pkg_src_summary(1)
 # for details.
