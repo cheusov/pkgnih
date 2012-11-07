@@ -1,6 +1,5 @@
 {sha512,pkg_summary} -> {sha512,pkg_summary}_YYYYMMDD only if they differ
 {sha512,pkg_summary} -> {sha512,pkg_summary}_YYYYMMDD optional
-fetch() function failure -> ! Checksum mismatch
 -k marked packages are not installed => problems with PROVIDES/REQUIRES
 mkdir: /srv/pkgsrc_bin/DragonFly/All: No such file or directory
 pkg_refresh_summary needs to be speeded-up

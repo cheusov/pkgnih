@@ -554,15 +554,22 @@ download_pkgs (){
 	while read pkg; do
 	    if ! test -f "$pkg" || ! check_cksums "$pkg"; then
 		echo "Downloading package $pkg..."
-		if fetch "$REPOSITORY/All/$pkg" && check_cksums "$pkg"; then
-		    :
-		else
-		    echo 'Checksum mismatch (nih refresh?)' 1>&2
-		    if test "$force_download"; then
-			ex=1
-		    else
+		if ! fetch "$REPOSITORY/All/$pkg"; then
+		    ex=1
+		    echo 'Download failed (nih refresh?)' 1>&2
+		    if test -z "$force_download"; then
 			exit 1
 		    fi
+		    continue
+		fi
+
+		if ! check_cksums "$pkg"; then
+		    ex=1
+		    echo 'Checksum mismatch (nih refresh?)' 1>&2
+		    if test -z "$force_download"; then
+			exit 1
+		    fi
+		    continue
 		fi
 	    fi
 	done
