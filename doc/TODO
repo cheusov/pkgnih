@@ -13,7 +13,6 @@ to fix: "Checking packages from update plan for common files..."
   package was installed using full path.
 
 plan -1:
-- nih search -sf should output both fields and search strategies
 - nih leaf -a: ALL leaf packages
 - nih uninstall: do not require .nih/pkg_summary.txt (ano)
 - nih install -u mark as installed -a autoinstalled
