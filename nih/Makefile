@@ -1,5 +1,6 @@
 EGDIR ?=		${DATADIR}/examples/nih # specific to pkgsrc
 PACKAGES ?=		/usr/pkgsrc/packages
+PKGSRCDIR ?=		/usr/pkgsrc
 CACHEDIR ?=		${PACKAGES}
 DFLTCONFDIR ?=		${LIBDIR}/nih
 
@@ -20,6 +21,7 @@ INTEXTS_REPLS +=	FTP_CMD  ${FTP}
 INTEXTS_REPLS +=	WGET_CMD ${WGET}
 
 INTEXTS_REPLS +=	PACKAGES       ${PACKAGES}
+INTEXTS_REPLS +=	PKGSRCDIR      ${PKGSRCDIR}
 
 INTEXTS_REPLS +=	cachedir       ${CACHEDIR}
 INTEXTS_REPLS +=	dfltconfdir    ${DFLTCONFDIR}

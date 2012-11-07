@@ -50,9 +50,10 @@ The following commands are provided.
 Display help message
 .TP
 .B  refresh
-Download pkg_summary(5) and SHA512 files from the remote repository and
-unpack them to ~/.nih/. The URL of the parent directory under which
-these files are located is specified in the REPOSITORY configuration variable.
+By default pkg_summary(5) and SHA512 files are downloaded from
+the remote repository, and
+unpacked to ~/.nih/. The URL of the parent directory under which
+these files are located is specified by the REPOSITORY configuration variable.
 Unless
 .I NO_SUMMARY_COPY
 variable is set in the configuration file, the previous version of the files
@@ -70,6 +71,26 @@ accepts the following options:
 .TP
 .B -h
 Display help message.
+.TP
+.B -b
+Download pkg_summary(5) and SHA512. This is the default.
+.TP
+.B -p
+Incrementally update pkg_src_summary file from pkgsrc tree.
+Take a note that the first run may take several hours even on modern
+computers. Further runs will be significantly faster provided that
+pkgsrc files under mk/ directories were not changed.
+.I PKGSRCDIR
+configuration variable points to pkgsrc tree.
+.I PSS_OPTIONS
+configuration variable contains options passed to
+.B pkg_src_summary(1)
+.RI ( -m
+by default).
+.I PKGSRC_ADDSUBDIRS
+configuration variable contains a list of additional
+subdirectories for pkgsrc packages, for example,
+.IR wip .
 .RE
 .TP
 .B  info
@@ -84,6 +105,11 @@ Display help message.
 .TP
 .B -b
 Query the binary repository. This is the default.
+.TP
+.B -p
+Search in pkg_src_summary file built from pkgsrc tree
+by
+.BR "nih refresh -p" .
 .TP
 .B -o
 Query pkg_online database.
@@ -125,6 +151,11 @@ Display help message.
 .TP
 .B -b
 Query the binary repository. This is the default.
+.TP
+.B -p
+Search in pkg_src_summary file built from pkgsrc tree
+by
+.BR "nih refresh -p" .
 .TP
 .B -o
 Query pkg_online database.
@@ -171,6 +202,11 @@ Display help message.
 .TP
 .B -b
 Search in the binary repository. This is the default.
+.TP
+.B -p
+Search in pkg_src_summary file built from pkgsrc tree
+by
+.BR "nih refresh -p" .
 .TP
 .B -o
 Search in pkg_online database.

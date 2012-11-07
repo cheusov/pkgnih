@@ -46,7 +46,8 @@ Global options:
 Commands:
  nih <command> -h    - Display help message for a <command>
  nih help            - Display help message
- nih refresh         - Download pkg_summary and SHA512 files
+ nih refresh         - Download pkg_summary/SHA512 files
+                       or update pkg_src_summary file
  nih install
    nih update        - Install or update packages
  nih uninstall
@@ -335,6 +336,8 @@ nih refresh [options]
 
    options:
       -h     display this help message
+      -b     download pkg_summary(5) and SHA512 (the default)
+      -p     update pkg_src_summary file from pkgsrc tree
 
 ~/.nih/config:
    REPOSITORY - URL or file name for pkg_summary.bz2/pkg_summary.txt
@@ -385,30 +388,8 @@ fetch_sha512_file (){
     fi
 }
 
-if test "$1" = refresh; then
-    shift
-    while getopts h f; do
-	case "$f" in
-	    '?')
-		exit 1;;
-	    h)
-		usage_refresh
-		exit 0;;
-	esac
-    done
-    shift `expr $OPTIND - 1`
-
-    if test -n "$PKG_SUMMARY"; then
-	cat 1>&2 <<EOF
-Variable PKG_SUMMARY is set in configuration file.
-Nothing to do.
-EOF
-	exit 1
-    fi
-
+refresh_bin_summary (){
     cd "$confdir"
-
-    fetch=""
 
     if ! fetch_summary_file bz2 && ! fetch_summary_file gz; then
 	echo 'pkg_summary(5) file cannot be downloaded.' 1>&2
@@ -427,6 +408,47 @@ EOF
 	    cp SHA512.txt SHA512_${date_sufx}.txt
 	fi
     fi
+}
+
+refresh_src_summary (){
+    echo 'This may take a while...'
+    export PKGSRCDIR
+    export PSS_OPTIONS
+    all_pkgs="$confdir/pkgsrc_packages"
+    pkg_list_all_pkgs -a "$PKGSRC_ADDSUBDIRS" > "$all_pkgs"
+    pkg_update_src_summary -d "$confdir" -f "$all_pkgs"
+}
+
+if test "$1" = refresh; then
+    shift
+
+    func=refresh_bin_summary
+
+    while getopts hbp f; do
+	case "$f" in
+	    '?')
+		exit 1;;
+	    h)
+		usage_refresh
+		exit 0;;
+	    b)
+		func=refresh_bin_summary;;
+	    p)
+		func=refresh_src_summary;;
+	esac
+    done
+    shift `expr $OPTIND - 1`
+
+    if test -n "$PKG_SUMMARY"; then
+	cat 1>&2 <<EOF
+Variable PKG_SUMMARY is set in configuration file.
+Nothing to do.
+EOF
+	exit 1
+    fi
+
+    $func
+
     exit 0
 fi
 
@@ -440,17 +462,18 @@ if test -z "$PKG_SUMMARY"; then
 fi
 
 summary_exists (){
-    if ! test -r "$PKG_SUMMARY"; then
+    # $1 -- summary file
+    if ! test -r "$1"; then
 	cat 1>&2 <<EOF
-'$PKG_SUMMARY' file doesn't exist or is not readable.
-Perhaps you need to run 'nih refresh'
+'$1' file doesn't exist or is not readable.
+Perhaps you need to run 'nih refresh [-b|-p]'
 EOF
 	exit 1
     fi
 }
 
 refresh_summary (){
-    summary_exists
+    summary_exists "$PKG_SUMMARY"
 
     tiny_summary="$tmp_dir/tiny_summary"
     grep -E '^$|^(PKGNAME|PKGPATH|COMMENT|automatic|CONFLICTS|DEPENDS|BUILD_DATE|PROVIDES|REQUIRES|FILE_NAME)=' \
@@ -1129,9 +1152,10 @@ nih search [options] [args]
    options:
       -h    display this help message
 
-      -b    search in pkg_summary.txt (the default)
-      -o    search using pkg_online
+      -b    search in binary repository (pkg_summary(5), the default)
+      -o    search in pkg_online database
       -I    search in installed packages
+      -p    search in pkg_src_summary file
 
       -s    output search strategies
       -f    output search fields
@@ -1173,9 +1197,10 @@ nih info [options] PKGBASE [PKGBASEs...]
    options:
       -h    display this help message
 
-      -b    search in pkg_summary.txt (the default)
-      -o    search using pkg_online
+      -b    search in binary repository (pkg_summary(5), the default)
+      -o    search in pkg_online database
       -I    search in installed packages
+      -p    search in pkg_src_summary file
 
       -r    raw summaries are output
       -q    quiet mode, do not print "No matches found" to stderr
@@ -1200,9 +1225,10 @@ nih meta [options]
    options:
       -h    display this help message
 
-      -b    search in pkg_summary.txt (the default)
-      -o    search using pkg_online
+      -b    search in binary repository (pkg_summary(5), the default)
+      -o    search in pkg_online database
       -I    search in installed packages
+      -p    search in pkg_src_summary file
 
       -r    raw summaries are output
       -q    quiet mode, do not print "No matches found" to stderr
@@ -1222,7 +1248,7 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
     shift
     export PKG_DIGGER_SUMMARY="$PKG_SUMMARY"
 
-    while getopts hboIsf139rq f; do
+    while getopts hboIpsf139rq f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1234,6 +1260,9 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 	    I)
 		export PKG_DIGGER_BACKEND=pkg_digger_installed
 		export PKG_DIGGER_SUMMARY="$confdir/installed_summary.txt";;
+	    p)
+		export PKG_DIGGER_BACKEND=pkg_digger_summary
+		export PKG_DIGGER_SUMMARY="$confdir/pkg_src_summary.txt";;
 	    r)
 		raw=1
 		opts="${opts}r";;
@@ -1246,8 +1275,8 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
     done
     shift `expr $OPTIND - 1`
 
-    if test "$PKG_DIGGER_BACKEND" = 'pkg_digger_installed'; then
-	summary_exists
+    if test "$PKG_DIGGER_BACKEND" != 'pkg_digger_installed'; then
+	summary_exists "$PKG_DIGGER_SUMMARY"
     fi
 
     case "$op" in
@@ -1586,7 +1615,7 @@ if test "$1" = deps; then
     if test -n "$installed_summary"; then
 	pkg_bin_summary -fPKGNAME,PKGPATH,DEPENDS
     else
-	summary_exists
+	summary_exists "$PKG_SUMMARY"
 	cat "$PKG_SUMMARY"
     fi |
     pkg_summary2deps -d $pn_opts 2>/dev/null |
