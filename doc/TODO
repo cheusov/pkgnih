@@ -25,7 +25,6 @@ plan0:
 - use distbb for source-based update
 
 plan1:
-- configuration variable for ~/.nih
 - nih status: -v analyse vulnerable packages against binary or pkgsrc tree
 - nih install: ability to check a number bytes to download and
   install/remove
@@ -35,9 +34,8 @@ plan1:
 - nih install: working with ALL binaries available in $CACHEDIR
 - nih clean-distdir
 
-- nih install: use pkg_summary-YYYYMMDD.txt?
 - Use pkg_summary-YYYYMMDD.txt
-  and use such summaries for in 'nih clean-cache' and 'nih install'
+  in 'nih clean-cache' and 'nih install'
 - before update warn about missed binaries for installed packages
   (downgrade will not be possible)
 
@@ -49,4 +47,3 @@ plan2:
 - nih clean-cache:    use FILE_NAME
 - autoverifying pkgdb after installation
 - separate pkg_install_plan script from nih
-- optionally disable REQUIRES/PROVIDES checks
