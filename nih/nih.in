@@ -929,9 +929,13 @@ nih uninstall [options] <packages>
 
    options:
       -h     display this help message
+
       -n     don't actually deinstall a package, just report the steps that
              would be taken if it were.
+
       -l     do not remove auto-installed leaf packages
+      -L     remove auto-installed leaf packages (the default)
+
       -t     remove "try out" packages
 Examples:
    nih uninstall libgnome python26 kdelibs4
@@ -940,11 +944,11 @@ EOF
 
 if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
     shift
-    while getopts hnlt f; do
+    while getopts hnlLt f; do
 	case "$f" in
 	    '?')
 		exit 1;;
-	    n|l)
+	    n|l|L)
 		pkg_delete_opts="$pkg_delete_opts -$f";;
 	    h)
 		usage_uninstall

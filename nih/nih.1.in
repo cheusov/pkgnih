@@ -492,6 +492,15 @@ would be taken if it were.
 .TP
 .B -l
 Do not remove auto-installed leaf packages.
+See
+.B nih install -l
+for details.
+.TP
+.B -L
+Remove auto-installed leaf packages.
+See
+.B nih install -L
+for details.
 .TP
 .B -t
 Uninstall "try out" packages.
