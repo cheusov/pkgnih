@@ -117,10 +117,9 @@ cmds=`process_options "$@"`
 eval "$cmds"
 
 # temp directory
+on_exit () { rm -rf $tmp_dir; }
+. @libexecdir@/psu/sig_handler.sh
 tmp_dir=`mktemp -d /tmp/nih.XXXXXX`
-if test -z "$debug"; then
-    trap "rm -rf $tmp_dir" 0 1 2 15
-fi
 test -n "$tmp_dir" || exit 1
 
 #
