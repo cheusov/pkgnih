@@ -1,0 +1,86 @@
+#!/usr/bin/env runawk
+
+#use "power_getopt.awk"
+#use "tmpfile.awk"
+#use "xsystem.awk"
+#use "xclose.awk"
+#use "shquote.awk"
+
+#.begin-str help
+# pkg_create_fake - create a fake package
+# usage: pkg_create_fake [options] filename
+# OPTIONS:
+#  -h            display this screen
+#  =n <name>     PKGNAME
+#  =p <path>     PKGPATH
+#  =d <deps>     DEPENDS
+#.end-str
+
+BEGIN {
+	package_fn = ARGV [1]
+	assert(ARGC == 2 && package_fn != "-", "filename should be specified")
+}
+
+BEGIN {
+	pkg_create_cmd="@PKG_CREATE_CMD@"
+	pkg_dbdir="@PKG_DBDIR@"
+	prefix="@PREFIX@"
+	user="@REAL_ROOT_USER@"
+	group="@REAL_ROOT_GROUP@"
+}
+
+BEGIN {
+	if (getarg("h")){
+		print_help()
+		exitnow(0)
+	}
+	pkgname = getarg("n")
+	assert(pkgname, "-n is a mandatory option")
+	pkgpath = getarg("p")
+	assert(pkgpath, "-p is a mandatory option")
+	deps    = getarg("d")
+
+	build_info_fn = tmpfile()
+	printf "PKGPATH=%s\n", pkgpath > build_info_fn
+	"uname -srp" | getline
+	printf "OPSYS=%s\n", $1 > build_info_fn
+	printf "OS_VERSION=%s\n", $2 > build_info_fn
+	printf "MACHINE_ARCH=%s\n", $3 > build_info_fn
+	xclose(build_info_fn)
+
+	build_version_fn = tmpfile()
+	printf "" > build_version_fn
+	xclose(build_version_fn)
+
+	desc_fn = tmpfile()
+	print "This is a fake package" > desc_fn
+	xclose(desc_fn)
+
+	plist_fn = tmpfile()
+	printf "@name %s\n", pkgname > plist_fn
+	split(deps, deps_arr)
+	for (i in deps_arr)
+		printf "@pkgdep %s\n", deps_arr [i] > plist_fn
+	delete deps_arr
+#	print "@comment $NetBSD$" > plist_fn
+	xclose(plist_fn)
+
+	size_all_fn = tmpfile()
+	print "1024" > size_all_fn
+	xclose(size_all_fn)
+
+	size_pkg_fn = tmpfile()
+	print "1024" > size_pkg_fn
+	xclose(size_pkg_fn)
+
+	prog = sprintf(														\
+		"%s -K %s -U -I %s -F gzip -B %s -b %s -c -'fake package' -d %s -f %s -S %s -s %s -p %s -u %s -g %s %s",
+		shquote(pkg_create_cmd), shquote(pkg_dbdir), shquote(prefix),
+		build_info_fn, build_version_fn, desc_fn, plist_fn, size_all_fn,
+		size_pkg_fn, "/", shquote(user),
+		shquote(group), shquote(package_fn))
+
+	xsystem(prog)
+
+	exitnow(0)
+}

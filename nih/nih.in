@@ -576,10 +576,10 @@ download_pkgs (){
 	ex=0
 	while read pkg; do
 	    if ! test -f "$pkg" || ! check_cksums "$pkg"; then
-		echo "Downloading package $pkg..."
+		echo "  downloading package $pkg..."
 		if ! fetch "$REPOSITORY/All/$pkg"; then
 		    ex=1
-		    echo 'Download failed (nih refresh?)' 1>&2
+		    echo '  download failed (nih refresh?)' 1>&2
 		    if test -z "$force_download"; then
 			exit 1
 		    fi
@@ -588,12 +588,14 @@ download_pkgs (){
 
 		if ! check_cksums "$pkg"; then
 		    ex=1
-		    echo 'Checksum mismatch (nih refresh?)' 1>&2
+		    echo '  checksum mismatch (nih refresh?)' 1>&2
 		    if test -z "$force_download"; then
 			exit 1
 		    fi
 		    continue
 		fi
+	    else
+		echo "  $pkg... ok"
 	    fi
 	done
 	exit $ex
@@ -610,6 +612,18 @@ rev_lines (){
     # $@ - files
     awk '{ line [NR] = $0 }
     END { for (i=NR; i >= 1; --i) print line [i] }' "$@"
+}
+
+fake_pkg_fn="$tmp_dir/fake.tgz"
+
+replace_with_fake (){
+    # $1 - pkgbase
+    # $2 - version
+    deps=`$PKG_INFO_CMD -X "$1" | sed -n 's/^DEPENDS=//p'`
+    path=`$PKG_INFO_CMD -X "$1" | sed -n 's/^PKGPATH=//p'`
+    @libexecdir@/nih/pkg_create_fake -n "$1-$2" -p "$path" -d "$deps" "$fake_pkg_fn"
+    $PKG_ADD_CMD -UD "$fake_pkg_fn"
+#    $PKG_ADMIN_CMD set fake=yes "$1-$2"
 }
 
 if test "_$1" = _install -o "_$1" = _update; then
@@ -632,8 +646,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 	    k)
 		export force_download=1;;
 	    B)
-		update_plan_opts="$update_plan_opts -B"
-		cmp_opts='-b';;
+		update_plan_opts="$update_plan_opts -B";;
 	    t)
 		update_plan_opts="$update_plan_opts -t";;
 	    l)
@@ -692,7 +705,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     verbose "Getting a list of installed packages..."
     installed_summary="$tmp_dir/installed_summary"
     pkg_bin_summary \
-	-fPROVIDES,REQUIRES,PKGNAME,PKGPATH,COMMENT,automatic,CONFLICTS,DEPENDS,BUILD_DATE,try_out,keep \
+	-fPROVIDES,REQUIRES,PKGNAME,PKGPATH,COMMENT,automatic,CONFLICTS,DEPENDS,BUILD_DATE,try_out,keep,PLIST \
 	> "$installed_summary"
 
     cmp_summary="$tmp_dir/cmp_summary"
@@ -747,17 +760,10 @@ if test "_$1" = _install -o "_$1" = _update; then
 	exit 1
     fi
 
-    pkg_cmp_summary $cmp_opts "$installed_summary" "$plan_summary" \
-	> "$cmp_summary" || true
+    pkg_cmp_summary -a force_update "$installed_summary" "$plan_summary" |
+    grep -v ^= > "$cmp_summary" || true
 
-    pkg_grep_summary -s force_update yes < "$plan_summary" |
-    awk '/^PKGNAME=/ {
-	base = ver = substr($0, 9)
-	sub(/-[^-]*$/, "", base)
-	sub(/^.*-/, "", ver)
-	printf "! %s x %s\n", base, ver}' >> "$cmp_summary"
-
-    if ! grep '^[^=]' "$cmp_summary" > /dev/null; then
+    if ! test -s "$cmp_summary" > /dev/null; then
 	echo 'Nothing to be done' 1>&2
 	exit
     fi
@@ -770,50 +776,32 @@ if test "_$1" = _install -o "_$1" = _update; then
     pkg_grep_summary -t strlist PKGBASE "$rem_pkgs" \
 	< "$installed_summary" > "$rem_summary"
 
-    inst_pkgs=`awk '$1 ~ /^[<>!]$/ {print $2 "-" $4}
-                    $1 ~ /^[+]$/   {print $2 "-" $3}' "$cmp_summary" | sort -u`
-    inst_pkgs=`echo $inst_pkgs`
+    inst_all_pkgs_fn="$tmp_dir/inst_all_pkgs"
+    inst_all_summary="$tmp_dir/inst_all_summary"
 
-    auto_pkgs=`pkg_grep_summary -v -e automatic < "$plan_summary" |
-	sed -n 's/^PKGNAME=//p'`
-    auto_pkgs=`echo $auto_pkgs`
+    awk '$1 ~ /^[<>!]$/ {print $2 "-" $4}
+	 $1 ~ /^[+]$/   {print $2 "-" $3}' "$cmp_summary" |
+    sort -u > "$inst_all_pkgs_fn"
+
+    pkg_grep_summary -t strfile PKGNAME "$inst_all_pkgs_fn" \
+	< "$plan_summary" > "$inst_all_summary"
 
     inst_auto_summary="$tmp_dir/inst_auto_summary"
-    pkg_grep_summary -t strlist PKGNAME "$inst_pkgs" < "$plan_summary" |
-    pkg_grep_summary -t strlist PKGNAME "$auto_pkgs" > "$inst_auto_summary"
+    pkg_grep_summary -v -e automatic < "$inst_all_summary" > "$inst_auto_summary"
 
-    inst_summary="$tmp_dir/inst_summary"
-    pkg_grep_summary -t strlist PKGNAME "$inst_pkgs" < "$plan_summary" |
-    pkg_grep_summary -v -t strlist PKGNAME "$auto_pkgs" > "$inst_summary"
-
-    conflicts_msg="$tmp_dir/conflicts"
-    extra_rem_pkgs="$tmp_dir/extra_rem"
-    extra_rem_summary="$tmp_dir/extra_rem_summary"
-    printf '' > "$extra_rem_summary"
-    if ! pkg_lint_summary -c "$inst_summary" "$inst_auto_summary" \
-	"$installed_summary" > "$conflicts_msg"
-    then
-	awk '$1 == "c:" {print $5; print $8}
-	     $1 == "d:" {print $6}' "$conflicts_msg" |
-	sort -u > "$extra_rem_pkgs"
-	pkg_grep_summary -t strfile PKGNAME "$extra_rem_pkgs" \
-	    < "$installed_summary" > "$extra_rem_summary"
-    fi
+    inst_user_summary="$tmp_dir/inst_user_summary"
+    pkg_grep_summary    -e automatic < "$inst_all_summary" > "$inst_user_summary"
 
     # rem
-    if test -s "$rem_summary" -o -s "$extra_rem_summary"; then
+    if test -s "$rem_summary"; then
 	echo 'The following packages will be removed'
 	summary2packages_to_be_removed "$rem_summary"
-	if test -s "$extra_rem_summary"; then
-	    echo '    //'
-	    summary2packages_to_be_removed "$extra_rem_summary"
-	fi
     fi
 
     # install
-    if test -s "$inst_summary"; then
+    if test -s "$inst_user_summary"; then
 	echo 'The following packages will be installed'
-	summary2packages_to_be_installed "$inst_summary"
+	summary2packages_to_be_installed "$inst_user_summary"
     fi
 
     # install as a depdendency
@@ -829,7 +817,8 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     ##################################################################
     ########################## installing ############################
-    summary2binary "$inst_summary" "$inst_auto_summary" |
+    echo "Downloading binary packages..." 1>&2
+    summary2binary "$inst_user_summary" "$inst_auto_summary" |
     grep -v '^[/.]' |
     download_pkgs
 
@@ -837,52 +826,68 @@ if test "_$1" = _install -o "_$1" = _update; then
 	exit 0
     fi
 
+    #
+    rem_pkgs="$tmp_dir/extra_rem"
+    sed -n 's/^PKGNAME=//p' "$rem_summary" > "$rem_pkgs"
+
+    #
     cd $CACHEDIR/All
 
     # Ensure that packages that will be be installed do not have
     # common files
-    if test -z "$NO_PLIST_CHECK" -a -n "$inst_pkgs"; then
-	echo "Checking packages from update plan for common files..." 1>&2
+    if test -z "$NO_PLIST_CHECK" -a -s "$inst_all_pkgs_fn"; then
+	echo "Analysing PLIST..." 1>&2
 	plist_summary="$tmp_dir/plist_summary"
+	toinst_plist_summary="$tmp_dir/toinst_plist_summary"
+	inst_plist_summary="$tmp_dir/inst_plist_summary"
+	conflicts_fn="$tmp_dir/conflicts"
 
-	{
-	    # packages to install
-	    for i in $inst_pkgs; do
-		echo "./$i$SUFX"
-	    done | 
-	    xargs pkg_bin_summary -e -f PKGNAME,PKGPATH,PLIST
+	# packages to install
+	awk '{print $0 '"\"$SUFX\"}" "$inst_all_pkgs_fn" |
+	xargs pkg_bin_summary -e -f PKGNAME,PKGPATH,PLIST > "$toinst_plist_summary"
 
-	    # remained packages
-	    awk '/^[=]/ {print $2}' "$cmp_summary" |
-	    xargs pkg_bin_summary -e -f PKGNAME,PKGPATH,PLIST
-	} | pkg_uniq_summary -n > "$plist_summary"
+	# inst packages
+	pkg_grep_summary -f PKGNAME,PKGPATH,PLIST -v \
+	    -t strfile PKGNAME "$rem_pkgs" < "$installed_summary" |
+	sed 's/^PKGPATH=/PKGPATH=nih-installed-/' > "$inst_plist_summary"
 
-	if ! pkg_lint_summary -f "$plist_summary"; then
-	    exit 1
-	fi
+	pkg_lint_summary -f "$toinst_plist_summary" \
+	    "$inst_plist_summary" > "$conflicts_fn" || true
+
+	repl_fake_fn="$tmp_dir/repl_fake"
+	@libexecdir@/nih/analyse_conflicts "$conflicts_fn" > "$repl_fake_fn"
+	while read p; do
+	    ver=`pkg_grep_summary -f PKGNAME -s PKGBASE "$p" < "$toinst_plist_summary" | sed -n 's/^PKGNAME=.*-//p'`
+	    echo "Replacing $p with fake package..." 1>&2
+	    replace_with_fake "$p" "$ver"
+	done < "$repl_fake_fn"
     fi
 
     # installation
     save_installed_packages
 
-    if test -s "$rem_summary" -o -s "$extra_rem_summary"; then
-	sed -n 's/^PKGNAME=//p' "$rem_summary" "$extra_rem_summary" \
-	    > "$extra_rem_pkgs"
+    if test -s "$rem_summary"; then
 	pkg_summary2deps -drt "$installed_summary" | tsort |
-	grep_lines "$extra_rem_pkgs" - | rev_lines |
+	grep_lines "$rem_pkgs" - | rev_lines |
 	while read pkg; do
 	    echo "Removing package $pkg..." 1>&2
 	    $PKG_DELETE_CMD -f $pkg_opts "$pkg"
 	done
     fi
 
+    pkg1_fn="$tmp_dir/pkg1"
+
     pkg_summary2deps -ndtr "$plan_summary" | tsort |
+    grep_lines "$inst_all_pkgs_fn" |
     while read pkg; do
-	fn_auto_pkg=`pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_auto_summary" | summary2binary`
-	fn_pkg=`pkg_grep_summary -r -s PKGNAME "$pkg" < "$inst_summary" | summary2binary`
-	if test -n "$fn_auto_pkg"; then
+	cat "$inst_auto_summary" "$inst_user_summary" |
+	pkg_grep_summary -r -s PKGNAME "$pkg" > "$pkg1_fn"
+
+	fn_pkg=`summary2binary "$pkg1_fn"`
+
+	if grep automatic "$pkg1_fn" > /dev/null; then
 	    echo "Installing package $pkg as a dependency..." 1>&2
-	    if ! $PKG_ADD_CMD $pkg_opts -UDA "$fn_auto_pkg"; then
+	    if ! $PKG_ADD_CMD $pkg_opts -UDA "$fn_pkg"; then
 		cleanup_db; exit 1
 	    fi
 	elif test -n "$fn_pkg"; then
@@ -891,61 +896,14 @@ if test "_$1" = _install -o "_$1" = _update; then
 		cleanup_db; exit 1
 	    fi
 	fi
-    done
 
-    ##################################################################
-    ###### Marking packages that were not installed or updated #######
-    echo "Updating installed information..." 1>&2
-    awk -v auto=0 -v try_out=0 -v keep=0 '
-	FILENAME != "-" && $0 ~ /^PKGNAME=/ {pkgname = substr($0, 9)}
-
-	FILENAME != "-" && $0 ~ /^automatic/ {auto = 1}
-	FILENAME != "-" && NF == 0 {automatic_o [pkgname] = auto; auto = 0}
-
-	FILENAME != "-" && $0 ~ /^keep/ {keep = 1}
-	FILENAME != "-" && NF == 0 {keep_o [pkgname] = keep; keep = 0}
-
-	FILENAME == "-" && $0 ~ /^PKGNAME=/ {pkgname = substr($0, 9)}
-
-	FILENAME == "-" && $0 ~ /^automatic/ {auto = 1}
-	FILENAME == "-" && NF == 0 {automatic_n [pkgname] = auto; auto = 0}
-
-	FILENAME == "-" && $0 ~ /^try_out/ {try_out = 1}
-	FILENAME == "-" && NF == 0 {try_out_n [pkgname] = try_out; try_out = 0}
-
-	FILENAME == "-" && $0 ~ /^keep/ {keep = 1}
-	FILENAME == "-" && NF == 0 {keep_n [pkgname] = keep; keep = 0}
-
-	END {
-	    for (i in automatic_n)
-		if ((i in automatic_o) && automatic_o [i] != automatic_n [i])
-		    print i, "automatic", automatic_n [i]
-	    for (i in try_out_n)
-		if (try_out_n [i] || try_out_o [i])
-		    print i, "try_out", 1
-	    for (i in keep_n)
-		if (keep_n [i] || keep_o [i])
-		    print i, "keep", 1
-	}' "$installed_summary" - < "$plan_summary" |
-    while read pkg marker m; do
-	if test "$m" -eq 0; then
-	    echo "  marking $pkg as installed by user"
-	    if test -z "$pkg_opts"; then
-		$PKG_ADMIN_CMD unset "$marker" "$pkg"
-	    else
-		echo '   skipped'
-	    fi
-	else
-	    echo "  marking $pkg as \"$marker\""
-	    if test -z "$pkg_opts"; then
-		$PKG_ADMIN_CMD set "$marker"=yes "$pkg"
-	    else
-		echo '   skipped'
+	if grep try_out "$pkg1_fn" > /dev/null; then
+	    echo "Marking package $pkg as 'try_out'..." 1>&2
+	    if !$PKG_ADMIN_CMD set try_out=yes; then
+		cleanup_db; exit 1
 	    fi
 	fi
     done
-
-    cleanup_db
 
     exit 0
 fi
@@ -1394,6 +1352,7 @@ nih list [options]
       -u       output packages installed by user
       -t       output installed packages marked as "try out"
       -k       output installed packages marked as "keep"
+      -f       output installed packages marked as "fake"
 
       -r       output raw summaries
 
@@ -1407,7 +1366,7 @@ EOF
 
 if test "$1" = list; then
     shift
-    while getopts hbauIrtk f; do
+    while getopts hbauIrtkf f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1418,10 +1377,16 @@ if test "$1" = list; then
 		info_opts='';;
 	    t)
 		info_opts='a'
-		try_out=1;;
+		marker=try_out
+		cond=yes;;
 	    k)
 		info_opts='a'
-		keep=1;;
+		marker=keep
+		cond=yes;;
+	    f)
+		info_opts='a'
+		marker=COMMENT
+		cond='fake package';;
 	    I)
 		info_opts="${info_opts}a";;
 	    a|u)
@@ -1433,11 +1398,9 @@ if test "$1" = list; then
     shift `expr $OPTIND - 1`
 
     if test -n "$info_opts"; then
-	pkg_bin_summary -a automatic,try_out,keep -- "-$info_opts" |
-	if test -n "$try_out"; then
-	    pkg_grep_summary -s try_out yes
-	elif test -n "$keep"; then
-	    pkg_grep_summary -s keep yes
+	pkg_bin_summary -a automatic,try_out,keep,COMMENT -- "-$info_opts" |
+	if test -n "$marker"; then
+	    pkg_grep_summary -s "$marker" "$cond"
 	else
 	    cat
 	fi |
@@ -1821,7 +1784,7 @@ if test "$1" = history; then
     unpacked1_fn="$tmp_dir/unpacked1.txt"
     unpacked2_fn="$tmp_dir/unpacked2.txt"
 
-    ls -r $confdir/installed_* |
+    ls -r $confdir/installed_????????_????.* |
     while read curr_fn; do
 	curr=`echo $curr_fn | awk 'match($0, /[0-9].*[0-9]/) {
 	    print substr($0, RSTART, 4) "-" substr($0, RSTART+4, 2) "-" substr($0, RSTART+6, 2) " " substr($0, RSTART+9, 2) ":" substr($0, RSTART+11, 2)}'`

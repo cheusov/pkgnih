@@ -1,0 +1,35 @@
+#!/usr/bin/env runawk
+
+#use "exitnow.awk"
+#use "psu_funcs.awk"
+
+BEGIN {
+	ex = 0
+}
+
+{
+	inst5=sub(/^nih-installed-/, "", $4)
+	inst7=sub(/^nih-installed-/, "", $6)
+}
+
+(inst5 && !inst7) || (!inst5 && inst7) {
+	p5=pkgname2pkgbase($5)
+	p7=pkgname2pkgbase($7)
+	if (p5 != p7){
+		if (inst5)
+			print p5
+		else
+			print p7
+	}
+
+	next
+}
+
+!inst5 && !inst7 {
+	print $0 > "/dev/stderr"
+	ex = 1
+}
+
+END {
+	exitnow(ex)
+}

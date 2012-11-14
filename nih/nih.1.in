@@ -15,7 +15,7 @@
 .fi
 ..
 .\" ------------------------------------------------------------------
-.TH NIH 1 "Aug 26, 2012" "" ""
+.TH NIH 1 "Nov 7, 2012" "" ""
 .SH NAME
 nih \- package manager for pkgsrc
 .SH SYNOPSIS

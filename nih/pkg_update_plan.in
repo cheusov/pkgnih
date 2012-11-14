@@ -238,6 +238,8 @@ BEGIN {
 			keep = (substr($0, 6) != "")
 		}else if ($0 ~ /^PROVIDES=/){
 			provides_arr [substr($0, 10)] = 1
+		}else if ($0 ~ /^COMMENT=fake package/){
+			fake = 1
 		}else if (NF == 0){
 			pkgbase = pkgname
 			sub(/-[^-]*$/, "", pkgbase)
@@ -248,6 +250,9 @@ BEGIN {
 			}
 			delete provides_arr
 
+			if (fake)
+				fake_packages [pkgbase] = 0
+
 			inst_name2pair [pkgname] = pkgpair
 			inst_base2pair [pkgbase] = pkgpair
 			inst_path2pair [pkgpath] = pkgpair
@@ -256,7 +261,7 @@ BEGIN {
 				inst_base2keep [pkgbase] = 1
 
 			pkgname = pkgpath = ""
-			keep = auto = 0
+			fake = keep = auto = 0
 		}
 	}
 	xclose(inst_summary)
@@ -355,6 +360,9 @@ BEGIN {
 			process_pkg(ARGV [i], try_out)
 		}
 	}
+
+	for (d in fake_packages)
+		process_pkg(d "_")
 
 	if (ex)
 		exitnow(ex)
