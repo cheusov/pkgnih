@@ -527,16 +527,20 @@ Don't actually remove a package, just report the steps that
 would be taken if it were.
 .TP
 .B -l
-Do not remove auto-installed leaf packages.
-See
-.B nih install -l
-for details.
+The same as
+.BR "nih install -l" .
 .TP
 .B -L
-Remove auto-installed leaf packages.
-See
-.B nih install -L
-for details.
+The same as
+.BR "nih install -L" .
+.TP
+.B -p
+The same as
+.BR "nih install -p" .
+.TP
+.B -P
+The same as
+.BR "nih install -P" .
 .TP
 .B -t
 Uninstall "try out" packages.

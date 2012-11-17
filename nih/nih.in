@@ -928,6 +928,9 @@ nih uninstall [options] <packages>
       -l     do not remove auto-installed leaf packages
       -L     remove auto-installed leaf packages (the default)
 
+      -p     disable REQUIRES/PROVIDES consistency check
+      -P     enable REQUIRES/PROVIDES consistency check (the default)
+
       -t     remove "try out" packages
 Examples:
    nih uninstall libgnome python26 kdelibs4
@@ -936,11 +939,11 @@ EOF
 
 if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
     shift
-    while getopts hnlLt f; do
+    while getopts hnlLpPt f; do
 	case "$f" in
 	    '?')
 		exit 1;;
-	    n|l|L)
+	    n|l|L|p|P)
 		pkg_delete_opts="$pkg_delete_opts -$f";;
 	    h)
 		usage_uninstall
