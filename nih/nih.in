@@ -816,9 +816,9 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     ##################################################################
     ########################## installing ############################
-    echo "Downloading binary packages..." 1>&2
     summary2binary "$inst_user_summary" "$inst_auto_summary" |
     grep -v '^[/.]' |
+    awk 'NR==1 {print "Downloading binary packages..." > "/dev/stderr"} {print}' |
     download_pkgs
 
     if test -n "$download_only"; then
