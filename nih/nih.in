@@ -1277,60 +1277,58 @@ nih leaf [options]
 
    options:
       -h    display this help message
-      -t    output only PKGNAME
-      -R    remove automatically installed leaf packages
+      -a    output all leaf packages
+      -A    output auto-installed leaf packages (the default)
+      -R    remove auto-installed leaf packages
       -n    pass -n to pkg_delete
 
 Examples:
-   nih leaf -t
-   nih leaf -R
+   nih leaf
+   nih leaf -a
    nih leaf -Rn
 EOF
 }
 
 if test "$1" = leaf; then
     shift
-    opts='l'
-    while getopts htRn f; do
+    opts='-r'
+    pkg_delete_opts=''
+    while getopts haARn f; do
 	case "$f" in
 	    '?')
 		exit 1;;
 	    h)
 		usage_leaf
 		exit 0;;
+	    a)
+		unset remove || true
+		opts='';;
+	    A)
+		unset remove || true
+		opts='-r';;
 	    R)
+		opts='-r'
 		remove=1;;
-	    *)
-		pkg_delete_opts=-n
-		opts="${opts}$f";;
+	    n)
+		pkg_delete_opts=-n;;
 	esac
     done
     shift `expr $OPTIND - 1`
 
-    if echo "$opts" | awk 'BEGIN { exit (!/[RE]/ || /n/) }' > /dev/null; then
-	save_installed_packages
-    fi
+    verbose "Finding leaf packages..."
+    installed_summary="$tmp_dir/installed_summary"
+    pkg_bin_summary \
+	-f PKGNAME,PKGPATH,COMMENT,automatic,DEPENDS \
+	> "$installed_summary"
+
+    leaves_fn="$tmp_dir/leaves"
+    pkg_summary2leaves $opts "$installed_summary" > "$leaves_fn"
 
     if test -n "$remove"; then
-	rem_pkgnames="$tmp_dir/rem_pkgnames"
-	rem_summary="$tmp_dir/rem_summary"
-
-	pkg_status -lt > "$rem_pkgnames"
-
-	if test -s "$rem_pkgnames"; then
-	    echo 'The following packages will be removed'
-	    xargs pkg_bin_summary -e < "$rem_pkgnames" > "$rem_summary"
-	    summary2packages_to_be_removed "$rem_summary"
-
-	    if ! yesno remove_pkgs 'Proceed'; then
-		exit 0
-	    fi
-
-	    save_installed_packages
-	    xargs $PKG_DELETE_CMD $pkg_delete_opts < "$rem_pkgnames"
-	fi
+	pkgnames=`sed -n 's/^PKGNAME=//p' "$leaves_fn"`
+	$0 $always_yes remove $pkg_delete_opts $pkgnames
     else
-	pkg_status "-$opts" "$@"
+	summary2leaf_packages "$leaves_fn"
     fi
 
     exit 0

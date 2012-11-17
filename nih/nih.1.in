@@ -691,7 +691,7 @@ using existing pkg-vulnerabilities file.
 .RE
 .TP
 .B  leaf
-Show or uninstall all auto-installed leaf packages.
+Output or uninstall leaf packages.
 .P
 .RS
 .B "nih leaf"
@@ -700,8 +700,11 @@ accepts the following options:
 .B -h
 Display help message.
 .TP
-.B -t
-Show PKGNAME only.
+.B -a
+Output all leaf packages.
+.TP
+.B -A
+Output auto-installed leaf packages. This is the default.
 .TP
 .B -R
 Remove auto-installed leaf packages.
@@ -709,6 +712,14 @@ Remove auto-installed leaf packages.
 .B -n
 Don't actually uninstall packages,
 just report the steps that would be taken.
+.RE
+.P
+.RS
+Output format can be changed with a help of the shell
+function 'summary2leaf_packages'
+defined in the configuration file.
+See @dfltconfdir@/nih.default.conf for details.
+The default format may change in future releases.
 .RE
 .TP
 .B  list
