@@ -35,12 +35,22 @@ fetch_wget (){
     $wget_cmd -O "$_base" --timeout=1800 --progress=bar $WGET_OPTIONS "$1"
 }
 
+fetch_cp (){
+    _base=`basename $1`
+    rm -f "$_base"
+    cp "$1" .
+}
+
 # Command to download binaries, pkg_summary and SHA512
 fetch (){
-    fetch_ftp "$@"
-#    fetch_lftp "$@"
-#    fetch_wget "$@"
-#    fetch_curl "$@"
+    if echo "$REPOSITORY" | grep -v ^/ > /dev/null; then
+	fetch_ftp "$@"
+#	fetch_lftp "$@"
+#	fetch_wget "$@"
+#	fetch_curl "$@"
+    elif test "_$CACHEDIR" != "_$REPOSITORY" -o _`pwd` = "_$confdir"; then
+	fetch_cp "$@"
+    fi
 }
 
 # Default directory for pkgsrc tree
