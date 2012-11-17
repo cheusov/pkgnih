@@ -712,6 +712,9 @@ Remove auto-installed leaf packages.
 .B -n
 Don't actually uninstall packages,
 just report the steps that would be taken.
+.TP
+.B -r
+Output raw package summaries.
 .RE
 .P
 .RS

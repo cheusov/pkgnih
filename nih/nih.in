@@ -1281,6 +1281,7 @@ nih leaf [options]
       -A    output auto-installed leaf packages (the default)
       -R    remove auto-installed leaf packages
       -n    pass -n to pkg_delete
+      -r    raw output (pkg_summary format)
 
 Examples:
    nih leaf
@@ -1293,7 +1294,7 @@ if test "$1" = leaf; then
     shift
     opts='-r'
     pkg_delete_opts=''
-    while getopts haARn f; do
+    while getopts haARnr f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1311,6 +1312,8 @@ if test "$1" = leaf; then
 		remove=1;;
 	    n)
 		pkg_delete_opts=-n;;
+	    r)
+		raw=1;;
 	esac
     done
     shift `expr $OPTIND - 1`
@@ -1327,8 +1330,10 @@ if test "$1" = leaf; then
     if test -n "$remove"; then
 	pkgnames=`sed -n 's/^PKGNAME=//p' "$leaves_fn"`
 	$0 $always_yes remove $pkg_delete_opts $pkgnames
-    else
+    elif test -z "$raw"; then
 	summary2leaf_packages "$leaves_fn"
+    else
+	cat "$leaves_fn"
     fi
 
     exit 0
