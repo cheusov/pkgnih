@@ -9,12 +9,9 @@ to fix: "Checking packages from update plan for common files..."
   package was installed using full path.
 
 plan -1:
-- nih leaf -a: ALL leaf packages
 - nih uninstall: do not require .nih/pkg_summary.txt (ano)
 - nih install -u mark as installed -a autoinstalled
 - fix for -L
-- fix for wildcard in DEPENDS
-- SHA512 with All/ prefix
 - multiple pkg_summary(5) (e.g. 5.0-indep)
 
 plan0:
@@ -24,10 +21,8 @@ plan1:
 - nih status: -v analyse vulnerable packages against binary or pkgsrc tree
 - nih install: ability to check a number bytes to download and
   install/remove
-- nih install: ipp -- default repository for OI
 - nih status: -N   -- check installed(?) packages
                       against build-time dependencies
-- nih install: working with ALL binaries available in $CACHEDIR
 - nih clean-distdir
 
 - Use pkg_summary-YYYYMMDD.txt
