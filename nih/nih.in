@@ -415,7 +415,7 @@ refresh_src_summary (){
     export PSS_OPTIONS
     all_pkgs="$confdir/pkgsrc_packages"
     pkg_list_all_pkgs -a "$PKGSRC_ADDSUBDIRS" > "$all_pkgs"
-    pkg_update_src_summary -d "$confdir" -f "$all_pkgs"
+    pkg_update_src_summary -d "$confdir" -f "$all_pkgs" -v
 }
 
 if test "$1" = refresh; then
