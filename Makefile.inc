@@ -1,3 +1,5 @@
+DOCDIR ?=		${PREFIX}/share/doc/pkgnih
+
 VERSION ?=		0.10.1
 
 INTEXTS_REPLS +=	VERSION ${VERSION}

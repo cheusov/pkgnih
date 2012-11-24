@@ -1,0 +1,669 @@
+\documentclass[hyperref=unicode,ascii,xcolor=dvipsnames]{beamer}
+
+\usepackage{fancyvrb,relsize}
+\usepackage{graphicx}
+\usepackage[T2A]{fontenc}
+\usepackage[english]{babel}
+
+\setbeamertemplate{navigation symbols}{}
+
+\usebackgroundtemplate{%
+ \rule{0pt}{\paperheight}%
+ \hspace*{\paperwidth}%
+ \makebox[0pt][r]{\includegraphics[width=20mm]{pkgsrc-long.ps}}}
+
+%\usetheme{Boadilla}
+%\usetheme{CambridgeUS}
+%\usetheme{Malmoe}
+%\usetheme{Singapore}
+%\usetheme{boxes}
+
+%\usecolortheme{crane}
+%\usecolortheme{dove}
+
+\usetheme[height=7mm]{Rochester}
+
+%\usecolortheme{seagull} % very cool with \usetheme{default}
+\usecolortheme[RGB={255,102,0}]{structure}
+%\usefonttheme{professionalfonts}
+%\useinnertheme{rectangles}
+
+\mode<presentation>
+\title{Package search in modern package managers.\\
+NIH approach}
+\author{Aleksey Cheusov\\
+  \texttt{cheusov@NetBSD.org}}
+\date{Minsk LUG meeting, 24 Nov. 2012, Belarus}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newenvironment{Code}[1]%
+              {\Verbatim[label=\bf{#1},frame=single,%
+                  fontsize=\small,%
+                  commandchars=\\\{\}]}%
+              {\endVerbatim}
+
+%\newenvironment{Code}[1]%
+%               {\semiverbatim[]}%
+%               {\endsemiverbatim}
+
+\newenvironment{CodeNoLabel}%
+               {\Verbatim[frame=single,%
+                   fontsize=\small,%
+                   commandchars=\\\{\}]}%
+               {\endVerbatim}
+
+\newenvironment{CodeNoLabelSmallest}%
+               {\Verbatim[frame=single,%
+                   fontsize=\footnotesize,%
+                   commandchars=\\\{\}]}%
+               {\endVerbatim}
+\newenvironment{CodeLarge}%
+               {\Verbatim[frame=single,%
+                   fontsize=\large,%
+                   commandchars=\\\{\}]}%
+               {\endVerbatim}
+
+%\newcommand{\prompt}[1]{\textcolor{blue}{#1}}
+%\newcommand{\prompt}[1]{\textbf{#1}\textnormal{}}
+\newcommand{\prompt}[1]{{\bf{#1}}}
+%\newcommand{\h}[1]{\textbf{#1}}
+%\newcommand{\h}[1]{\bf{#1}\textnormal{}}
+\newcommand{\h}[1]{{\bf{#1}}}
+\newcommand{\URL}[1]{\textbf{#1}}
+\newcommand{\AutohellFile}[1]{\textcolor{red}{#1}}
+\newcommand{\MKCfile}[1]{\textcolor{green}{#1}}
+\newcommand{\ModuleName}[1]{\textbf{#1}\textnormal{}}
+\newcommand{\ProgName}[1]{\textbf{#1}\textnormal{}}
+\newcommand{\ProjectName}[1]{\textbf{#1}\textnormal{}}
+\newcommand{\PackageName}[1]{\textbf{#1}\textnormal{}}
+\newcommand{\MKC}[1]{\large\textsf{#1}\textnormal{}\normalsize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+  \titlepage
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Problem}
+  \begin{itemize}
+  \item {\bf OBS}: more than 160.000 packages for 22 distributions
+  \item {\bf Debian/Linux}: about 29000 packages
+  \item {\bf FreeBSD}: more than 24000 ports
+  \item {\bf pkgsrc}: more than 12000 packages
+  \item {\bf AltLinux}: more than 12000 packages
+  \item ...
+  \item but package search facilities are still very rudimental
+  \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Existing practices (I)}
+  \begin{itemize}
+  \item {\bf apt-cache(8)} --- ``It searches the package names and the
+    descriptions for an occurrence of the regular
+    expression...''\copyright. Why only regexp? Why only package name
+    and description? How about file names? How about {\bf apt-file(1)}?
+  \item {\bf yum(8)} --- The search is limited to package names, summaries,
+    descriptions, URL and regexp match.
+  \item {\bf pkgng(8)/pkg-search(8) (FreeBSD)} --- Only a few search fields
+    are available: one-line comment, description, origin, package name
+    with/without version. The only available search strategy is regexp
+  \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Existing practices (II)}
+  \begin{itemize}
+  \item {\bf pkgin(1) (NetBSD/pkgsrc)} --- Package name and description again plus package category. Regexp search
+  \item {\bf pacman(8) (Arch Linux)} --- It is also limited to package
+    name and description.
+  \item pkgsrc {\bf pkg\_info(8)}, {\bf dpkg(1)}, {\bf rpm(1)}, {\bf
+    pacman(1)} and others are able to answer the following questions:
+    ``What installed package owns this file?'', ``What installed
+    package(s) depend on this one?''
+  \item {\bf aptitude(8)} --- Much better than all of the above, but it is still limited
+  \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Four main questions about package search (I)}
+  \begin{itemize}
+  \item {\bf Where} to search
+    \begin{itemize}
+    \item Binary package repository
+    \item Installed packages
+    \item Build specifications (rpm .spec, debian/, pkgsrc tree etc.)
+    \item Online resources
+    \item ...
+    \end{itemize}
+  \item {\bf What} to match
+    \begin{itemize}
+    \item Package name
+    \item One-line description of the package
+    \item Full description of the package
+    \item Package maintainer
+    \item File lists
+    \item Dependencies and dependants
+    \item ...
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Four main questions about package search (II)}
+  \begin{itemize}
+  \item {\bf How} to search
+    \begin{itemize}
+    \item Exact match
+    \item Substring
+    \item Regexp search
+    \item Version matching (e.g. >=5.14.0<5.16)
+    \item More than one query in a single request (logical AND, OR
+      and NOT, for example in CNF or DNF over simple queries)
+    \item ...
+    \end{itemize}
+  \item {\bf How much} information do we need
+    \begin{itemize}
+    \item Package name or identifier
+    \item Short description of a package
+    \item Full information about a package
+    \item ...
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Four main questions: conclusion}
+  \begin{itemize}
+  \item A list of available search fields should be {\bf variable} (package
+    name, full description, maintainer etc.)
+  \item A list of available search strategies should be {\bf variable}
+    (exact match, regular expression etc.)
+  \item High level {\bf AND}, {\bf OR} and {\bf NOT} constructions
+    should be a part of {\bf frontend} while actual search should be
+    done in {\bf backend}. Also, {\bf backend} determines a list of
+    supported search fields and search strategies
+  \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Concrete plan: backend functionality}
+  \begin{itemize}
+  \item Keeps a list of supported search fields and returns it on demand
+  \item Keeps a list of supported search strategies and returns it on demand
+  \item Given a search field, search strategies and a query, does a
+    search and outputs identifiers of found packages
+  \item Given a package identifier returns a description of the appropriate package
+  \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Concrete plan: frontend functionality}
+  \begin{itemize}
+  \item Ask backend what search fields it support
+  \item Ask backend what search strategies it support
+  \item Call backend for actual search
+  \item Provide support for AND, OR and NOT and operates on sets of package ids
+  \item Provide short synonyms for search fields and strategies
+  \item Do some postprocessing (formatting, coloring, GUI etc.)
+  \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Package metainfo. pkg\_summary(5)}
+The file pkg\_summary
+contains information about each package in a binary package
+repository as a list of variable-value pairs. The variables
+describing different packages are separated by one empty line.
+
+\begin{block}{Source code}
+  \begin{Code}{Makefile}
+PKGNAME=mrxvt-0.5.4nb6
+DEPENDS=jpeg>=8nb1
+DEPENDS=png>=1.5.0
+COMMENT=Multi-tabbed terminal emulator with Xft support
+PKGPATH=x11/mrxvt
+HOMEPAGE=http://materm.sourceforge.net/
+SIZE\_PKG=420641
+BUILD\_DATE=2012-10-12 16:16:33 +0000
+...
+  \end{Code}
+\end{block}
+For the same purposes RFC822 is used in Debian and YAML in FreeBSD(pkgng)
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Backends available in pkgsrc}
+  \begin{itemize}
+  \item {\bf pkg\_digger\_summary(1)} --- search in pkg\_summary(5) file
+  \item {\bf pkg\_digger\_installed(1)} --- search in installed packages
+  \item {\bf pkg\_online\_client(1)} --- search in pkg\_online database provided by dict://dict.mova.org:26280
+  \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Backend pkg\_digger\_summary(1)}
+  \begin{itemize}
+  \item {\bf pkg\_digger\_summary} -s\\
+    output available search strategies
+  \item {\bf pkg\_digger\_summary} -f\\
+    output available search fields
+  \item {\bf pkg\_digger\_summary} field:strat:query1 [f:s:q2...]\\
+    search for packages and output packages ids
+  \item {\bf pkg\_digger\_summary} -1|-3|-9|-i [-r] pkgid1 [pkgid2...]\\
+    output description of the package
+    \begin{itemize}
+    \item -1         output 1-line information about package
+    \item -3         output short information about package
+    \item -9|-i      output full information about package
+    \item -r         raw output in pkg\_summary(5) format
+    \end{itemize}
+  \end{itemize}
+  Other backends have the same options
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Backend pkg\_digger\_summary(1)}
+  \begin{block}{How it works}
+    \begin{Code}{}
+\prompt{# pkg\_digger\_summary -s}
+exact   Match exactly
+prefix  Match prefixes
+suffix  Match suffixes
+substring       Match substring
+word    Match separate words
+first   Match the first word
+last    Match the last word
+re      POSIX 1003.2 (modern) regular expressions
+strfile Match the words from file
+strlist Match the specified words
+awk     Match using AWK expression
+empty   Match an empty string
+kw      "keyword" match
+\prompt{#}
+    \end{Code}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Backend pkg\_digger\_summary(1)}
+  \begin{block}{How it works}
+    \begin{Code}{}
+\prompt{# export PKG\_DIGGER\_SUMMARY=/root/summary}
+\prompt{# pkg\_digger\_summary -f}
+BUILD\_DATE
+CATEGORIES
+COMMENT
+CONFLICTS
+DEPENDS
+DESCRIPTION
+...
+PKGNAME
+...
+PKG\_OPTIONS
+PREV\_PKGPATH
+PROVIDES
+REQUIRES
+...
+\prompt{#}
+    \end{Code}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Backend pkg\_digger\_summary(1)}
+  \begin{block}{How it works}
+    \begin{Code}{}
+\prompt{# pkg\_digger\_summary COMMENT:kw:'dns server'}
+\prompt{                       COMMENT:kw:'dns proxy'}
+net/maradns,maradns
+net/mydns-mysql,mydns-mysql
+net/mydns-pgsql,mydns-pgsql
+net/nsd,nsd
+net/rootprobe,rootprobe
+net/unbound,unbound
+net/totd,totd
+\prompt{# }
+    \end{Code}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Backend pkg\_digger\_summary(1)}
+  \begin{block}{How it works}
+    \begin{Code}{}
+\prompt{# pkg\_digger\_summary -1 net/unbound,unbound}
+net/unbound        - DNS resolver and recursive server
+\prompt{# pkg\_digger\_summary -3 net/unbound,unbound}
+-----------------------------------------------------------
+PKGNAME:        unbound-1.4.18
+COMMENT:        DNS resolver and recursive server
+CATEGORIES:     net
+HOMEPAGE:       http://www.unbound.net/
+PKGPATH:        net/unbound
+DESCRIPTION:
+    Unbound is an implementation of a DNS resolver.
+    It provides a library...
+    Homepage:
+    http://www.unbound.net/
+
+\prompt{#}
+    \end{Code}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Backend pkg\_digger\_summary(1)}
+  \begin{block}{How it works}
+    \begin{Code}{}
+\prompt{# pkg\_digger\_summary -9r net/unbound,unbound}
+PKGNAME=unbound-1.4.18
+DEPENDS=ldns>=1.4
+COMMENT=DNS resolver and recursive server
+SIZE\_PKG=6266495
+BUILD\_DATE=2012-11-09 19:13:30 +0000
+CATEGORIES=net
+HOMEPAGE=http://www.unbound.net/
+LICENSE=modified-bsd
+...
+\prompt{#}
+    \end{Code}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Backend pkg\_online\_client(1)}
+  \begin{block}{How it works}
+    \small
+    \begin{Code}{}
+\prompt{# pkg\_online\_client -s}
+      exact    Match headwords exactly
+     prefix    Match prefixes
+    nprefix    Match prefixes (skip, count)
+  substring    Match substring occurring anywhere
+               in a headword
+     suffix    Match suffixes
+         re    POSIX 1003.2 (modern) regular expressions
+     regexp    Old (basic) regular expressions
+    soundex    Match using SOUNDEX algorithm
+        lev    Match headwords within
+               Levenshtein distance one
+       word    Match separate words within headwords
+      first    Match the first word within headwords
+       last    Match the last word within headwords
+\prompt{#}
+    \end{Code}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Backend pkg\_online\_client(1)}
+  \begin{block}{How it works}
+    \begin{Code}{}
+\prompt{# pkg\_online\_client -f}
+PKGPATH
+PKGNAME
+PKGBASE
+DEPENDS
+BUILD\_DEPENDS
+CONFLICTS
+HOMEPAGE
+COMMENT
+LICENSE
+ONLYFOR
+NOTFOR
+MAINTAINER
+CATEGORIES
+PLIST
+DESCRIPTION
+\prompt{#}
+    \end{Code}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Backend pkg\_online\_client(1)}
+  \begin{block}{How it works}
+    \begin{Code}{}
+\prompt{# pkg\_online\_client PLIST:substring:bin/blockdiag}
+graphics/py-blockdiag,py26-blockdiag
+graphics/py-blockdiag,py27-blockdiag
+\prompt{# pkg\_online\_client PKGBASE:prefix:dict}
+textproc/dict-client,dict-client
+textproc/dict-dictionaries,dict-data
+textproc/dict-mueller7,dict-mueller7
+textproc/dict-server,dict-server
+textproc/dictem,dictem
+textproc/diction,diction
+wip/dict-est-rus,dict-est-rus
+wip/dict-freedict-eng-ara,dict-freedict-eng-ara
+wip/dict-freedict-eng-fra,dict-freedict-eng-fra
+\prompt{#}
+    \end{Code}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Frontend pkg\_digger(1)}
+  \begin{block}{Short synonyms for search fields}
+    \begin{Code}{}
+\prompt{# export PKG\_DIGGER\_SUMMARY=/root/summary}
+\prompt{# pkg\_digger -f}
+synonym | full name
+--------------------------
+     C   CATEGORIES
+     c   COMMENT
+     d   DESCRIPTION
+     m   MAINTAINER
+ empty   PKGBASE
+     n   PKGNAME
+     p   PKGPATH
+     f   PLIST
+   ...
+\prompt{#}
+    \end{Code}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Frontend pkg\_digger(1)}
+  \begin{block}{Short synonyms for search strategies}
+    \begin{Code}{}
+\prompt{# pkg\_digger -s}
+ empty     exact   Match exactly
+   p       prefix   Match prefixes
+   u       suffix   Match suffixes
+   s    substring   Match substring
+   w         word   Match separate words
+   f        first   Match the first word
+   l         last   Match the last word
+   r           re   POSIX 1003.2 (modern)
+                    regular expressions
+\prompt{#}
+    \end{Code}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Frontend pkg\_digger(1)}
+  \begin{block}{Short synonyms for search fields/strategies}
+    \begin{Code}{}
+\prompt{asrock# pkg\_digger m:s:cheusov}
+archivers/heirloom-tar -   Collection of standard Unix
+audio/xmms-cdread      -   XMMS input plugin that read...
+audio/xmms-nas         -   XMMS output plugin for Netw...
+databases/libdbi       -   Database Independent Abstra...
+databases/libdbi-driver-mysql - MySQL driver for libdb...
+databases/libdbi-driver-pgsql - PostgreSQL driver for ...
+databases/libdbi-driver-sqlite - SQLite driver for lib...
+databases/libdbi-driver-sqlite3 -  SQLite3 driver for ...
+devel/heirloom-getopt  -   Collection of standard Unix...
+devel/heirloom-libcommon - Collection of standard Unix...
+devel/heirloom-what    -   Collection of standard Unix...
+devel/libjudy          -   High-performance sparse dyn...
+devel/libmaa           -   General purpose data struct...
+...
+\prompt{#}
+    \end{Code}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Frontend pkg\_digger(1)}
+{\small If neither field nor strategy was specified, fallback rules are used
+(by default PKGNAME:exact, PKGPATH:exact,
+PKGNAME:substring, COMMENT:word, COMMENT:substring). Frontend also
+implements operations on sets (Intersection and subtraction)}
+\vspace{-0.3cm}
+\begin{block}{}
+    \begin{Code}{}
+\prompt{# pkg\_digger dns server}
+net/dhisd              -   DynDNS server
+net/fpdns              -   Fingerprinting DNS servers
+net/maradns            -   Secure DNS server for *NIX...
+net/mydns-mysql        -   MySQL-based DNS server
+net/mydns-pgsql        -   PostgreSQL-based DNS serve...
+net/p5-Net-DNSServer   -   Perl5 module to be used as...
+net/powerdns           -   Modern, advanced and high ...
+net/powerdns-recursor(pdns-recursor) -   PowerDNS res...
+net/rootprobe          -   Root DNS server performanc...
+net/unbound            -   DNS resolver and recursive...
+...
+\prompt{#}
+    \end{Code}
+  \end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Finally! This approach was implemented in NIH}
+NIH is a package manager for pkgsrc (pkgtools/nih)
+\begin{itemize}
+\item {\bf Where} to search
+  \begin{itemize}
+  \item {\bf nih search -b} --- search in binary repository
+  \item {\bf nih search -I} --- search in installed packages
+  \item {\bf nih search -o} --- search in pkg\_online database
+  \item {\bf nih search -p} --- search in pkgsrc tree
+  \end{itemize}
+\item {\bf What} to match
+  \begin{itemize}
+  \item {\bf nih search -f} --- output supported search fields (-b|-I|-o|-p)
+  \end{itemize}
+\item {\bf How} to search
+  \begin{itemize}
+  \item {\bf nih search -s} --- output supported search strategies (-b|-I|-o|-p)
+  \item if neither strategy nor field to search was specified we use
+    fallback rules to make search easier and more efficient
+  \end{itemize}
+\item {\bf How much} information do we need
+  \begin{itemize}
+  \item {\bf -1} --- output 1-line information about found packages
+  \item {\bf -3} --- output short information about found packages
+  \item {\bf -9|-i} --- output full information about found packages
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Finally! This approach was implemented in NIH}
+  \begin{itemize}
+  \item Usage:
+\begin{verbatim}
+nih search -h
+nih search [-b|-I|-o|-p] -s
+nih search [-b|-I|-o|-p] -f
+nih search [-b|-I|-o|-p] [-1|-3|-9|-i] query1 [query2...]
+nih search [-b|-I|-o|-p] [-1|-3|-9|-i] query1 [query2...]
+\end{verbatim}
+\item Lines of code:
+\begin{verbatim}
+ 212 pkg_digger_summary
+  94 pkg_digger_installed
+ 306 pkg_digger
+ 330 pkg_online_client
+ 250 pkg_grep_summary
+ 254 ../share/runawk/pkg_grep_summary.awk
+1446 total
+\end{verbatim}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{TODO}
+  \begin{itemize}
+  \item Reimplement {\bf pkg\_summary\_installed} for better efficiency
+  \item Partially reimplement {\bf pkg\_grep\_summary} for better efficiency
+  \item Currently {\bf pkg\_digger} is able to intersect and subtract sets of package ids.
+    Support for for union is needed.
+  \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Source code}
+  \begin{itemize}
+  \item pkgtools/nih\\
+    (https://github.com/cheusov/pkgnih)
+  \item pkgtools/pkg\_summary-utils\\
+    (https://github.com/cheusov/pkg\_summary-utils)
+  \item pkgtools/pkg\_online-client
+  \end{itemize}
+  \begin{center}
+    \Huge{The End}
+  \end{center}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
