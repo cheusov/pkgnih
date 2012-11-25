@@ -18,6 +18,7 @@ package-search.pdf: package-search.tex
 .ps.pdf:
 	ps2pdf ${.IMPSRC}
 
-CLEANFILES += *.dvi *.ps *.pdf *.aux *.log *.nav *.out *.snm *.toc *.res *.err
+CLEANFILES += *.dvi *.ps *.pdf *.aux *.log *.nav *.out \
+	*.snm *.toc *.res *.err
 
 .include <mkc.files.mk>
