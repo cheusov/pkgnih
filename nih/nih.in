@@ -900,7 +900,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 
 	if grep try_out "$pkg1_fn" > /dev/null; then
 	    echo "Marking package $pkg as 'try_out'..." 1>&2
-	    if !$PKG_ADMIN_CMD set try_out=yes; then
+	    if ! $PKG_ADMIN_CMD set try_out=yes "$pkg"; then
 		cleanup_db; exit 1
 	    fi
 	fi
