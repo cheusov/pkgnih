@@ -560,11 +560,13 @@ check_cksums (){
     fi
 
     expected_sha512=`awk -v p="(All/$1)" '$2 == p {print $4}' $confdir/SHA512.txt`
+    printf '    ckecksum... ' 1>&2
     curr_sha512=`digest sha512 "$1" | awk '{print $4}'`
     if test "$expected_sha512" = "$curr_sha512"; then
+	echo 'ok' 1>&2
 	return 0
     else
-	echo "$1 is corrupted, checksum mismatch"
+	echo 'failed' 1>&2
 	return 1
     fi
 }
@@ -574,27 +576,27 @@ download_pkgs (){
 	cd "$CACHEDIR/All"
 	ex=0
 	while read pkg; do
+	    echo "  $pkg"
 	    if ! test -f "$pkg" || ! check_cksums "$pkg"; then
-		echo "  downloading package $pkg..."
+		printf '    downloading... '
 		if ! fetch "$REPOSITORY/All/$pkg"; then
 		    ex=1
-		    echo '  download failed (nih refresh?)' 1>&2
+		    echo 'failed' 1>&2
 		    if test -z "$force_download"; then
 			exit 1
 		    fi
 		    continue
 		fi
+		echo 'ok' 1>&2
 
 		if ! check_cksums "$pkg"; then
 		    ex=1
-		    echo '  checksum mismatch (nih refresh?)' 1>&2
+		    echo 'Try to update pkg_summary(5) file (nih refresh)' 1>&2
 		    if test -z "$force_download"; then
 			exit 1
 		    fi
 		    continue
 		fi
-	    else
-		echo "  $pkg... ok"
 	    fi
 	done
 	exit $ex
