@@ -1,4 +1,45 @@
 ======================================================================
+Version 0.11.0, by Aleksey Cheusov, Sat,  2 Feb 2013 14:40:32 +0300
+
+  nih install:
+    - Order of packages does matter
+      ("nih install emacs- editors/emacs22" is correct)
+    - Option -P and new config variable NO_REQPROV_CHECK were added
+    - Option -L and new config variable NO_REMOVE_LEAVES were added
+    - "Nothing to be done" message is output if everything is up-to-date
+    - Download failures and cksum failures are handled differently
+    - Handling CONFLICTS between installed packages and packages to
+      install are handled differently. Now package splits and similar
+      problems are resolved with a help of "fake" packages. Fake
+      packages are always marked for updates.
+      New option -f for "nih list" was added in order to list them
+    - Improvemed download progress messages
+
+  nih uninstall:
+    - Option -L was added, see "nih install -L"
+    - Options -p and -P were added. See "nih install"
+
+  nih leaf:
+    - Command was reimplemented and simplified
+    - Option -t option was removed
+      pkg_status doesn't have -ltRn options anymore
+    - Option -r was added
+
+  nih search:
+    - Option -I uses pkg_digger_installed provided by pkg_summary-utils
+
+  pkg_update_plan:
+    - Fixes in error messages
+
+  nih search|meta|info:
+    - Option -p was added. With a help of it one may search in
+      pkgsrc packages offline. Also see "nih refresh -p" and man page
+
+  Now nih works correctly if REPOSITORY is a directory
+
+  Fixes for shell's "trap" command.
+
+======================================================================
 Version 0.10.1, by Aleksey Cheusov, Sun, 26 Aug 2012 18:38:19 +0300
 
   Fix gawk warning message appeared on Linux and other systems
