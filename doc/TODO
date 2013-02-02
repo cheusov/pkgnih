@@ -1,3 +1,5 @@
+nih deps -1
+compat50 -- no PKGPATH
 -k marked packages are not installed => problems with PROVIDES/REQUIRES
 mkdir: /srv/pkgsrc_bin/DragonFly/All: No such file or directory
 
