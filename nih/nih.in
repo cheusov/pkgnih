@@ -757,8 +757,9 @@ if test "_$1" = _install -o "_$1" = _update; then
 	"$installed_summary" "$PKG_SUMMARY" \
 	> "$plan_summary" < "$update_pkgs_fn"
     then
+	ex=$?
 	cat "$plan_summary" 1>&2
-	exit 1
+	exit $ex
     fi
 
     pkg_cmp_summary -a force_update "$installed_summary" "$plan_summary" |
