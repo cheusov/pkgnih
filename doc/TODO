@@ -1,3 +1,37 @@
+
+$ export PSS_SLAVES=+5 sudo nih refresh -p
+This may take a while...
+Analysing Makefiles...
+Analysing checksums...
+Gathering summaries for 11478 package(s)
+paexec_reorder: not found
+paexec: not found
+
+Add paexec to psu dependencies unconditionally
+----------------------------------------------------------------------------
+nih refresh -p -- additional option for rescanning all packages from scratch
+
+nih search -- sort found packages alphabetically
+
+"nih info" now defaults to -9 mode, that is, all files are output.
+It makes sense to make -3 the default, i.e. to output everything except
+files.
+
+nih info -[bIob] -l -- for listing package files, one per line
+
+nih {info,search,meta,list}: renamed -I option (uppercase) to -i (lowercase)
+
+[root@cheusov ~]# nih info -o nih
+'/root/.nih/pkg_summary.txt' file doesn't exist or is not readable.
+Perhaps you need to run 'nih refresh [-b|-p]'
+[root@cheusov ~]#
+
+nih refresh -p fails. The default values for PKGSRCDIR is determined
+at nih build time, as a result binary package built by bouyer@
+defaults to strange place /tree/pkgsrc. A better default would be just
+/usr/pkgsrc.
+
+nih remove package: mkdir: cannot create directory `/srv/pkgsrc_bin': File exists
 nih deps -1
 compat50 -- no PKGPATH
 6.0.0_PATCH -> 6.0/All directory
