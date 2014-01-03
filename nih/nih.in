@@ -1117,7 +1117,7 @@ nih search [options] [args]
 
       -b    search in binary repository (pkg_summary(5), the default)
       -o    search in pkg_online database
-      -I    search in installed packages
+      -i    search in installed packages
       -p    search in pkg_src_summary file
 
       -s    output search strategies
@@ -1162,7 +1162,7 @@ nih info [options] PKGBASE [PKGBASEs...]
 
       -b    search in binary repository (pkg_summary(5), the default)
       -o    search in pkg_online database
-      -I    search in installed packages
+      -i    search in installed packages
       -p    search in pkg_src_summary file
 
       -r    raw summaries are output
@@ -1173,7 +1173,7 @@ See pkg_digger(1) for details.
 Examples:
    nih info -h
    nih info runawk
-   nih info -I runawk
+   nih info -i runawk
    nih info -o oberon
 EOF
 }
@@ -1190,7 +1190,7 @@ nih meta [options]
 
       -b    search in binary repository (pkg_summary(5), the default)
       -o    search in pkg_online database
-      -I    search in installed packages
+      -i    search in installed packages
       -p    search in pkg_src_summary file
 
       -r    raw summaries are output
@@ -1201,7 +1201,7 @@ See pkg_digger(1) for details.
 Examples:
    nih meta -h
    nih meta
-   nih meta -Ir
+   nih meta -ir
    nih meta -o
 EOF
 }
@@ -1213,7 +1213,7 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
     export PKG_DIGGER_BACKEND=pkg_digger_summary
     export PKG_DIGGER_SUMMARY="$PKG_SUMMARY"
 
-    while getopts hboIpsf139rq f; do
+    while getopts hboiIpsf139rq f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1222,7 +1222,7 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 		export PKG_DIGGER_SUMMARY="$PKG_SUMMARY";;
 	    o)
 		export PKG_DIGGER_BACKEND=pkg_online_client;;
-	    I)
+	    i|I)
 		export PKG_DIGGER_BACKEND=pkg_digger_installed
 		export PKG_DIGGER_SUMMARY="$confdir/installed_summary.txt";;
 	    p)
@@ -1358,7 +1358,7 @@ nih list [options]
       -h       display this help message
 
       -b       output packages from binary repository (the default)
-      -a|-I    output all installed packages
+      -a|-i    output all installed packages
       -u       output packages installed by user
       -t       output installed packages marked as "try out"
       -k       output installed packages marked as "keep"
@@ -1376,7 +1376,7 @@ EOF
 
 if test "$1" = list; then
     shift
-    while getopts hbauIrtkf f; do
+    while getopts hbauiIrtkf f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1397,7 +1397,7 @@ if test "$1" = list; then
 		info_opts='a'
 		marker=COMMENT
 		cond='fake package';;
-	    I)
+	    i|I)
 		info_opts="${info_opts}a";;
 	    a|u)
 		info_opts="${info_opts}$f";;
@@ -1537,7 +1537,7 @@ nih deps [options] [pkgs...]
       -P    output PKGPATH
       -N    output PKGNAME
       -t    output dependencies in tsort(1) compatible format
-      -I    analyse installed packages
+      -i    analyse installed packages
 If both -P and -N are applied, PKGPATH;PKGNAME is output,
 if both -P and -B are applied, PKGPATH;PKGBASE is output.
 
@@ -1547,7 +1547,7 @@ Examples:
    nih deps -PB
    nih deps glib2
    nih deps -r glib2
-   nih deps -rI pkgnih
+   nih deps -ri pkgnih
    nih deps -lBP 'devel/glib2;glib2' 'devel/libmaa;libmaa'
    nih deps -P devel/glib2 devel/libmaa
 EOF
@@ -1557,7 +1557,7 @@ if test "$1" = deps; then
     shift
     sb_opts=''
     pn_opts=''
-    while getopts hrlBNPtI f; do
+    while getopts hrlBNPtiI f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1577,7 +1577,7 @@ if test "$1" = deps; then
 		pn_opts="$pn_opts -nr";;
 	    P)
 		pn_opts="$pn_opts -p";;
-	    I)
+	    i|I)
 		installed_summary=1;;
 	esac
     done

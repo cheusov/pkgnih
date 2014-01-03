@@ -114,7 +114,7 @@ by
 .B -o
 Query pkg_online database.
 .TP
-.B -I
+.B -i
 Display information about installed packages.
 .TP
 .B -r
@@ -131,7 +131,7 @@ Examples:
    nih info glib2 runawk emacs
 
    # output raw summaries of installed packages
-   nih info -Ir glib2 runawk
+   nih info -ir glib2 runawk
 
    # output raw summaries from pkg_online database
    nih info -orq glib2 runawk
@@ -160,7 +160,7 @@ by
 .B -o
 Query pkg_online database.
 .TP
-.B -I
+.B -i
 Display information about installed meta packages.
 .TP
 .B -q
@@ -177,7 +177,7 @@ Examples:
    nih meta
 
    # output installed meta packages
-   nih meta -I
+   nih meta -i
 
    # output raw summaries for meta packages from pkg_online database
    nih meta -or
@@ -212,7 +212,7 @@ by
 Search in pkg_online database.
 For this to work you need pkgtools/pkg_online-client package.
 .TP
-.B -I
+.B -i
 Search in installed packages.
 .TP
 .B -s
@@ -275,7 +275,7 @@ Examples:
    nih search ::emacs
 
    # search for auto-installed packages, summaries have short format
-   nih search -I3 automatic::yes
+   nih search -i3 automatic::yes
 
    # search for packages with PKGPATH=lang/mawk, summaries have long format
    nih search -9 lang/mawk
@@ -739,7 +739,7 @@ Display help message.
 .B -b
 Output packages available in the binary repository. This is the default.
 .TP
-.B -a|-I
+.B -a|-i
 Output all installed packages.
 .TP
 .B -u
@@ -849,7 +849,7 @@ Output PKGNAME.
 .B -t
 Output the graph in tsort(1) compatible format.
 .TP
-.B -I
+.B -i
 Show dependency graph for installed packages.
 .RE
 .P
