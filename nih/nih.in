@@ -624,7 +624,7 @@ replace_with_fake (){
     path=`$PKG_INFO_CMD -X "$1" | sed -n 's/^PKGPATH=//p'`
     @libexecdir@/nih/pkg_create_fake -n "$1-$2" -p "$path" -d "$deps" "$fake_pkg_fn"
     $PKG_ADD_CMD -UD "$fake_pkg_fn"
-#    $PKG_ADMIN_CMD set fake=yes "$1-$2"
+    $PKG_ADMIN_CMD set fake=yes "$1-$2"
 }
 
 if test "_$1" = _install -o "_$1" = _update; then
