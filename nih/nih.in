@@ -337,6 +337,8 @@ nih refresh [options]
       -h     display this help message
       -b     download pkg_summary(5) and SHA512 (the default)
       -p     update pkg_src_summary file from pkgsrc tree
+      -P     the same as -p but pkg_src_summary file
+             is regenerated from scratch
 
 ~/.nih/config:
    REPOSITORY - URL or file name for pkg_summary.bz2/pkg_summary.txt
@@ -423,7 +425,7 @@ if test "$1" = refresh; then
 
     func=refresh_bin_summary
 
-    while getopts hbp f; do
+    while getopts hbpP f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -433,6 +435,9 @@ if test "$1" = refresh; then
 	    b)
 		func=refresh_bin_summary;;
 	    p)
+		func=refresh_src_summary;;
+	    P)
+		rm -f "$confdir/pkg_src_summary.txt"
 		func=refresh_src_summary;;
 	esac
     done

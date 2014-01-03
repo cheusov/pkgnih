@@ -85,12 +85,18 @@ configuration variable points to pkgsrc tree.
 .I PSS_OPTIONS
 configuration variable contains options passed to
 .B pkg_src_summary(1)
-.RI ( -m
+.RB ( -m
 by default).
 .I PKGSRC_ADDSUBDIRS
 configuration variable contains a list of additional
 subdirectories for pkgsrc packages, for example,
 .IR wip .
+.TP
+.B -P
+The same as
+.B -p
+but pkg_src_summary file
+is regenerated from scratch, that is, pkgsrc tree is fully rescanned.
 .RE
 .TP
 .B  info
