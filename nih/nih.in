@@ -1209,6 +1209,8 @@ EOF
 if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
     op="$1"
     shift
+
+    export PKG_DIGGER_BACKEND=pkg_digger_summary
     export PKG_DIGGER_SUMMARY="$PKG_SUMMARY"
 
     while getopts hboIpsf139rq f; do
@@ -1238,7 +1240,7 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
     done
     shift `expr $OPTIND - 1`
 
-    if test "$PKG_DIGGER_BACKEND" != 'pkg_digger_installed'; then
+    if test "$PKG_DIGGER_BACKEND" = 'pkg_digger_summary'; then
 	summary_exists "$PKG_DIGGER_SUMMARY"
     fi
 

@@ -25,11 +25,6 @@ nih info -[bIob] -l -- for listing package files, one per line
 
 nih {info,search,meta,list}: renamed -I option (uppercase) to -i (lowercase)
 
-[root@cheusov ~]# nih info -o nih
-'/root/.nih/pkg_summary.txt' file doesn't exist or is not readable.
-Perhaps you need to run 'nih refresh [-b|-p]'
-[root@cheusov ~]#
-
 nih refresh -p fails. The default values for PKGSRCDIR is determined
 at nih build time, as a result binary package built by bouyer@
 defaults to strange place /tree/pkgsrc. A better default would be just
