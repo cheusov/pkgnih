@@ -3,8 +3,6 @@ FILESDIR =	${DOCDIR}
 
 MKC_REQUIRE_PROGS=	latex dvips ps2pdf
 
-.include <mkc.configure.mk>
-
 package-search.pdf: package-search.tex
 
 .SUFFIXES: .tex .dvi .ps .pdf
