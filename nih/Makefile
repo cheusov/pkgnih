@@ -1,6 +1,5 @@
 EGDIR ?=		${DATADIR}/examples/nih # specific to pkgsrc
 PACKAGES ?=		/usr/pkgsrc/packages
-PKGSRCDIR ?=		/usr/pkgsrc
 CACHEDIR ?=		${PACKAGES}
 DFLTCONFDIR ?=		${LIBDIR}/nih
 PKG_DBDIR ?=		/var/db/pkg
@@ -31,7 +30,6 @@ INTEXTS_REPLS +=	WGET_CMD ${WGET}
 
 INTEXTS_REPLS +=	PREFIX         ${PREFIX}
 INTEXTS_REPLS +=	PACKAGES       ${PACKAGES}
-INTEXTS_REPLS +=	PKGSRCDIR      ${PKGSRCDIR}
 INTEXTS_REPLS +=	PKG_DBDIR      ${PKG_DBDIR}
 
 INTEXTS_REPLS +=	cachedir       ${CACHEDIR}

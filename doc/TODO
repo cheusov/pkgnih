@@ -6,11 +6,6 @@ nih update _
 ----------------------------------------------------------------------------
 nih search -- sort found packages alphabetically
 
-nih refresh -p fails. The default values for PKGSRCDIR is determined
-at nih build time, as a result binary package built by bouyer@
-defaults to strange place /tree/pkgsrc. A better default would be just
-/usr/pkgsrc.
-
 nih remove package: mkdir: cannot create directory `/srv/pkgsrc_bin': File exists
 
 nih deps -1
