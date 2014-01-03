@@ -3,15 +3,6 @@ nih update _
       d: not_found jpeg>=9 <- graphics/py-imaging py27-imaging-1.1.7nb7
    py27-imaging-1.1.7nb4 --> py27-imaging-1.1.7nb7
 
-$ export PSS_SLAVES=+5 sudo nih refresh -p
-This may take a while...
-Analysing Makefiles...
-Analysing checksums...
-Gathering summaries for 11478 package(s)
-paexec_reorder: not found
-paexec: not found
-
-Add paexec to psu dependencies unconditionally
 ----------------------------------------------------------------------------
 nih refresh -p -- additional option for rescanning all packages from scratch
 
