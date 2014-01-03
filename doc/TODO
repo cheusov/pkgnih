@@ -1,3 +1,8 @@
+nih update _
+   The above problem is caused by the following
+      d: not_found jpeg>=9 <- graphics/py-imaging py27-imaging-1.1.7nb7
+   py27-imaging-1.1.7nb4 --> py27-imaging-1.1.7nb7
+
 nih deps -1
 compat50 -- no PKGPATH
 6.0.0_PATCH -> 6.0/All directory
