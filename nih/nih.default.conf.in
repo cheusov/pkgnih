@@ -150,6 +150,10 @@ summary2markers (){
     # input: pkg_summary
     grep -E '^(PKGNAME|PKGPATH|COMMENT|automatic|try_out|keep)=|^$' "$@"
 }
+summary2filelist (){
+    # input: pkg_summary
+    grep -E '^(PKGNAME|PKGPATH|PLIST)=|^$' "$@" | pkg_summary4view
+}
 
 # Uncomment the folowing line if you want to ignore SHA512 file.
 # Some bulk build software doesn't provide it.

@@ -1127,9 +1127,12 @@ nih search [options] [args]
 
       -s    output search strategies
       -f    output search fields
+
       -1    display 1-line information about packages (default)
       -3    display short information about packages
       -9    display full information about packages
+      -l    display PKGNAME, PKGPATH and file list
+
       -r    raw summaries are output
       -q    quiet mode, do not print "No matches found" to stderr
 
@@ -1170,7 +1173,7 @@ nih info [options] PKGBASE [PKGBASEs...]
       -i    search in installed packages
       -p    search in pkg_src_summary file
 
-      -1|-3|-9      the same as in nih search, the default is -3
+      -1|-3|-9|-l      the same as in 'nih search', the default is -3
 
       -r    raw summaries are output
       -q    quiet mode, do not print "No matches found" to stderr
@@ -1223,7 +1226,9 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
     export PKG_DIGGER_BACKEND=pkg_digger_summary
     export PKG_DIGGER_SUMMARY="$PKG_SUMMARY"
 
-    while getopts hboiIpsf139rq f; do
+    _summary2filelist=cat
+
+    while getopts hboiIpsf139rql f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1238,6 +1243,9 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 	    p)
 		export PKG_DIGGER_BACKEND=pkg_digger_summary
 		export PKG_DIGGER_SUMMARY="$confdir/pkg_src_summary.txt";;
+	    l)
+		_summary2filelist=summary2filelist
+		opts="${opts}r9";;
 	    r)
 		raw=1
 		opts="${opts}r";;
@@ -1264,7 +1272,7 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 
 	    for i in "$@"; do
 		pkg_digger -3 ${opts+-$opts} PKGBASE:exact:"$i"
-	    done;;
+	    done | $_summary2filelist;;
 	meta)
 	    pkg_digger -1r ${opts+-$opts} CATEGORIES:word:meta-pkgs |
 	    if test -n "$raw"; then
@@ -1273,7 +1281,7 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 		summary2meta_packages
 	    fi;;
 	*)
-	    pkg_digger ${opts+-$opts} "$@";;
+	    pkg_digger ${opts+-$opts} "$@" | $_summary2filelist;;
     esac
 
     exit 0

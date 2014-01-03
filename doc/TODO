@@ -6,8 +6,6 @@ nih update _
 ----------------------------------------------------------------------------
 nih search -- sort found packages alphabetically
 
-nih info -[bIob] -l -- for listing package files, one per line
-
 nih refresh -p fails. The default values for PKGSRCDIR is determined
 at nih build time, as a result binary package built by bouyer@
 defaults to strange place /tree/pkgsrc. A better default would be just

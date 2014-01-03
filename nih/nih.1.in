@@ -123,7 +123,7 @@ Query pkg_online database.
 .B -i
 Display information about installed packages.
 .TP
-.B -1|-3|-9
+.B -1|-3|-9|-l
 The same as in
 .BR "nih search" .
 The default is
@@ -252,6 +252,9 @@ Display short information about the packages.
 .B -9
 Display full information about the packages.
 .TP
+.B -l
+Display PKGNAME, PKGPATH and file list.
+.TP
 .B -r
 Raw output in pkg_summary(5) format. This option requires either
 .BR -3 " or " -9 " option.
@@ -321,6 +324,11 @@ Examples:
    # summaries have long format
    nih search -o -q9r spreadsheet
 .VE
+.P
+The output format can be changed with a help of the shell
+function 'summary2filelist' defined in the configuration file.
+See @dfltconfdir@/nih.default.conf for details.
+The default format may change in future releases.
 .RE
 .TP
 .BR  install " and " update

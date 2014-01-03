@@ -689,6 +689,7 @@ NIH is a package manager for pkgsrc (pkgtools/nih)
   \item {\bf -1} --- output 1-line information about found packages
   \item {\bf -3} --- output short information about found packages
   \item {\bf -9} --- output full information about found packages
+  \item {\bf -l} --- output PKGNAME, PKGPATH and file list
   \end{itemize}
 \end{itemize}
 \end{frame}
@@ -697,14 +698,15 @@ NIH is a package manager for pkgsrc (pkgtools/nih)
 
 \begin{frame}[fragile]
   \frametitle{}
+  \small
   \begin{itemize}
   \item Usage:
 \begin{verbatim}
 nih search -h
 nih search [-b|-i|-o|-p] -s
 nih search [-b|-i|-o|-p] -f
-nih search [-b|-i|-o|-p] [-1|-3|-9] query1 [query2...]
-nih search [-b|-i|-o|-p] [-1|-3|-9] query1 [query2...]
+nih search [-b|-i|-o|-p] [-1|-3|-9|-l] query1 [query2...]
+nih search [-b|-i|-o|-p] [-1|-3|-9|-l] query1 [query2...]
 \end{verbatim}
 \item Lines of code:
 \begin{verbatim}
