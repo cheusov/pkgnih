@@ -6,10 +6,6 @@ nih update _
 ----------------------------------------------------------------------------
 nih search -- sort found packages alphabetically
 
-"nih info" now defaults to -9 mode, that is, all files are output.
-It makes sense to make -3 the default, i.e. to output everything except
-files.
-
 nih info -[bIob] -l -- for listing package files, one per line
 
 nih refresh -p fails. The default values for PKGSRCDIR is determined

@@ -1258,7 +1258,7 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 	    fi
 
 	    for i in "$@"; do
-		pkg_digger -9 ${opts+-$opts} PKGBASE:exact:"$i"
+		pkg_digger -3 ${opts+-$opts} PKGBASE:exact:"$i"
 	    done;;
 	meta)
 	    pkg_digger -3r ${opts+-$opts} CATEGORIES:word:meta-pkgs |
