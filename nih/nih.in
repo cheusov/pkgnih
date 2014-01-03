@@ -1261,7 +1261,7 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 		pkg_digger -3 ${opts+-$opts} PKGBASE:exact:"$i"
 	    done;;
 	meta)
-	    pkg_digger -3r ${opts+-$opts} CATEGORIES:word:meta-pkgs |
+	    pkg_digger -1r ${opts+-$opts} CATEGORIES:word:meta-pkgs |
 	    if test -n "$raw"; then
 		cat
 	    else
