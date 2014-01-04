@@ -12,11 +12,9 @@ nih search -- sort found packages alphabetically
 
 nih deps -1
 compat50 -- no PKGPATH
-6.0.0_PATCH -> 6.0/All directory
 nih status -- pkgin-like output
 
 -k marked packages are not installed => problems with PROVIDES/REQUIRES
-mkdir: /srv/pkgsrc_bin/DragonFly/All: No such file or directory
 
 nih verify -s vs. 6.0_STABLE/6.0_RELEASE
 nih install -N - do not alter auto-installed flag

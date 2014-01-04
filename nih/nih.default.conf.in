@@ -1,8 +1,12 @@
 # -*-mode: sh-*-
 
 # Select mirror
+strip_osver (){
+    sed 's,^\([0-9][0-9]*[.][0-9][0-9]*\).*,\1,' "$@"
+}
+
 opsys=$(uname -s)
-osver=$(uname -r | sed 's/[_-].*$//')
+osver=$(uname -r | strip_osver)
 arch=$(uname -m)
 case "$opsys" in
     DragonFly)
