@@ -3,8 +3,6 @@ nih update _
       d: not_found jpeg>=9 <- graphics/py-imaging py27-imaging-1.1.7nb7
    py27-imaging-1.1.7nb4 --> py27-imaging-1.1.7nb7
 
-nih refresh -p: progress message (scanned packages count)
-
 Gathering summaries for 0 package(s) takes too much time
 
 ----------------------------------------------------------------------------

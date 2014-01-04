@@ -97,6 +97,8 @@ fi
 . $dfltconfdir/nih.default.conf
 . "$conffile"
 
+export PKGSRCDIR PSS_SLAVES PSS_OPTIONS
+
 mkdir -p "$confdir"
 
 create_cachedir (){
@@ -413,8 +415,6 @@ refresh_bin_summary (){
 
 refresh_src_summary (){
     echo 'This may take a while...'
-    export PKGSRCDIR
-    export PSS_OPTIONS
     all_pkgs="$confdir/pkgsrc_packages"
     pkg_list_all_pkgs -a "$PKGSRC_ADDSUBDIRS" > "$all_pkgs"
     pkg_update_src_summary -d "$confdir" -f "$all_pkgs" -v
