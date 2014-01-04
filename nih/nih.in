@@ -578,9 +578,9 @@ check_cksums (){
 
 download_pkgs (){
     (
-	cd "$CACHEDIR/All"
 	ex=0
 	while read pkg; do
+	    cd "$CACHEDIR/All"
 	    echo "  $pkg"
 	    if ! test -f "$pkg" || ! check_cksums "$pkg"; then
 		printf '    downloading... '
@@ -636,8 +636,6 @@ if test "_$1" = _install -o "_$1" = _update; then
     cmd="$1"
     shift
 
-    create_cachedir
-
     while getopts hndkBtDlLpPa:rR f; do
 	case "$f" in
 	    '?')
@@ -682,7 +680,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 	update_plan_opts="$update_plan_opts -p"
     fi
 
-    # -p
+    # -l
     if test -n "$NO_REMOVE_LEAVES"; then
 	update_plan_opts="$update_plan_opts -l"
     fi
@@ -822,6 +820,12 @@ if test "_$1" = _install -o "_$1" = _update; then
 	exit 0
     fi
 
+    # creating cache dir
+    if test -s "$inst_user_summary" -o -s "$inst_auto_summary"; then
+	create_cachedir
+	cd $CACHEDIR/All
+    fi
+
     ##################################################################
     ########################## installing ############################
     summary2binary "$inst_user_summary" "$inst_auto_summary" |
@@ -836,9 +840,6 @@ if test "_$1" = _install -o "_$1" = _update; then
     #
     rem_pkgs="$tmp_dir/extra_rem"
     sed -n 's/^PKGNAME=//p' "$rem_summary" > "$rem_pkgs"
-
-    #
-    cd $CACHEDIR/All
 
     # Ensure that packages that will be be installed do not have
     # common files
