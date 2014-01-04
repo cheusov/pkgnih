@@ -476,12 +476,29 @@ EOF
     fi
 }
 
+make_tiny_summary (){
+    # remove unnecessary fields and add PKGPATH with "fake" category if it is absent
+    awk '
+! /^$|^(PKGNAME|PKGPATH|COMMENT|automatic|CONFLICTS|DEPENDS|BUILD_DATE|PROVIDES|REQUIRES|FILE_NAME)=/ {next}
+/^PKGPATH=/ {ok = 1}
+/^PKGNAME=/ {name = substr($0, 9)}
+NF == 0 {
+        if (!ok) {
+                sub(/-[^-]*$/, "", name)
+                print "PKGPATH=fake/" name
+                name = ""; ok = 0
+        }
+        print ""; next
+}
+{ print }
+' "$@"
+}
+
 refresh_summary (){
     summary_exists "$PKG_SUMMARY"
 
     tiny_summary="$tmp_dir/tiny_summary"
-    grep -E '^$|^(PKGNAME|PKGPATH|COMMENT|automatic|CONFLICTS|DEPENDS|BUILD_DATE|PROVIDES|REQUIRES|FILE_NAME)=' \
-	"$PKG_SUMMARY" > "$tiny_summary" || true
+    make_tiny_summary "$PKG_SUMMARY" > "$tiny_summary"
     export PKG_SUMMARY="$tiny_summary"
 
     refreshed_summary="$tmp_dir/refreshed_summary"

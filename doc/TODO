@@ -9,7 +9,6 @@ Gathering summaries for 0 package(s) takes too much time
 nih search -- sort found packages alphabetically
 
 nih deps -1
-compat50 -- no PKGPATH
 nih status -- pkgin-like output
 
 -k marked packages are not installed => problems with PROVIDES/REQUIRES
