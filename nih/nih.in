@@ -1405,7 +1405,10 @@ nih list [options]
       -h       display this help message
 
       -b       output packages from binary repository (the default)
-      -a|-i    output all installed packages
+      -p       output packages from pkg_src_summary file
+      -i       output all installed packages
+
+      -a       output all installed packages
       -u       output packages installed by user
       -t       output installed packages marked as "try out"
       -k       output installed packages marked as "keep"
@@ -1426,7 +1429,7 @@ if test "$1" = list; then
     _cat_summary=cat_bin_summary
     _summary4view=summary2available_packages
     _grep_summary=cat
-    while getopts hbauiIrtkf f; do
+    while getopts hbauiIrtkfp f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1440,6 +1443,10 @@ if test "$1" = list; then
 	    a|i|I)
 		_summary4view=summary2installed_packages
 		_cat_summary=cat_installed_summary
+		_grep_summary=cat;;
+	    p)
+		_summary4view=summary2available_packages
+		_cat_summary=cat_src_summary
 		_grep_summary=cat;;
 	    t)
 		_summary4view=summary2installed_packages

@@ -770,6 +770,10 @@ Output packages available in the binary repository. This is the default.
 .B -a|-i
 Output all installed packages.
 .TP
+.B -p
+Output packages from pkg_src_summary file built from pkgsrc tree by
+.BR "nih refresh -p" .
+.TP
 .B -u
 Output packages installed by user.
 .TP
