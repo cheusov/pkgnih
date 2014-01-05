@@ -1575,14 +1575,20 @@ nih deps [options] [pkgs...]
 
    options:
       -h    display this help message
+
+      -b    analyse packages from binary repository
+      -p    analyse packages from pkg_src_summary file
+      -i    analyse installed packages
+
       -r    output dependencies, by default packages
             that depend on "pkgs" are output.
+
       -l    output list of packages instead of graph
       -B    output PKGBASE (the default)
       -P    output PKGPATH
       -N    output PKGNAME
+
       -t    output dependencies in tsort(1) compatible format
-      -i    analyse installed packages
 If both -P and -N are applied, PKGPATH;PKGNAME is output,
 if both -P and -B are applied, PKGPATH;PKGBASE is output.
 
@@ -1603,7 +1609,7 @@ if test "$1" = deps; then
     sb_opts=''
     pn_opts=''
     _cat_summary=cat_bin_summary
-    while getopts hrlBNPtiI f; do
+    while getopts hrlBNPtiIbp f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1625,6 +1631,10 @@ if test "$1" = deps; then
 		pn_opts="$pn_opts -p";;
 	    i|I)
 		_cat_summary=cat_installed_summary;;
+	    b)
+		_cat_summary=cat_bin_summary;;
+	    p)
+		_cat_summary=cat_src_summary;;
 	esac
     done
     shift `expr $OPTIND - 1`

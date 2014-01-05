@@ -863,6 +863,16 @@ accepts the following options:
 .B -h
 Display help message.
 .TP
+.B -b
+Output dependency graph for packages from binary repository. This is the default.
+.TP
+.B -i
+Output dependency graph for installed packages.
+.TP
+.B -p
+Output dependency graph for packages from pkg_src_summary file built from pkgsrc tree by
+.BR "nih refresh -p" .
+.TP
 .B -r
 Show a graph of dependency packages rather than dependent packages.
 .TP
@@ -880,9 +890,6 @@ Output PKGNAME.
 .TP
 .B -t
 Output the graph in tsort(1) compatible format.
-.TP
-.B -i
-Show dependency graph for installed packages.
 .RE
 .P
 .RS
