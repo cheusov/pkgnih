@@ -315,6 +315,20 @@ save_installed_packages (){
     bzip2 > "$installed_fn"
 }
 
+cat_bin_summary (){
+    summary_exists "$PKG_SUMMARY"
+    cat "$PKG_SUMMARY"
+}
+
+cat_installed_summary (){
+    pkg_bin_summary -a PLIST,automatic,try_out,keep,COMMENT
+}
+
+cat_src_summary (){
+    summary_exists "$confdir/pkg_src_summary.txt"
+    cat "$confdir/pkg_src_summary.txt"
+}
+
 ######################################################################
 ######################################################################
 ######################################################################
@@ -1409,6 +1423,9 @@ EOF
 
 if test "$1" = list; then
     shift
+    _cat_summary=cat_bin_summary
+    _summary4view=summary2available_packages
+    _grep_summary=cat
     while getopts hbauiIrtkf f; do
 	case "$f" in
 	    '?')
@@ -1417,48 +1434,36 @@ if test "$1" = list; then
 		usage_list
 		exit 0;;
 	    b)
-		info_opts='';;
+		_summary4view=summary2available_packages
+		_cat_summary=cat_bin_summary
+		_grep_summary=cat;;
+	    a|i|I)
+		_summary4view=summary2installed_packages
+		_cat_summary=cat_installed_summary
+		_grep_summary=cat;;
 	    t)
-		info_opts='a'
-		marker=try_out
-		cond=yes;;
+		_summary4view=summary2installed_packages
+		_cat_summary=cat_installed_summary
+		_grep_summary='pkg_grep_summary -s try_out yes';;
 	    k)
-		info_opts='a'
-		marker=keep
-		cond=yes;;
+		_summary4view=summary2installed_packages
+		_cat_summary=cat_installed_summary
+		_grep_summary='pkg_grep_summary -s keep yes';;
 	    f)
-		info_opts='a'
-		marker=COMMENT
-		cond='fake package';;
-	    i|I)
-		info_opts="${info_opts}a";;
-	    a|u)
-		info_opts="${info_opts}$f";;
+		_summary4view=summary2installed_packages
+		_cat_summary=cat_installed_summary
+		_grep_summary="pkg_grep_summary -s COMMENT 'fake package'";;
+	    u)
+		_summary4view=summary2installed_packages
+		_cat_summary=cat_installed_summary
+		_grep_summary='pkg_grep_summary -e automatic';;
 	    r)
-		raw=1;;
+		_summary4view=cat;;
 	esac
     done
     shift `expr $OPTIND - 1`
 
-    if test -n "$info_opts"; then
-	pkg_bin_summary -a automatic,try_out,keep,COMMENT -- "-$info_opts" |
-	if test -n "$marker"; then
-	    pkg_grep_summary -s "$marker" "$cond"
-	else
-	    cat
-	fi |
-	if test -n "$raw"; then
-	    cat
-	else
-	    summary2installed_packages
-	fi
-    else
-	if test -n "$raw"; then
-	    cat "$PKG_SUMMARY"
-	else
-	    summary2available_packages "$PKG_SUMMARY"
-	fi
-    fi
+    $_cat_summary | eval $_grep_summary | $_summary4view
 
     exit 0
 fi
