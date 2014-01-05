@@ -1602,6 +1602,7 @@ if test "$1" = deps; then
     shift
     sb_opts=''
     pn_opts=''
+    _cat_summary=cat_bin_summary
     while getopts hrlBNPtiI f; do
 	case "$f" in
 	    '?')
@@ -1623,19 +1624,14 @@ if test "$1" = deps; then
 	    P)
 		pn_opts="$pn_opts -p";;
 	    i|I)
-		installed_summary=1;;
+		_cat_summary=cat_installed_summary;;
 	esac
     done
     shift `expr $OPTIND - 1`
 
     pn_opts="${pn_opts:--n}${pn_addon_opts}"
 
-    if test -n "$installed_summary"; then
-	pkg_bin_summary -fPKGNAME,PKGPATH,DEPENDS
-    else
-	summary_exists "$PKG_SUMMARY"
-	cat "$PKG_SUMMARY"
-    fi |
+    $_cat_summary |
     pkg_summary2deps -d $pn_opts 2>/dev/null |
     if test $# -eq 0; then
 	sort -u
