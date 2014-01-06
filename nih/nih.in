@@ -79,7 +79,14 @@ PKG_ADMIN_CMD=${PKG_ADMIN_CMD-@PKG_ADMIN_CMD@}
 PKG_DELETE_CMD=${PKG_DELETE_CMD-@PKG_DELETE_CMD@}
 PKG_UPDATE_PLAN_CMD=${PKG_UPDATE_PLAN_CMD-pkg_update_plan}
 PKG_ADD_CMD=${PKG_ADD_CMD-@PKG_ADD_CMD@}
+PKG_DBDIR=${PKG_DBDIR-@PKG_DBDIR@}
 SUFX=${SUFX-.tgz}
+
+pkgdb=${PKG_DBDIR}/pkgdb.byfile.db
+if ! test -r "$pkgdb"; then
+    echo "Cannot find pkgdb..." 1>&2
+    exit 1
+fi
 
 # loading config files
 if test -r "$confdir/config"; then
@@ -96,6 +103,9 @@ fi
 
 . $dfltconfdir/nih.default.conf
 . "$conffile"
+
+PKG_INST_SUMMARY="$confdir/pkg_inst_summary.txt"
+PKG_SRC_SUMMARY="$confdir/pkg_src_summary.txt"
 
 export PKGSRCDIR PSS_SLAVES PSS_OPTIONS
 
@@ -309,9 +319,12 @@ save_installed_packages (){
 	counter=$(($counter+1))
     done
 
+    refresh_inst_summary
+
     installed_fn="${installed_fn}$counter.bz2"
-    pkg_bin_summary -f \
-	PKGNAME,PKGPATH,automatic,try_out,keep,BUILD_DATE |
+
+    grep -E '^$|^(PKGNAME|PKGPATH|automatic|try_out|keep|BUILD_DATE)=' \
+	"$PKG_INST_SUMMARY" |
     bzip2 > "$installed_fn"
 }
 
@@ -320,13 +333,14 @@ cat_bin_summary (){
     cat "$PKG_SUMMARY"
 }
 
-cat_installed_summary (){
-    pkg_bin_summary -a PLIST,automatic,try_out,keep,COMMENT
+cat_inst_summary (){
+    refresh_inst_summary
+    cat "$PKG_INST_SUMMARY"
 }
 
 cat_src_summary (){
-    summary_exists "$confdir/pkg_src_summary.txt"
-    cat "$confdir/pkg_src_summary.txt"
+    summary_exists "$PKG_SRC_SUMMARY"
+    cat "$PKG_SRC_SUMMARY"
 }
 
 ######################################################################
@@ -428,10 +442,22 @@ refresh_bin_summary (){
 }
 
 refresh_src_summary (){
-    echo 'This may take a while...'
+    echo 'Updating pkg_src_summary. This may take a while...' 1>&2
     all_pkgs="$confdir/pkgsrc_packages"
     pkg_list_all_pkgs -a "$PKGSRC_ADDSUBDIRS" > "$all_pkgs"
     pkg_update_src_summary -d "$confdir" -f "$all_pkgs" -v
+}
+
+refresh_inst_summary (){
+    if test -r "$PKG_INST_SUMMARY" &&
+	test "$pkgdb" -ot "$PKG_INST_SUMMARY"
+    then
+	:
+    else
+	echo 'Updating pkg_inst_summary...' 1>&2
+	pkg_bin_summary -a PLIST,automatic,try_out,keep,COMMENT \
+	    > "$PKG_INST_SUMMARY"
+    fi
 }
 
 if test "$1" = refresh; then
@@ -451,7 +477,7 @@ if test "$1" = refresh; then
 	    p)
 		func=refresh_src_summary;;
 	    P)
-		rm -f "$confdir/pkg_src_summary.txt"
+		rm -f "$PKG_SRC_SUMMARY"
 		func=refresh_src_summary;;
 	esac
     done
@@ -736,12 +762,11 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     # 
     refresh_summary
+    refresh_inst_summary
 
-    verbose "Getting a list of installed packages..."
     installed_summary="$tmp_dir/installed_summary"
-    pkg_bin_summary \
-	-fPROVIDES,REQUIRES,PKGNAME,PKGPATH,COMMENT,automatic,CONFLICTS,DEPENDS,BUILD_DATE,try_out,keep,PLIST \
-	> "$installed_summary"
+    grep -E '^$|^(PROVIDES|REQUIRES|PKGNAME|PKGPATH|COMMENT|automatic|CONFLICTS|DEPENDS|BUILD_DATE|try_out|keep|PLIST)=' \
+	"$PKG_INST_SUMMARY" > "$installed_summary"
 
     cmp_summary="$tmp_dir/cmp_summary"
 
@@ -998,8 +1023,8 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
 
     if test -n "$try_out"; then
 	tryout_pkgs="$tmp_dir/tryout"
-	pkg_bin_summary -f PKGNAME,try_out |
-	pkg_grep_summary -s try_out yes |
+	refresh_inst_summary
+	pkg_grep_summary -s try_out yes < "$PKG_INST_SUMMARY" |
 	awk '/^PKGNAME=/ {print substr($0, 9) "--"}' > "$tryout_pkgs"
 	plan=`cat "$tryout_pkgs"`
     fi
@@ -1271,11 +1296,11 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 	    o)
 		export PKG_DIGGER_BACKEND=pkg_online_client;;
 	    i|I)
-		export PKG_DIGGER_BACKEND=pkg_digger_installed
-		export PKG_DIGGER_SUMMARY="$confdir/installed_summary.txt";;
+		export PKG_DIGGER_BACKEND=pkg_digger_summary #pkg_digger_installed
+		export PKG_DIGGER_SUMMARY="$PKG_INST_SUMMARY";;
 	    p)
 		export PKG_DIGGER_BACKEND=pkg_digger_summary
-		export PKG_DIGGER_SUMMARY="$confdir/pkg_src_summary.txt";;
+		export PKG_DIGGER_SUMMARY="$PKG_SRC_SUMMARY";;
 	    l)
 		_summary2filelist=summary2filelist
 		opts="${opts}r9";;
@@ -1291,6 +1316,9 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
     done
     shift `expr $OPTIND - 1`
 
+    if test "$PKG_DIGGER_SUMMARY" = "$PKG_INST_SUMMARY"; then
+	refresh_inst_summary
+    fi
     if test "$PKG_DIGGER_BACKEND" = 'pkg_digger_summary'; then
 	summary_exists "$PKG_DIGGER_SUMMARY"
     fi
@@ -1370,14 +1398,12 @@ if test "$1" = leaf; then
     done
     shift `expr $OPTIND - 1`
 
+    refresh_inst_summary
+
     verbose "Finding leaf packages..."
-    installed_summary="$tmp_dir/installed_summary"
-    pkg_bin_summary \
-	-f PKGNAME,PKGPATH,COMMENT,automatic,DEPENDS \
-	> "$installed_summary"
 
     leaves_fn="$tmp_dir/leaves"
-    pkg_summary2leaves $opts "$installed_summary" > "$leaves_fn"
+    pkg_summary2leaves $opts "$PKG_INST_SUMMARY" > "$leaves_fn"
 
     if test -n "$remove"; then
 	pkgnames=`sed -n 's/^PKGNAME=//p' "$leaves_fn"`
@@ -1442,7 +1468,7 @@ if test "$1" = list; then
 		_grep_summary=cat;;
 	    a|i|I)
 		_summary4view=summary2installed_packages
-		_cat_summary=cat_installed_summary
+		_cat_summary=cat_inst_summary
 		_grep_summary=cat;;
 	    p)
 		_summary4view=summary2available_packages
@@ -1450,19 +1476,19 @@ if test "$1" = list; then
 		_grep_summary=cat;;
 	    t)
 		_summary4view=summary2installed_packages
-		_cat_summary=cat_installed_summary
+		_cat_summary=cat_inst_summary
 		_grep_summary='pkg_grep_summary -s try_out yes';;
 	    k)
 		_summary4view=summary2installed_packages
-		_cat_summary=cat_installed_summary
+		_cat_summary=cat_inst_summary
 		_grep_summary='pkg_grep_summary -s keep yes';;
 	    f)
 		_summary4view=summary2installed_packages
-		_cat_summary=cat_installed_summary
+		_cat_summary=cat_inst_summary
 		_grep_summary="pkg_grep_summary -s COMMENT 'fake package'";;
 	    u)
 		_summary4view=summary2installed_packages
-		_cat_summary=cat_installed_summary
+		_cat_summary=cat_inst_summary
 		_grep_summary='pkg_grep_summary -e automatic';;
 	    r)
 		_summary4view=cat;;
@@ -1559,6 +1585,7 @@ if test "$1" = mark; then
     fi
 
     save_installed_packages
+    printf '' >> $pkgdb
     $PKG_ADMIN_CMD $cmd "$@"
     exit 0
 fi
@@ -1630,7 +1657,7 @@ if test "$1" = deps; then
 	    P)
 		pn_opts="$pn_opts -p";;
 	    i|I)
-		_cat_summary=cat_installed_summary;;
+		_cat_summary=cat_inst_summary;;
 	    b)
 		_cat_summary=cat_bin_summary;;
 	    p)
@@ -1836,10 +1863,9 @@ if test "$1" = history; then
 	echo "Warning: NO_INSTALLED_COPY is set in config file!"
     fi
 
-    installed_fn="$tmp_dir/install"
-    pkg_bin_summary -f PKGNAME,PKGPATH,automatic,try_out,keep,BUILD_DATE > "$installed_fn"
+    refresh_inst_summary
 
-    last_fn="$installed_fn"
+    last_fn="$PKG_INST_SUMMARY"
     last=current
 
     unpacked1_fn="$tmp_dir/unpacked1.txt"
