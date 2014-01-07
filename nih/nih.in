@@ -490,7 +490,7 @@ if test "$1" = refresh; then
     done
     shift `expr $OPTIND - 1`
 
-    if test -n "$PKG_SUMMARY"; then
+    if test refresh_bin_summary = "$func" -a -n "$PKG_SUMMARY"; then
 	cat 1>&2 <<EOF
 Variable PKG_SUMMARY is set in configuration file.
 Nothing to do.
