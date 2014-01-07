@@ -92,6 +92,9 @@ configuration variable contains a list of additional
 subdirectories for pkgsrc packages, for example,
 .IR wip .
 .TP
+.B -i
+Update pkg_inst_summary.txt file consisting of summaries for installed packages.
+.TP
 .B -P
 The same as
 .B -p

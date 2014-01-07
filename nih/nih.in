@@ -371,6 +371,7 @@ nih refresh [options]
       -h     display this help message
       -b     download pkg_summary(5) and SHA512 (the default)
       -p     update pkg_src_summary file from pkgsrc tree
+      -i     update pkg_inst_summay file
       -P     the same as -p but pkg_src_summary file
              is regenerated from scratch
 
@@ -469,7 +470,7 @@ if test "$1" = refresh; then
 
     func=refresh_bin_summary
 
-    while getopts hbpP f; do
+    while getopts hbipP f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -480,6 +481,8 @@ if test "$1" = refresh; then
 		func=refresh_bin_summary;;
 	    p)
 		func=refresh_src_summary;;
+	    i)
+		func=refresh_inst_summary;;
 	    P)
 		rm -f "$PKG_SRC_SUMMARY"
 		func=refresh_src_summary;;
