@@ -1,3 +1,10 @@
+always "nih verify" before "nih uninstal/install"
+
+nih deps should accept pkgbase or pkgname or pkgpaba but output what
+is requested
+
+----------------------------------------------------------------------------
+
 nih update _
    The above problem is caused by the following
       d: not_found jpeg>=9 <- graphics/py-imaging py27-imaging-1.1.7nb7
