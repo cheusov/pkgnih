@@ -234,8 +234,8 @@ show_summary_NC (){
 
 show_summary_N (){
     # PKGNAME
-    awk '/^PKGNAME=/ {printf "%s ", substr($0, 9)}
-	END {printf "\n"}' "$@" | wrap 70
+    awk '/^PKGNAME=/ {printf "%s\n", substr($0, 9)}' "$@" | sort | tr '
+' ' ' | wrap 70
 }
 
 show_summary_NP (){
