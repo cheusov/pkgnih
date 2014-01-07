@@ -81,14 +81,14 @@ confdir=$HOME/.nih
 
 dfltconfdir=${NIH_DFLTCONFDIR-@dfltconfdir@}
 
-CACHEDIR=${CACHEDIR-@cachedir@}
-PKG_INFO_CMD=${PKG_INFO_CMD-@PKG_INFO_CMD@}
-PKG_ADMIN_CMD=${PKG_ADMIN_CMD-@PKG_ADMIN_CMD@}
-PKG_DELETE_CMD=${PKG_DELETE_CMD-@PKG_DELETE_CMD@}
-PKG_UPDATE_PLAN_CMD=${PKG_UPDATE_PLAN_CMD-pkg_update_plan}
-PKG_ADD_CMD=${PKG_ADD_CMD-@PKG_ADD_CMD@}
-PKG_DBDIR=${PKG_DBDIR-@PKG_DBDIR@}
-SUFX=${SUFX-.tgz}
+: ${CACHEDIR:=@cachedir@}
+: ${PKG_INFO_CMD:=@PKG_INFO_CMD@}
+: ${PKG_ADMIN_CMD:=@PKG_ADMIN_CMD@}
+: ${PKG_DELETE_CMD:=@PKG_DELETE_CMD@}
+: ${PKG_UPDATE_PLAN_CMD:=pkg_update_plan}
+: ${PKG_ADD_CMD:=@PKG_ADD_CMD@}
+: ${PKG_DBDIR:=@PKG_DBDIR@}
+: ${SUFX:=.tgz}
 
 pkgdb=${PKG_DBDIR}/pkgdb.byfile.db
 if ! test -r "$pkgdb"; then
