@@ -873,8 +873,11 @@ Output dependency graph for installed packages.
 Output dependency graph for packages from pkg_src_summary file built from pkgsrc tree by
 .BR "nih refresh -p" .
 .TP
+.B -1
+Output direct dependencies or dependent packages.
+.TP
 .B -r
-Show a graph of dependency packages rather than dependent packages.
+Output a graph of dependency packages rather than dependent packages.
 .TP
 .B -l
 Output a list of packages instead of a graph.

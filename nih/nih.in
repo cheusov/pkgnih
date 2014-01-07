@@ -1640,7 +1640,7 @@ if test "$1" = deps; then
     sb_opts=''
     pn_opts=''
     _cat_summary=cat_bin_summary
-    while getopts hrlBNPtiIbp f; do
+    while getopts hrlBNPtiIbp1 f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1654,6 +1654,8 @@ if test "$1" = deps; then
 	    t)
 		pn_addon_opts="$pn_addon_opts -t"
 		sb_opts="$sb_opts -t";;
+	    1)
+		sb_opts="$sb_opts -1";;
 	    B)
 		pn_opts="$pn_opts -n";;
 	    N)
