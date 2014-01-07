@@ -76,7 +76,7 @@ Display help message.
 Download pkg_summary(5) and SHA512. This is the default.
 .TP
 .B -p
-Incrementally update pkg_src_summary file from pkgsrc tree.
+Incrementally update pkg_src_summary.txt file from pkgsrc tree.
 Take a note that the first run may take several hours even on modern
 computers. Further runs will be significantly faster provided that
 pkgsrc files under mk/ directories were not changed.
@@ -98,7 +98,7 @@ Update pkg_inst_summary.txt file consisting of summaries for installed packages.
 .B -P
 The same as
 .B -p
-but pkg_src_summary file
+but pkg_src_summary.txt file
 is regenerated from scratch, that is, pkgsrc tree is fully rescanned.
 .RE
 .TP
@@ -116,7 +116,7 @@ Display help message.
 Query the binary repository. This is the default.
 .TP
 .B -p
-Search in pkg_src_summary file built from pkgsrc tree
+Search in pkg_src_summary.txt file built from pkgsrc tree
 by
 .BR "nih refresh -p" .
 .TP
@@ -168,7 +168,7 @@ Display help message.
 Query the binary repository. This is the default.
 .TP
 .B -p
-Search in pkg_src_summary file built from pkgsrc tree
+Search in pkg_src_summary.txt file built from pkgsrc tree
 by
 .BR "nih refresh -p" .
 .TP
@@ -227,7 +227,7 @@ Display help message.
 Search in the binary repository. This is the default.
 .TP
 .B -p
-Search in pkg_src_summary file built from pkgsrc tree
+Search in pkg_src_summary.txt file built from pkgsrc tree
 by
 .BR "nih refresh -p" .
 .TP
@@ -378,7 +378,8 @@ variable is set in the config file. The same applies to
 commands.
 
 Once the binaries have been downloaded, the packages to be installed
-are checked for common files in order to prevent file name clashes and the consequent
+are checked for common files in order to prevent file name clashes and
+the consequent
 failures in the middle of the process. This is in addition to analysing
 the CONFLICTS variable set for this purpose.
 Setting
@@ -537,7 +538,8 @@ Examples:
 .P
 The output format can be changed with a help of shell functions
 "summary2packages_to_be_removed", "summary2packages_to_be_installed"
-or "summary2packages_to_be_installed_as_dep" defined in the configuration file.
+or "summary2packages_to_be_installed_as_dep" defined
+in the configuration file.
 See @dfltconfdir@/nih.default.conf for details.
 The default format may change in future releases.
 .RE
@@ -774,7 +776,7 @@ Output packages available in the binary repository. This is the default.
 Output all installed packages.
 .TP
 .B -p
-Output packages from pkg_src_summary file built from pkgsrc tree by
+Output packages from pkg_src_summary.txt file built from pkgsrc tree by
 .BR "nih refresh -p" .
 .TP
 .B -u
@@ -873,7 +875,7 @@ Output dependency graph for packages from binary repository. This is the default
 Output dependency graph for installed packages.
 .TP
 .B -p
-Output dependency graph for packages from pkg_src_summary file built from pkgsrc tree by
+Output dependency graph for packages from pkg_src_summary.txt file built from pkgsrc tree by
 .BR "nih refresh -p" .
 .TP
 .B -1
@@ -959,6 +961,13 @@ Consider packages different if their BUILD_DATE differ.
 Configuration file for nih.
 .br
 See @dfltconfdir@/nih.default.conf for details.
+.TP
+.I "~/.nih"
+Directory where pkg_inst_summary.txt (summaries for installed
+packages), pkg_src_summary.txt (summaries for pkgsrc tree),
+pkg_summary.txt (downloaded summaries for binary packages),
+pkg_summary_YYYYMMDD_hhmm.txt, SHA512_YYYYMMDD_hhmm.txt, and
+installed_YYYYMMDD_hhmm.txt files are stored.
 .SH BUGS
 Sometimes
 .I nih
