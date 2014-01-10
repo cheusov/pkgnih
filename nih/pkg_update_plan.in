@@ -677,13 +677,8 @@ BEGIN {
 		}
 
 		generate_plan(planfn)
-		if (reqd_prov_check){
-			if (!resolve("dcul"))
-				break
-		}else{
-			if (!resolve("dcu"))
-				break
-		}
+		if (!resolve("dcu") && (!reqd_prov_check || !resolve("l")))
+			break
 
 		if (ex)
 			break
