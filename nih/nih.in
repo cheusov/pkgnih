@@ -1592,7 +1592,7 @@ if test "$1" = mark; then
     fi
 
     save_installed_packages
-    printf '' >> $pkgdb
+    touch $pkgdb
     $PKG_ADMIN_CMD $cmd "$@"
     exit 0
 fi
