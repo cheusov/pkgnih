@@ -1,4 +1,65 @@
 ======================================================================
+Version 0.12.0, by Aleksey Cheusov, Fri, 10 Jan 2014 17:50:57 +0300
+
+  Most important parts of pkg_grep_summary, a part of
+  pkgtools/pkg_summary-utils, was reimplemented in C. As a result
+  "nih {search,info,meta,leaf,install,remove,deps}" should work faster.
+
+  nih install:
+    - if pkg_update_plan(1) fails, nih(1) exits with pkg_update_plan's
+      exit status.
+    - packages to be installed or removed are output in sorted order.
+
+  nih {search,meta,info}:
+    - "nih meta" now defaults to -1 mode (internally).
+    - documentation for -1|-3|-9 ads added for "nih {info,meta}" commands
+    - "nih info" now defaults to -3 mode.
+    - "nih {search,meta,info}" now work correctly with -{o,i} options
+      if ~/.nih/pkg_summary.txt is absent.
+    - new option -l was added to "nih {search,info}" that outputs
+      package file list.
+
+  Summary for installed packages is cached in
+  ~/.nih/pkg_inst_summary.txt. "nih {refresh,search,info,meta,deps,list} -i"
+  use this file and update it when necessary.
+
+  nih refresh:
+    - Option -P was added for fully rescanning pkgsrc tree.
+    - The default value for PKGSRCDIR is not determined at build time
+      anymore.  As a result "nih refresh -p" does not try to access
+      /tree/pkgsrc used by bouyer@ who builds official NetBSD binary
+      packages. Now PKGSRCDIR defaults to /usr/pkgsrc.
+    - "nih refresh -p" shows progress counter (the number of scanned
+      packages) unless -m is in PSS_OPTIONS.
+    - option -i was added that updates summaries for installed
+      packages (~/.nih/pkg_inst_summary.txt).
+
+  nih remove:
+    - does not try to create $CACHEDIR and "cd" to it.
+
+  nih list:
+    - was completely reimplemented and simplified.
+    - new option -p was added that outputs pkgsrc tree packages.
+
+  nih deps:
+    - new options -b and -p were added for working with binary
+      repository and pkgsrc scanned packages
+      (pkg_summary.txt ad pkg_src_summary.txt respectively)
+    - option -1 was added that outputs direct dependencies or dependents.
+
+  nih/config:
+    - better conversion from "uname -r" to repository URL.
+    - REPOSITORY for SunOS defaults to smartos.org.
+
+  Support for summaries with no PKGPATH, e.g., compat50-5.1.tgz, was
+  added.
+
+  Option -I for "list", "deps', "meta", "info" and "search" was
+  renamed to -i. Option -I is supported for backward compatibility.
+
+  package_search.pdf was updated, fixed and improved.
+
+======================================================================
 Version 0.11.0, by Aleksey Cheusov, Fri,  8 Mar 2013 15:56:56 +0300
 
   nih install:
