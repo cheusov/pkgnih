@@ -5,6 +5,16 @@ is requested
 
 ----------------------------------------------------------------------------
 
+# nih update curl-7.33.0
+Generating an update plan...
+    R:1 U:1 A:0
+Update plan cannot be built
+================================
+The above problem is caused by the following
+   u: unicity curl <- www/curl www/curl
+curl-7.32.0 --> curl-7.33.0
+
+----------------------------------------------------------------------------
 nih update _
    The above problem is caused by the following
       d: not_found jpeg>=9 <- graphics/py-imaging py27-imaging-1.1.7nb7
