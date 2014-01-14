@@ -1,3 +1,22 @@
+Default answer Yes to all questions.
+nih -n -- answer no to all questions.
+
+----------------------------------------------------------------------------
+
+Update nih.
+
+----------------------------------------------------------------------------
+
+Keep MESSAGES in special file and tell user about it.
+
+----------------------------------------------------------------------------
+
+Variables NIH-{command} with options always applied, e.g.
+ NIH_list=-q or NIH_list=-i. This will make special variables
+ for install -l|-L and -p|-P obsolete.
+
+----------------------------------------------------------------------------
+
 always "nih verify" before "nih uninstal/install"
 
 nih deps should accept pkgbase or pkgname or pkgpaba but output what
