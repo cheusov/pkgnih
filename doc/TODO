@@ -1,3 +1,7 @@
+pkg_digger: remove -i option, add -s option for sorted output.
+
+----------------------------------------------------------------------------
+
 Default answer Yes to all questions.
 nih -n -- answer no to all questions.
 
