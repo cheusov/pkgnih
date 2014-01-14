@@ -158,7 +158,12 @@ function process_pkg (pkg, try_out, hash_val,       base,suff,pair,rempair,pipe,
 	}else if (suff != "-"){
 		bad_package = base
 		print_eqs(0)
-		print "Package " base " cannot not be found" > "/dev/stderr"
+
+		if (base != rempair && sub(/;.*/, "", rempair))
+			print "Update for " base "(" rempair ") cannot be found" > "/dev/stderr"
+		else
+			print "Package " base " cannot be found" > "/dev/stderr"
+
 		ex = 1
 		return
 	}
@@ -610,7 +615,7 @@ function resolve (flags){
 
 function print_eqs (force){
 	if (force || !eqs_printed)
-		print "================================" > "/dev/stderr"
+		print "==========================================" > "/dev/stderr"
 	eqs_printed = 1
 }
 
@@ -649,7 +654,7 @@ function show_trace (){
 
 	msg = ""
 	print_eqs(1)
-	print "The above problem is caused by the following" > "/dev/stderr"
+	print "Details:" > "/dev/stderr"
 	pkg = bad_package
 	while (pkg){
 		old_name = pair2name(inst_base2pair [pkg])

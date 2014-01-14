@@ -376,7 +376,7 @@ nih refresh [options]
              is regenerated from scratch
 
 ~/.nih/config:
-   REPOSITORY - URL or file name for pkg_summary.bz2/pkg_summary.txt
+   REPOSITORY      - URL or file name for pkg_summary.bz2/pkg_summary.txt
    PKG_SUMMARY     - path to pkg_summary.txt, set this variable if you use
                    local pkg_summary, otherwise keep it unset
    fetch function  - download command
