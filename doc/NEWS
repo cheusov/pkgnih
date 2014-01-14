@@ -1,5 +1,5 @@
 ======================================================================
-Version 0.12.0, by Aleksey Cheusov, Fri, 10 Jan 2014 17:50:57 +0300
+Version 0.12.0, by Aleksey Cheusov, Tue, 14 Jan 2014 03:22:19 +0300
 
   Most important parts of pkg_grep_summary, a part of
   pkgtools/pkg_summary-utils, was reimplemented in C. As a result
