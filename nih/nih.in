@@ -322,6 +322,13 @@ save_installed_packages (){
 	return
     fi
 
+    # was inst_summary already saved?
+    if test -n "$summary_aleady_saved"; then
+	return
+    fi
+    summary_aleady_saved=1
+
+    #
     installed_fn=$confdir/installed_`get_date`
     counter=''
     while test -f "${installed_fn}$counter.bz2"; do
@@ -936,6 +943,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 	while read p; do
 	    ver=`pkg_grep_summary -f PKGNAME -s PKGBASE "$p" < "$toinst_plist_summary" | sed -n 's/^PKGNAME=.*-//p'`
 	    verbose "Replacing $p with fake package..."
+	    save_installed_packages
 	    replace_with_fake "$p" "$ver"
 	done < "$repl_fake_fn"
     fi
