@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2011, Aleksey Cheusov <vle@gmx.net>
+# Copyright (c) 2011-2014, Aleksey Cheusov <vle@gmx.net>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -942,7 +942,8 @@ if test "_$1" = _install -o "_$1" = _update; then
 	@libexecdir@/nih/analyse_conflicts "$conflicts_fn" > "$repl_fake_fn"
 	while read p; do
 	    ver=`pkg_grep_summary -f PKGNAME -s PKGBASE "$p" < "$toinst_plist_summary" | sed -n 's/^PKGNAME=.*-//p'`
-	    verbose "Replacing $p with fake package..."
+	    verbose "Replacing $p with fake package $p-$ver..."
+	    test -n "$ver"
 	    save_installed_packages
 	    replace_with_fake "$p" "$ver"
 	done < "$repl_fake_fn"
