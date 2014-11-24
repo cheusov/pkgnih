@@ -114,7 +114,7 @@ function process_pkg (pkg, try_out, hash_val,       base,suff,pair,rempair,pipe,
 	}
 
 	bbase = base # PKGBASE if base is PKGNAME
-	sub(/-[0-9].*$/, "", bbase)
+	sub(/-[^-]*$/, "", bbase)
 
 	if (base != bbase && (bbase in inst_base2pair)){
 		rempair = inst_base2pair [bbase]
