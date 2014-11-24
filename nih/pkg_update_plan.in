@@ -85,9 +85,37 @@ BEGIN {
 	inst_deps_ok = 0
 }
 
+function get_largest_version(base,         i,best,curr){
+	if (! (base in avail_base_cnt))
+		return ""
+
+	for (i=1; i <= avail_base_cnt[base]; ++i){
+		curr = avail_base2pairs[base, i]
+		if (!best || pkgname_gt_pkgname(curr, best))
+			best = curr
+	}
+
+	return best
+}
+
+function get_matched_pkgpair(base, pattern,        i,curr){
+	if (! (base in avail_base_cnt))
+		return ""
+
+	for (i=1; i <= avail_base_cnt[base]; ++i){
+		curr = avail_base2pairs[base, i]
+		if (pattern_match(pkgname2version(curr), pattern))
+			return curr
+	}
+
+	return ""
+}
+
 ############################################################
 # preparations
-function process_pkg (pkg, try_out, hash_val,       base,suff,pair,rempair,pipe,arr,cmp){
+function process_pkg (pkg, try_out, hash_val, reqd,
+      base,suff,pair,rempair,pipe,arr,cmp) \
+{
 	if (!hash_val)
 		hash_val = 0
 
@@ -152,8 +180,11 @@ function process_pkg (pkg, try_out, hash_val,       base,suff,pair,rempair,pipe,
 		return
 	}
 
-	if (base in avail_base2pair){
-		pair = avail_base2pair [base]
+	if ((base SUBSEP 1) in avail_base2pairs){
+		if (reqd == "")
+			pair = get_largest_version(base)
+		else
+			pair = get_matched_pkgpair(base, reqd)
 	}else if (base in avail_name2pair){
 		pair = avail_name2pair [base]
 	}else if (base in avail_path2pair){
@@ -295,12 +326,7 @@ BEGIN {
 				instpath = pkgpath
 			}
 
-			if (instpath == pkgpath &&
-				(! (pkgbase in avail_base2pair) ||
-				 pkgname_gt_pkgname(pkgname, pair2name(avail_base2pair [pkgbase]))))
-			{
-				avail_base2pair [pkgbase] = pkgpair
-			}
+			avail_base2pairs[pkgbase, ++avail_base_cnt[pkgbase]] = pkgpair
 			avail_path2pair [pkgpath] = pkgpair
 			avail_name2pair [pkgname] = pkgpair
 			avail_pair [pkgpair] = 0
@@ -540,11 +566,11 @@ function resolve (flags){
 			if (! (pkgbase in add_base)){
 				expl_line [pkgbase] = $0
 				expl_next [pkgbase] = depbase
-				addme [pkgbase] = 0
+				addme [pkgbase] = pkgname2version($3)
 			}else if (! (depbase in add_base)){
 				expl_line [depbase] = $0
 				expl_next [depbase] = pkgbase
-				addme [depbase] = 0
+				addme [depbase] = pkgname2version($3)
 			}else{
 				if (!bad_package)
 					print "Update plan cannot be built" > "/dev/stderr"
@@ -560,7 +586,8 @@ function resolve (flags){
 			if ((pkgbase in add_base) && !(cnfbase in add_base)){
 				expl_line [cnfbase] = $0
 				expl_next [cfgbase] = pkgbase
-				addme [cnfbase] = 0
+				if (! (cnfbase in addme))
+					addme [cnfbase] = ""
 			}else{
 				if (!bad_package)
 					print "Update plan cannot be built" > "/dev/stderr"
@@ -584,7 +611,8 @@ function resolve (flags){
 			if (!(pkgbase in add_base)){
 				expl_line [pkgbase] = $0
 				expl_next [pkgbase] = pkgpana2pkgbase(inst_provides [$3])
-				addme [pkgbase] = 0
+				if (! (pkgbase in addme))
+					addme [pkgbase] = ""
 			}else if (($3 in avail_provides) &&
 					  !index(avail_provides [$3], " "))
 			{
@@ -593,7 +621,7 @@ function resolve (flags){
 				pkg = avail_provides [$3]
 				expl_line [pkg] = $0
 				expl_next [pkg] = pkgpana2pkgbase(inst_provides [$3])
-				addme [pkg] = 1
+				addme [pkg] = "1"
 			}else{
 				print_eqs(0)
 				if ($3 in avail_provides){
@@ -694,10 +722,10 @@ BEGIN {
 			break
 
 		for (pkg in addme){
-			if (addme [pkg])
+			if (addme [pkg] == "1")
 				process_pkg(pkg)
 			else
-				process_pkg(pkg "_")
+				process_pkg(pkg "_", 0, "", addme [pkg])
 		}
 		delete addme
 

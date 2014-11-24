@@ -1,6 +1,6 @@
 .\"     $NetBSD$
 .\"
-.\" Copyright (c) 2010-2012 by Aleksey Cheusov (vle@gmx.net)
+.\" Copyright (c) 2010-2014 by Aleksey Cheusov (vle@gmx.net)
 .\" This man page may contain portions of pkgin.1 by Emile Heitor.
 .\" Absolutely no warranty.
 .\"
@@ -15,7 +15,7 @@
 .fi
 ..
 .\" ------------------------------------------------------------------
-.TH NIH 1 "Nov 7, 2012" "" ""
+.TH NIH 1 "Nov 24, 2014" "" ""
 .SH NAME
 nih \- package manager for pkgsrc
 .SH SYNOPSIS
@@ -968,24 +968,6 @@ packages), pkg_src_summary.txt (summaries for pkgsrc tree),
 pkg_summary.txt (downloaded summaries for binary packages),
 pkg_summary_YYYYMMDD_hhmm.txt, SHA512_YYYYMMDD_hhmm.txt, and
 installed_YYYYMMDD_hhmm.txt files are stored.
-.SH BUGS
-Sometimes
-.I nih
-fails to find dependencies correctly, for example,
-.VB
-
-   nih install www/apache2
-
-.VE
-fails to find the correct version of the package.
-.IR apr .
-In order to fix this kind of issues, required dependencies should
-be specified explicitly like the following:
-.VB
-
-   nih install www/apache2 devel/apr0+
-
-.VE
 .SH NOTES
 .I Auto-installed package
 means this package was installed as a dependency, see
