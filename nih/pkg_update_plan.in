@@ -702,8 +702,8 @@ function show_trace (){
 		new_name = pair2name(add_base2pair(pkg))
 		if (!new_name)
 			new_name = "?"
-		msg = (old_name " --> " new_name "\n" msg)
 		msg = ("   " expl_line [pkg] "\n" msg)
+		msg = (old_name " --> " new_name "\n" msg)
 		pkg = expl_next [pkg]
 	}
 	print msg
