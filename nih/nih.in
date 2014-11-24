@@ -597,6 +597,9 @@ nih install [options] <packages>
       -p     disable REQUIRES/PROVIDES consistency check
       -P     enable REQUIRES/PROVIDES consistency check (the default)
 
+      -v     disable verifying pkgdb before installation
+      -V     enable verifying pkgdb before installation (the default)
+
       -t     install packages and mark them as "try out"
 
       -d     download binaries only, do not update installed packages
@@ -713,7 +716,9 @@ if test "_$1" = _install -o "_$1" = _update; then
     cmd="$1"
     shift
 
-    while getopts hndkBtDlLpPa:rR f; do
+    verify_pkgdb=1
+
+    while getopts a:BdDhklLnpPrRtvV f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -738,6 +743,10 @@ if test "_$1" = _install -o "_$1" = _update; then
 		NO_REQPROV_CHECK=1;;
 	    P)
 		unset NO_REQPROV_CHECK || true;;
+	    v)
+		unset verify_pkgdb || true;;
+	    V)
+		verify_pkgdb=1;;
 	    D)
 		debug=1;;
 	    a)
@@ -751,6 +760,12 @@ if test "_$1" = _install -o "_$1" = _update; then
 	esac
     done
     shift `expr $OPTIND - 1`
+
+    # -V
+    if test -n "$verify_pkgdb"; then
+	verbose 'Verifying pkgdb'
+	pkg_status -k -lLdc | awk '{print "  ", $0}'
+    fi
 
     # -p
     if test -n "$NO_REQPROV_CHECK"; then
@@ -849,7 +864,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 	exit
     fi
 
-    printf '%s\n' '---------------------- UPDATE PLAN -------------------------'
+    printf '%s\n' '--------------------------------------------------------'
 
     rem_pkgs=`awk '$1 == "-" {print $2}' "$cmp_summary"`
     rem_pkgs=`echo $rem_pkgs` # remove NL characters

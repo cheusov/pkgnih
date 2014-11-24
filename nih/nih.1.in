@@ -435,6 +435,12 @@ Enable REQUIRES/PROVIDES consistency checks. See
 .B -p
 for more information.
 .TP
+.B -v
+Disable pkgdb validation before installation.
+.TP
+.B -V
+Enable pkgdb validation before installation. This is the default.
+.TP
 .B -B
 Consider packages different if their BUILD_DATE differ.
 .TP
