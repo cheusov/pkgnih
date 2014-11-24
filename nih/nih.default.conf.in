@@ -162,3 +162,20 @@ summary2filelist (){
 # Uncomment the folowing line if you want to ignore SHA512 file.
 # Some bulk build software doesn't provide it.
 #IGNORE_CKSUMS=1
+
+# config variable for subcommands
+NIH_REFRESH_OPTS=''
+NIH_UNINSTALL_OPTS=''
+NIH_INSTALL_OPTS=''
+NIH_VERIFY_OPTS=''
+NIH_STATUS_OPTS=''
+NIH_SEARCH_OPTS=''
+NIH_INFO_OPTS=''
+NIH_META_OPTS=''
+NIH_LEAF_OPTS=''
+NIH_LIST_OPTS=''
+NIH_MARK_OPTS=''
+NIH_DEPS_OPTS=''
+NIH_CLEAN_CACHE_OPTS=''
+NIH_AUDIT_OPTS=''
+NIH_HISTORY_OPTS=''

@@ -100,6 +100,11 @@ The same as
 .B -p
 but pkg_src_summary.txt file
 is regenerated from scratch, that is, pkgsrc tree is fully rescanned.
+.TP
+Config variables:
+.BR NIH_REFRESH_OPTS " -- options passed to"
+.B "nih refresh"
+by default. The default value is "".
 .RE
 .TP
 .B  info
@@ -137,6 +142,11 @@ Output raw package summaries.
 .TP
 .B -q
 Quiet mode, do not print "No matches found" to stderr
+.TP
+Config variables:
+.BR NIH_INFO_OPTS " -- options passed to"
+.B "nih info"
+by default. The default value is "".
 .RE
 .P
 .RS
@@ -191,6 +201,11 @@ Output raw package summaries.
 .TP
 .B -q
 Quiet mode, do not print "No matches found" to stderr
+.TP
+Config variables:
+.BR NIH_META_OPTS " -- options passed to"
+.B "nih meta"
+by default. The default value is "".
 .RE
 .P
 .RS
@@ -264,6 +279,11 @@ Raw output in pkg_summary(5) format. This option requires either
 .TP
 .B -q
 Quiet mode, do not print "No matches found" to stderr.
+.TP
+Config variables:
+.BR NIH_SEARCH_OPTS " -- options passed to"
+.B "nih search"
+by default. The default value is "".
 .RE
 .P
 .RS
@@ -487,6 +507,11 @@ can be used respectively.
 .TP
 .B -D
 Enable debugging output.
+.TP
+Config variables:
+.BR NIH_INSTALL_OPTS " -- options passed to"
+.B "nih install"
+by default. The default value is "".
 .RE
 .P
 .RS
@@ -583,9 +608,12 @@ The same as
 .TP
 .B -t
 Uninstall "try out" packages.
-.RE
-.P
-.RS
+.TP
+Config variables:
+.BR NIH_UNINSTALL_OPTS " -- options passed to"
+.B "nih uninstall"
+by default. The default value is "".
+.TP
 Examples:
 .VB
    # uninstall mawk and gawk with their dependents
@@ -625,6 +653,11 @@ Check if dependencies are present and their versions match.
 .B -s
 Compare "uname -r" output
 and the version of the OS on which the packages were built.
+.TP
+Config variables:
+.BR NIH_VERIFY_OPTS " -- options passed to"
+.B "nih verify"
+by default. The default value is "".
 .RE
 .P
 .RS
@@ -687,6 +720,11 @@ This option works only with
 .TP
 .B -q
 No noisy reminder about output format.
+.TP
+Config variables:
+.BR NIH_STATUS_OPTS " -- options passed to"
+.B "nih status"
+by default. The default value is "".
 .RE
 .P
 .RS
@@ -727,6 +765,11 @@ do not check packages.
 .B -c
 Check the packages for vulnerabilities
 using existing pkg-vulnerabilities file.
+.TP
+Config variables:
+.BR NIH_AUDIT_OPTS " -- options passed to"
+.B "nih audit"
+by default. The default value is "".
 .RE
 .TP
 .B  leaf
@@ -754,6 +797,11 @@ just report the steps that would be taken.
 .TP
 .B -r
 Output raw package summaries.
+.TP
+Config variables:
+.BR NIH_LEAF_OPTS " -- options passed to"
+.B "nih leaf"
+by default. The default value is "".
 .RE
 .P
 .RS
@@ -796,6 +844,11 @@ Output packages marked "keep".  See "nih mark -k" for details.
 .TP
 .B -r
 Show raw package summaries.
+.TP
+Config variables:
+.BR NIH_LIST_OPTS " -- options passed to"
+.B "nih list"
+by default. The default value is "".
 .RE
 .P
 .RS
@@ -830,6 +883,11 @@ Mark/unmark packages with "keep" flag.  "keep" marker means that a
 package can't be updated by "nih update" command.  This marker is
 particularly useful to mark packages that the user compiled manually
 from pkgsrc.
+.TP
+Config variables:
+.BR NIH_MARK_OPTS " -- options passed to"
+.B "nih mark"
+by default. The default value is "".
 .P
 NOTES: in effect, -a and -U are synonyms, -u and -A are synonyms.
 .RE
@@ -904,6 +962,11 @@ Output PKGNAME.
 .TP
 .B -t
 Output the graph in tsort(1) compatible format.
+.TP
+Config variables:
+.BR NIH_DEPS_OPTS " -- options passed to"
+.B "nih deps"
+by default. The default value is "".
 .RE
 .P
 .RS
@@ -944,6 +1007,11 @@ nih clean-cache
 without options, running it with -i option
 does not remove binaries of packages that the user ever tried, since these
 packages are reflected in the history files ~/.nih/installed_*.
+.TP
+Config variables:
+.BR NIH_CLEAN_CACHE_OPTS " -- options passed to"
+.B "nih clean-cache"
+by default. The default value is "".
 .RE
 .TP
 .B history
@@ -960,6 +1028,11 @@ Display help message.
 .TP
 .B -B
 Consider packages different if their BUILD_DATE differ.
+.TP
+Config variables:
+.BR NIH_HISTORY_OPTS " -- options passed to"
+.B "nih history"
+by default. The default value is "".
 .RE
 .SH FILES
 .TP

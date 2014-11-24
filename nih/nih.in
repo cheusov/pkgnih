@@ -483,6 +483,8 @@ if test "$1" = refresh; then
 
     func=refresh_bin_summary
 
+    set -- $NIH_REFRESH_OPTS "$@"
+
     while getopts hbipP f; do
 	case "$f" in
 	    '?')
@@ -717,6 +719,8 @@ if test "_$1" = _install -o "_$1" = _update; then
     shift
 
     verify_pkgdb=1
+
+    set -- $NIH_INSTALL_OPTS "$@"
 
     while getopts a:BdDhklLnpPrRtvV f; do
 	case "$f" in
@@ -1041,6 +1045,9 @@ EOF
 
 if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
     shift
+
+    set -- $NIH_UNINSTALL_OPTS "$@"
+
     while getopts hnlLpPt f; do
 	case "$f" in
 	    '?')
@@ -1112,6 +1119,9 @@ EOF
 if test "$1" = verify; then
     shift
     opts='k'
+
+    set -- $NIH_VERIFY_OPTS "$@"
+
     while getopts hmUlLdcs f; do
 	case "$f" in
 	    '?')
@@ -1177,6 +1187,9 @@ EOF
 if test "$1" = status; then
     shift
     opts='b'
+
+    set -- $NIH_STATUS_OPTS "$@"
+
     while getopts hbsruaqAB f; do
 	case "$f" in
 	    '?')
@@ -1323,6 +1336,12 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
     _summary2filelist=cat
     _summary2meta_packages=summary2meta_packages
 
+    case "$op" in
+	meta) set -- $NIH_META_OPTS "$@";;
+	info) set -- $NIH_INFO_OPTS "$@";;
+	search) set -- $NIH_SEARCH_OPTS "$@";;
+    esac
+
     while getopts hboiIpsf139rql f; do
 	case "$f" in
 	    '?')
@@ -1411,6 +1430,9 @@ if test "$1" = leaf; then
     shift
     opts='-r'
     pkg_delete_opts=''
+
+    set -- $NIH_LEAF_OPTS "$@"
+
     while getopts haARnr f; do
 	case "$f" in
 	    '?')
@@ -1492,6 +1514,9 @@ if test "$1" = list; then
     _cat_summary=cat_bin_summary
     _summary4view=summary2available_packages
     _grep_summary=cat
+
+    set -- $NIH_LIST_OPTS "$@"
+
     while getopts hbauiIrtkfp f; do
 	case "$f" in
 	    '?')
@@ -1570,6 +1595,9 @@ EOF
 if test "$1" = mark; then
     shift
     opts='l'
+
+    set -- $NIH_MARK_OPTS "$@"
+
     while getopts huUaAtTkK f; do
 	case "$f" in
 	    '?')
@@ -1673,6 +1701,9 @@ if test "$1" = deps; then
     sb_opts=''
     pn_opts=''
     _cat_summary=cat_bin_summary
+
+    set -- $NIH_DEPS_OPTS "$@"
+
     while getopts hrlBNPtiIbp1 f; do
 	case "$f" in
 	    '?')
@@ -1744,6 +1775,9 @@ EOF
 
 if test "$1" = clean-cache; then
     shift
+
+    set -- $NIH_CLEAN_CACHE_OPTS "$@"
+
     while getopts hnai f; do
 	case "$f" in
 	    '?')
@@ -1833,6 +1867,8 @@ if test "$1" = audit; then
     check=1
     download=1
 
+    set -- $NIH_AUDIT_OPTS "$@"
+
     while getopts hdc f; do
 	case "$f" in
 	    '?')
@@ -1884,6 +1920,8 @@ EOF
 
 if test "$1" = history; then
     shift
+
+    set -- $NIH_HISTORY_OPTS "$@"
 
     while getopts hB f; do
 	case "$f" in
