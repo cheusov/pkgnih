@@ -185,6 +185,14 @@ function process_pkg (pkg, try_out, hash_val, reqd,
 			pair = get_largest_version(base)
 		else
 			pair = get_matched_pkgpair(base, reqd)
+
+		if (pair == ""){
+			bad_package = base
+			print_eqs(0)
+			print "Package " base reqd " cannot be found" > "/dev/stderr"
+			ex = 1
+			return
+		}
 	}else if (base in avail_name2pair){
 		pair = avail_name2pair [base]
 	}else if (base in avail_path2pair){
@@ -566,7 +574,7 @@ function resolve (flags){
 			if (! (pkgbase in add_base)){
 				expl_line [pkgbase] = $0
 				expl_next [pkgbase] = depbase
-				addme [pkgbase] = pkgname2version($3)
+				addme [pkgbase] = ""
 			}else if (! (depbase in add_base)){
 				expl_line [depbase] = $0
 				expl_next [depbase] = pkgbase
