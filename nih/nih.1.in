@@ -431,10 +431,7 @@ Continue downloading packages despite errors that may occur underway.
 Do not remove auto-installed leaf packages.
 Bear in mind that
 this may cause problems in creating a non-conflicting update plan.
-The default is to remove such packages unless
-.I NO_REMOVE_LEAVES
-configuration variable is set to
-.IR yes " or " 1 .
+The default is to remove such packages.
 .TP
 .B -L
 Remove auto-installed leaf packages. See
@@ -445,10 +442,7 @@ for more information.
 Disable REQUIRES/PROVIDES consistency checks.
 Bear in mind that
 this may cause problems in creating a non-conflicting update plan.
-By default this check is enabled unless
-.I NO_REQPROV_CHECK
-configuration variable is set to
-.IR yes " or " 1 .
+By default this check is enabled.
 .TP
 .B -P
 Enable REQUIRES/PROVIDES consistency checks. See
@@ -511,7 +505,7 @@ Enable debugging output.
 Config variables:
 .BR NIH_INSTALL_OPTS " -- options passed to"
 .B "nih install"
-by default. The default value is "".
+by default. The default value is "-LP".
 .RE
 .P
 .RS

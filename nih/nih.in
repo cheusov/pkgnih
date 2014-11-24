@@ -719,6 +719,8 @@ if test "_$1" = _install -o "_$1" = _update; then
     shift
 
     verify_pkgdb=1
+    remove_leaves=1
+    reqprov_check=1
 
     set -- $NIH_INSTALL_OPTS "$@"
 
@@ -740,13 +742,13 @@ if test "_$1" = _install -o "_$1" = _update; then
 	    t)
 		update_plan_opts="$update_plan_opts -t";;
 	    l)
-		NO_REMOVE_LEAVES=1;;
+		unset remove_leaves || true;;
 	    L)
-		unset NO_REMOVE_LEAVES || true;;
+		remove_leaves=1;;
 	    p)
-		NO_REQPROV_CHECK=1;;
+		unset reqprov_check || true;;
 	    P)
-		unset NO_REQPROV_CHECK || true;;
+		reqprov_check=1;;
 	    v)
 		unset verify_pkgdb || true;;
 	    V)
@@ -772,12 +774,12 @@ if test "_$1" = _install -o "_$1" = _update; then
     fi
 
     # -p
-    if test -n "$NO_REQPROV_CHECK"; then
+    if test -z "$reqprov_check"; then
 	update_plan_opts="$update_plan_opts -p"
     fi
 
     # -l
-    if test -n "$NO_REMOVE_LEAVES"; then
+    if test -z "$remove_leaves"; then
 	update_plan_opts="$update_plan_opts -l"
     fi
 

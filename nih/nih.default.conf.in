@@ -93,14 +93,6 @@ PSS_OPTIONS='-m'
 # from update plan for common files.
 #NO_PLIST_CHECK=1
 
-# Uncomment the following line if you don't want to run
-# a REQUIRES/PROVIDES consistency check.
-#NO_REQPROV_CHECK=1
-
-# Uncomment the following line if you don't want to remove
-# auto-installed leaf packages.
-#NO_REMOVE_LEAVES=1
-
 # If your machine is multi-CPU, it makes sense to uncomment the following
 # line in order to make some operations faster. See pkg_src_summary(1)
 # for details.
@@ -166,7 +158,7 @@ summary2filelist (){
 # config variable for subcommands
 NIH_REFRESH_OPTS=''
 NIH_UNINSTALL_OPTS=''
-NIH_INSTALL_OPTS=''
+NIH_INSTALL_OPTS='-LP'
 NIH_VERIFY_OPTS=''
 NIH_STATUS_OPTS=''
 NIH_SEARCH_OPTS=''
