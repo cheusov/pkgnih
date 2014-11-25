@@ -131,7 +131,7 @@ process_options (){
 	y     'always_yes=-y' \
 	D     'debug=1' \
 	=s    'summary=' \
-	-- "$@"
+	-- $NIH_OPTS "$@"
 }
 cmds=`process_options "$@"`
 eval "$cmds"

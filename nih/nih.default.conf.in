@@ -156,6 +156,7 @@ summary2filelist (){
 #IGNORE_CKSUMS=1
 
 # config variable for subcommands
+NIH_OPTS=''
 NIH_REFRESH_OPTS=''
 NIH_UNINSTALL_OPTS=''
 NIH_INSTALL_OPTS='-LP'

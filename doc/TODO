@@ -2,12 +2,11 @@ pkg_digger: remove -i option, add -s option for sorted output.
 
 ----------------------------------------------------------------------------
 
-Default answer Yes to all questions.
-nih -n -- answer no to all questions.
+pkg_digger: remove -i option, add -s option for sorted output.
 
 ----------------------------------------------------------------------------
 
-Update nih.
+nih -n -- answer no to all questions.
 
 ----------------------------------------------------------------------------
 
@@ -17,12 +16,6 @@ Keep MESSAGES in special file and tell user about it.
 
 nih deps should accept pkgbase or pkgname or pkgpaba but output what
 is requested
-
-----------------------------------------------------------------------------
-nih update _
-   The above problem is caused by the following
-      d: not_found jpeg>=9 <- graphics/py-imaging py27-imaging-1.1.7nb7
-   py27-imaging-1.1.7nb4 --> py27-imaging-1.1.7nb7
 
 ----------------------------------------------------------------------------
 nih search -- sort found packages alphabetically
@@ -41,7 +34,6 @@ to fix: "Checking packages from update plan for common files..."
 plan -1:
 - nih uninstall: do not require .nih/pkg_summary.txt (ano)
 - nih install -u mark as installed -a autoinstalled
-- fix for -L
 - multiple pkg_summary(5) (e.g. 5.0-indep)
 
 plan0:

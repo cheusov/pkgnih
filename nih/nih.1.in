@@ -43,6 +43,11 @@ Answer 'Yes' to all questions.
 Specify the path to pkg_summary(5) file for use instead of downloaded one
 or specified in a config file. Plain text, gzip-ed of bzip2-ed files
 are supported.
+.TP
+Config variables:
+.BR NIH_OPTS " -- options passed to"
+.B "nih"
+by default. The default value is "".
 .SH COMMANDS
 The following commands are provided.
 .TP
