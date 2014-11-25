@@ -868,6 +868,10 @@ accepts the following options:
 .B -h
 Display help message.
 .TP
+.B -n
+Do not actually alter installed packages, just report the steps that
+would be taken if it were.
+.TP
 .B -u/-U
 Mark/unmark packages as "installed by user".
 .TP
