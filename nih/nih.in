@@ -529,6 +529,7 @@ fi
 
 summary_exists (){
     # $1 -- summary file
+    # $2 -- option for "nih refresh"
     if ! test -s "$1"; then
 	cat 1>&2 <<EOF
 '$1' file doesn't exist or is empty.
