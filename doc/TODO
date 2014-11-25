@@ -32,7 +32,6 @@ to fix: "Checking packages from update plan for common files..."
   package was installed using full path.
 
 plan -1:
-- nih uninstall: do not require .nih/pkg_summary.txt (ano)
 - nih install -u mark as installed -a autoinstalled
 - multiple pkg_summary(5) (e.g. 5.0-indep)
 

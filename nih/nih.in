@@ -346,7 +346,7 @@ save_installed_packages (){
 }
 
 cat_bin_summary (){
-    summary_exists "$PKG_SUMMARY"
+    summary_exists "$PKG_SUMMARY" ''
     cat "$PKG_SUMMARY"
 }
 
@@ -356,7 +356,7 @@ cat_inst_summary (){
 }
 
 cat_src_summary (){
-    summary_exists "$PKG_SRC_SUMMARY"
+    summary_exists "$PKG_SRC_SUMMARY" ' -p'
     cat "$PKG_SRC_SUMMARY"
 }
 
@@ -529,10 +529,10 @@ fi
 
 summary_exists (){
     # $1 -- summary file
-    if ! test -r "$1"; then
+    if ! test -s "$1"; then
 	cat 1>&2 <<EOF
-'$1' file doesn't exist or is not readable.
-Perhaps you need to run 'nih refresh [-b|-p]'
+'$1' file doesn't exist or is empty.
+Perhaps you need to run 'nih refresh$2'
 EOF
 	exit 1
     fi
@@ -557,7 +557,7 @@ NF == 0 {
 }
 
 refresh_summary (){
-    summary_exists "$PKG_SUMMARY"
+    summary_exists "$PKG_SUMMARY" ''
 
     tiny_summary="$tmp_dir/tiny_summary"
     make_tiny_summary "$PKG_SUMMARY" > "$tiny_summary"
@@ -1067,6 +1067,8 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
     done
     shift `expr $OPTIND - 1`
 
+    touch "$PKG_SUMMARY"
+
     if test -n "$try_out"; then
 	tryout_pkgs="$tmp_dir/tryout"
 	refresh_inst_summary
@@ -1344,6 +1346,8 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 	search) set -- $NIH_SEARCH_OPTS "$@";;
     esac
 
+    nih_refresh_opt=''
+
     while getopts hboiIpsf139rql f; do
 	case "$f" in
 	    '?')
@@ -1357,6 +1361,7 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 		export PKG_DIGGER_BACKEND=pkg_digger_summary #pkg_digger_installed
 		export PKG_DIGGER_SUMMARY="$PKG_INST_SUMMARY";;
 	    p)
+		nih_refresh_opt=' -p'
 		export PKG_DIGGER_BACKEND=pkg_digger_summary
 		export PKG_DIGGER_SUMMARY="$PKG_SRC_SUMMARY";;
 	    l)
@@ -1378,7 +1383,7 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 	refresh_inst_summary
     fi
     if test "$PKG_DIGGER_BACKEND" = 'pkg_digger_summary'; then
-	summary_exists "$PKG_DIGGER_SUMMARY"
+	summary_exists "$PKG_DIGGER_SUMMARY" "$nih_refresh_opt"
     fi
 
     case "$op" in
