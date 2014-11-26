@@ -98,14 +98,19 @@ function get_largest_version(base,         i,best,curr){
 	return best
 }
 
-function get_matched_pkgpair(base, pattern,        i,curr){
+function get_matched_pkgpair(base, pattern,        i,j,curr,patterns,cnt){
 	if (! (base in avail_base_cnt))
 		return ""
 
+	print "pattern=" pattern
+	cnt = split(pattern, patterns, /[|]/)
 	for (i=1; i <= avail_base_cnt[base]; ++i){
 		curr = avail_base2pairs[base, i]
-		if (pattern_match(pkgname2version(curr), pattern))
-			return curr
+		print "curr=" curr
+		for (j=1; j <= cnt; ++j){
+			if (pattern_match(pkgname2version(curr), pkgname2version(patterns[j])))
+				return curr
+		}
 	}
 
 	return ""
@@ -578,7 +583,7 @@ function resolve (flags){
 			}else if (! (depbase in add_base)){
 				expl_line [depbase] = $0
 				expl_next [depbase] = pkgbase
-				addme [depbase] = pkgname2version($3)
+				addme [depbase] = $3
 			}else{
 				if (!bad_package)
 					print "Update plan cannot be built" > "/dev/stderr"
