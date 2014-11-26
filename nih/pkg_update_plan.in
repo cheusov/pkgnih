@@ -102,11 +102,12 @@ function get_matched_pkgpair(base, pattern,        i,j,curr,patterns,cnt){
 	if (! (base in avail_base_cnt))
 		return ""
 
-	print "pattern=" pattern
+#	print "base=" base > "/dev/stderr"
+#	print "pattern=" pattern  > "/dev/stderr"
 	cnt = split(pattern, patterns, /[|]/)
 	for (i=1; i <= avail_base_cnt[base]; ++i){
 		curr = avail_base2pairs[base, i]
-		print "curr=" curr
+#		print "curr=" curr  > "/dev/stderr"
 		for (j=1; j <= cnt; ++j){
 			if (pattern_match(pkgname2version(curr), pkgname2version(patterns[j])))
 				return curr
@@ -194,7 +195,7 @@ function process_pkg (pkg, try_out, hash_val, reqd,
 		if (pair == ""){
 			bad_package = base
 			print_eqs(0)
-			print "Package " base reqd " cannot be found" > "/dev/stderr"
+			print "Package " reqd " cannot be found" > "/dev/stderr"
 			ex = 1
 			return
 		}
