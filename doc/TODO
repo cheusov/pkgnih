@@ -1,4 +1,5 @@
 pkg_digger: remove -i option, add -s option for sorted output.
+PROVIDES/REQUIRES -- ignore this type of errors for specific packages.
 
 ----------------------------------------------------------------------------
 

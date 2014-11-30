@@ -1,4 +1,34 @@
 ======================================================================
+Version 0.13.0, by Aleksey Cheusov, Sun, 30 Nov 2014 03:55:27 +0300
+
+  NIH_<subcommand>_OPTS variables were introduced. With their help one
+  can configure EVERYTHING from config file.
+
+  NIH_OPTS config variable was also introduced.
+
+  nih mark:
+    - new option -n was added.
+
+  nih install:
+    - Option -D doesn't remove temporary directory.
+    - New options -v and -V were added.
+    - NO_REQPROV_CHECK and NO_REQPROV_CHECK config variables were
+      removed.  Use NIH_INSTALL_OPTS instead.
+
+  nih uninstall:
+    - does not need "nih refresh -b".
+      Thanks to Andrey N. Oktyabrski for the report!
+
+  Fixed:
+    - Finding a correct dependency now works correctly if dependency
+      is ambiguous.
+    - Unicity problem in "nih install PKGNAME" was fixed.
+    - Analysing file conflicts now works correctly with files
+      containing a space character.
+    - Fix in saving ~/.nih/installed_* files
+    - Check for version emptyness in "fake packages" was added.
+
+======================================================================
 Version 0.12.0, by Aleksey Cheusov, Tue, 14 Jan 2014 03:22:19 +0300
 
   Most important parts of pkg_grep_summary, a part of
