@@ -872,10 +872,12 @@ if test "_$1" = _install -o "_$1" = _update; then
 	debug_opt=-v
     fi
 
-    if ! $PKG_UPDATE_PLAN_CMD -iv $update_plan_opts $debug_opt \
+    if $PKG_UPDATE_PLAN_CMD -iv $update_plan_opts $debug_opt \
 	"$installed_summary" "$PKG_SUMMARY" \
 	> "$plan_summary" < "$update_pkgs_fn"
     then
+	:
+    else
 	ex=$?
 	cat "$plan_summary" 1>&2
 	exit $ex
