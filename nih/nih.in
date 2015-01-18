@@ -1004,7 +1004,11 @@ if test "_$1" = _install -o "_$1" = _update; then
 	    fi
 	elif test -n "$fn_pkg"; then
 	    verbose "Installing package $pkg..."
-	    if ! $PKG_ADD_CMD $pkg_opts -UD "$fn_pkg"; then
+	    if $PKG_ADD_CMD $pkg_opts -UD "$fn_pkg" &&
+	       $PKG_ADMIN_CMD unset automatic "$pkg"
+	    then
+		:
+	    else
 		cleanup_db; exit 1
 	    fi
 	fi
