@@ -259,7 +259,7 @@ For this to work you need pkgtools/pkg_online-client package.
 Search in installed packages.
 .TP
 .B -s
-Output avalable search strategies.
+Output available search strategies.
 .TP
 .B -f
 Output available search fields. Field names (e.g. PKGNAME, COMMENT, etc)
