@@ -92,6 +92,24 @@ Obtain
 .I packages
 from stdin.
 .TP
+.B "-t"
+Mark packages to be installed with "try out" marker.
+.TP
+.B "-l"
+Do not mark leaf packages installed as a dependency for removal.
+.TP
+.B "-p"
+Do not run REQUIRES/PROVIDES consistency check.
+.TP
+.B "-r"
+Mark dependencies for install/update.
+.TP
+.B "-R"
+Mark dependent packages for install/update.
+.TP
+.B "-B"
+Consider packages different if their BUILD_DATE differ.
+.TP
 .B "-w"
 If requested package is not found, write a warning message to stderr
 and continue to work.
