@@ -15,7 +15,7 @@
 .fi
 ..
 .\" ------------------------------------------------------------------
-.TH NIH 1 "Nov 24, 2014" "" ""
+.TH NIH 1 "Jan 18, 2015" "" ""
 .SH NAME
 nih \- package manager for pkgsrc
 .SH SYNOPSIS
@@ -462,6 +462,10 @@ Enable pkgdb validation before installation. This is the default.
 .TP
 .B -B
 Consider packages different if their BUILD_DATE differ.
+.TP
+.B -w
+If requested package is not found, write a warning message to stderr
+and continue the installation.
 .TP
 .B -r
 Update specified packages and all their dependencies.

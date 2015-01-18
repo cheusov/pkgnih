@@ -607,6 +607,8 @@ nih install [options] <packages>
 
       -d     download binaries only, do not update installed packages
       -k     continue downloading packages after errors are encountered
+      -w     if requested package is not found, write a warning message to stderr
+             and continue the installation.
 
       -D     For debugging purposes
 
@@ -725,7 +727,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     set -- $NIH_INSTALL_OPTS "$@"
 
-    while getopts a:BdDhklLnpPrRtvV f; do
+    while getopts a:BdDhklLnpPrRtvVw f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -740,6 +742,8 @@ if test "_$1" = _install -o "_$1" = _update; then
 		export force_download=1;;
 	    B)
 		update_plan_opts="$update_plan_opts -B";;
+	    w)
+		update_plan_opts="$update_plan_opts -w";;
 	    t)
 		update_plan_opts="$update_plan_opts -t";;
 	    l)
