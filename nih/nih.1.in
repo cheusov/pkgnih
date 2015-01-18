@@ -508,6 +508,12 @@ can be used respectively.
 .br
 .I pkg_admin set try_out=yes <packages>.
 .TP
+.BI -f " file"
+Take packages for update/install from the specified
+.IR file .
+Each line contains one package. Empty lines and lines
+started with # symbol are ignored.
+.TP
 .B -D
 Enable debugging output.
 .TP
@@ -568,6 +574,9 @@ Examples:
 
    # uninstall all emacs modules
    nih install emacs-- emacs/
+
+   # initial deployment
+   nih install -wf required_packages.txt
 .VE
 .P
 The output format can be changed with a help of shell functions

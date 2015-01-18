@@ -76,6 +76,12 @@ Commands:
 EOF
 }
 
+remove_comments (){
+    # remove empty lines and lines started with #; trim spaces
+    # "$@" --file
+    runawk -f trim.awk -e '!/^#/ && NF > 0 {print trim_lrc($0)}' "$@"
+}
+
 sysconfdir=${NIH_SYSCONFDIR-@sysconfdir@}/nih
 confdir=$HOME/.nih
 
@@ -610,6 +616,8 @@ nih install [options] <packages>
       -w     if requested package is not found, write a warning message to stderr
              and continue the installation.
 
+      -f <file>     take packages for update/install from the specified file
+
       -D     For debugging purposes
 
 Install, uninstall or update specified packages.
@@ -727,7 +735,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     set -- $NIH_INSTALL_OPTS "$@"
 
-    while getopts a:BdDhklLnpPrRtvVw f; do
+    while getopts a:BdDf:hklLnpPrRtvVw f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -761,11 +769,13 @@ if test "_$1" = _install -o "_$1" = _update; then
 	    D)
 		debug=1;;
 	    a)
-		pkg_add_local=$OPTARG;;
+		pkg_add_local="$OPTARG";;
 	    r)
 		update_plan_opts="$update_plan_opts -r";;
 	    R)
 		update_plan_opts="$update_plan_opts -R";;
+	    f)
+		packages_fn="$OPTARG";;
 	    *)
 		opts="${opts}$f";;
 	esac
@@ -819,7 +829,11 @@ if test "_$1" = _install -o "_$1" = _update; then
     update_pkgs_fn="$tmp_dir/pkgs_specs.txt"
     printf '' > "$update_pkgs_fn"
     if test $# -eq 0; then
-	echo _ > "$update_pkgs_fn"
+	if test -n "$packages_fn"; then
+	    remove_comments "$packages_fn" > "$update_pkgs_fn"
+	else
+	    echo _ > "$update_pkgs_fn"
+	fi
     else
 	for i; do
 	    if echo "$i" | grep '^/' > /dev/null; then
