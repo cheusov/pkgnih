@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2011-2014, Aleksey Cheusov <vle@gmx.net>
+# Copyright (c) 2011-2015, Aleksey Cheusov <vle@gmx.net>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -127,7 +127,7 @@ create_cachedir (){
 process_options (){
     alt_getopt \
 	h     'usage; exit 0' \
-	V     'echo nih-@VERSION@; exit 0' \
+	V     'verbose nih-@VERSION@; exit 0' \
 	y     'always_yes=-y' \
 	D     'debug=1' \
 	=s    'summary=' \
@@ -139,7 +139,7 @@ eval "$cmds"
 # temp directory
 on_exit () {
     if test -n "$debug"; then
-	echo "temporary directory: $tmp_dir" 1>&2
+	verbose "temporary directory: $tmp_dir" 1>&2
     else
 	rm -rf $tmp_dir
     fi
@@ -284,7 +284,7 @@ yesno (){
 	printf '%s (y/N)? ' "$2"
 	set +e # workaround for buggy DragonFlyBSD/FreeBSD /bin/sh
 	if test -n "$always_yes" || eval 'test -n "$yes_'"$1\""; then
-	    echo Yes
+	    verbose Yes
 	    set -e # workaround for buggy DragonFlyBSD/FreeBSD /bin/sh
 	    return 0
 	fi
@@ -1634,7 +1634,7 @@ if test "$1" = mark; then
 	    K)
 		mode_K=1;;
 	    n)
-		exec_prefix='echo Running command:';;
+		exec_prefix='verbose Running command:';;
 	    *)
 		opts="${opts}$f";;
 	esac
@@ -1837,7 +1837,7 @@ if test "$1" = clean-cache; then
 
     comm -13 "$installed" "$present" > "$del"
     if test -s "$del"; then
-	echo 'The following files will be deleted'
+	verbose 'The following files will be deleted'
 	indent "$del"
 	if test -n "$noop" || ! yesno remove_pkgs 'Proceed'; then
 	    exit 0
@@ -1845,7 +1845,7 @@ if test "$1" = clean-cache; then
 
 	xargs rm -f < "$del"
     else
-	echo 'No binaries to remove'
+	verbose 'No binaries to remove'
 	exit 0
     fi
 
@@ -1955,7 +1955,7 @@ if test "$1" = history; then
     shift `expr $OPTIND - 1`
 
     if test -n "$NO_INSTALLED_COPY"; then
-	echo "Warning: NO_INSTALLED_COPY is set in config file!"
+	verbose "Warning: NO_INSTALLED_COPY is set in config file!"
     fi
 
     refresh_inst_summary
