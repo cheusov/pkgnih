@@ -31,7 +31,7 @@ set -e
 export LC_ALL=C
 
 verbose (){
-    printf "%s\n" "$1"
+    printf "%s\n" "$1" 1>&2
 }
 
 errmsg (){
@@ -1570,7 +1570,7 @@ if test "$1" = list; then
     done
     shift `expr $OPTIND - 1`
 
-    $_cat_summary | eval $_grep_summary | $_summary4view
+    $_cat_summary | { eval $_grep_summary; } | $_summary4view
 
     exit 0
 fi
