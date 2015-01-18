@@ -993,7 +993,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 
 	fn_pkg=`summary2binary "$pkg1_fn"`
 
-	if grep automatic "$pkg1_fn" > /dev/null; then
+	if grep ^automatic= "$pkg1_fn" > /dev/null; then
 	    verbose "Installing package $pkg as a dependency..."
 	    if ! $PKG_ADD_CMD $pkg_opts -UDA "$fn_pkg"; then
 		cleanup_db; exit 1
