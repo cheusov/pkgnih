@@ -76,7 +76,7 @@ PSS_OPTIONS='-m'
 
 # Uncomment the following line if you keep binaries in non-standard
 # location
-#CACHEDIR=/usr/pkgsrc/packages
+CACHEDIR=@cachedir@
 
 # Uncomment the following line if you use .tbz packages
 #SUFX=.tbz

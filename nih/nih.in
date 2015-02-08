@@ -87,7 +87,6 @@ confdir=$HOME/.nih
 
 dfltconfdir=${NIH_DFLTCONFDIR-@dfltconfdir@}
 
-: ${CACHEDIR:=@cachedir@}
 : ${PKG_INFO_CMD:=@PKG_INFO_CMD@}
 : ${PKG_ADMIN_CMD:=@PKG_ADMIN_CMD@}
 : ${PKG_DELETE_CMD:=@PKG_DELETE_CMD@}
