@@ -4,8 +4,8 @@
 # which is loaded before @sysconfdir@/nih/config.
 
 # Comment in the following in order to enable IPv6 while downloading
-FTP_OPTIONS='-4'
-WGET_OPTIONS='-4'
+#FTP_OPTIONS='-4'
+#WGET_OPTIONS='-4'
 
 # If you don't like the default REPOSITORY,
 # comment out and modify the following line
