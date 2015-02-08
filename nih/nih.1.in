@@ -61,9 +61,9 @@ unpacked to ~/.nih/. The URL of the parent directory under which
 these files are located is specified by the REPOSITORY configuration variable.
 Unless
 .I NO_SUMMARY_COPY
-variable is set in the configuration file, the previous version of the files
-pkg_summary.txt and SHA512.txt is backed up into "pkg_summary_YYYYMMDD_hhmm.txt" and
-"SHA512_YYYYMMDD_hhmm.txt" respectively. So, they can be restored and used again
+variable is set in the configuration file, the previous version of
+pkg_summary.txt is backed up into "pkg_summary_YYYYMMDD_hhmm.txt".
+So, it can be restored and used again
 at any point in the future.
 If
 .I IGNORE_CKSUMS
@@ -1061,7 +1061,7 @@ See @dfltconfdir@/nih.default.conf for details.
 Directory where pkg_inst_summary.txt (summaries for installed
 packages), pkg_src_summary.txt (summaries for pkgsrc tree),
 pkg_summary.txt (downloaded summaries for binary packages),
-pkg_summary_YYYYMMDD_hhmm.txt, SHA512_YYYYMMDD_hhmm.txt, and
+pkg_summary_YYYYMMDD_hhmm.txt, and
 installed_YYYYMMDD_hhmm.txt files are stored.
 .SH NOTES
 .I Auto-installed package

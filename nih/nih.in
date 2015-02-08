@@ -454,17 +454,19 @@ refresh_bin_summary (){
 	exit 1
     fi
 
-    if ! fetch_sha512_file bz2 && ! fetch_sha512_file gz; then
-	errmsg 'SHA512 file cannot be downloaded.'
-	exit 1
+    if ! grep -l '^FILE_CKSUM=' pkg_summary.txt > /dev/null; then
+	if ! fetch_sha512_file bz2 && ! fetch_sha512_file gz; then
+	    errmsg 'SHA512 file cannot be downloaded.'
+	    exit 1
+	fi
+	pkg_cksum2summary -c SHA512.txt pkg_summary.txt > pkg_summary.txt.tmp
+	mv pkg_summary.txt.tmp pkg_summary.txt
+	rm -f SHA512.txt SHA512.bz2 SHA512.gz
     fi
 
     if test -z "$NO_SUMMARY_COPY"; then
 	date_sufx=`get_date`
 	cp pkg_summary.txt pkg_summary_${date_sufx}.txt
-	if test -z "$IGNORE_CKSUMS"; then
-	    cp SHA512.txt SHA512_${date_sufx}.txt
-	fi
     fi
 }
 
@@ -660,8 +662,14 @@ check_cksums (){
 	return
     fi
 
-    expected_sha512=`awk -v p="(All/$1)" '$2 == p {print $4}' $confdir/SHA512.txt`
     printf '    ckecksum... ' 1>&2
+    expected_sha512=`pkg_grep_summary -s FILE_NAME "$1" < "$confdir/pkg_summary.txt" |
+	sed -n 's,^FILE_CKSUM= *sha512  *,,p'`
+    if test -z "$expected_sha512"; then
+	verbose 'skipped'
+	return 0
+    fi
+
     curr_sha512=`digest sha512 "$1" | awk '{print $4}'`
     if test "$expected_sha512" = "$curr_sha512"; then
 	verbose 'ok'
