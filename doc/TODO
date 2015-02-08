@@ -1,5 +1,3 @@
-pkg_digger: remove -i option, add -s option for sorted output.
-
 ----------------------------------------------------------------------------
 
 pkg_digger: remove -i option, add -s option for sorted output.
