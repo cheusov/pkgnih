@@ -35,6 +35,7 @@ verbose (){
 }
 
 errmsg (){
+    # $1 -- error message
     printf "%s\n" "$1" 1>&2
 }
 
@@ -83,7 +84,7 @@ remove_comments (){
 }
 
 sysconfdir=${NIH_SYSCONFDIR-@sysconfdir@}/nih
-confdir=$HOME/.nih
+confdir="$HOME/.nih"
 
 dfltconfdir=${NIH_DFLTCONFDIR-@dfltconfdir@}
 
@@ -95,7 +96,7 @@ dfltconfdir=${NIH_DFLTCONFDIR-@dfltconfdir@}
 : ${PKG_DBDIR:=@PKG_DBDIR@}
 : ${SUFX:=.tgz}
 
-pkgdb=${PKG_DBDIR}/pkgdb.byfile.db
+pkgdb="${PKG_DBDIR}/pkgdb.byfile.db"
 if ! test -r "$pkgdb"; then
     errmsg "Cannot find pkgdb."
     exit 1
@@ -114,7 +115,7 @@ EOF
     exit 1
 fi
 
-. $dfltconfdir/nih.default.conf
+. "$dfltconfdir/nih.default.conf"
 . "$conffile"
 
 PKG_INST_SUMMARY="$confdir/pkg_inst_summary.txt"
@@ -144,9 +145,9 @@ eval "$cmds"
 # temp directory
 on_exit () {
     if test -n "$debug"; then
-	verbose "temporary directory: $tmp_dir" 1>&2
+	errmsg "temporary directory: $tmp_dir"
     else
-	rm -rf $tmp_dir
+	rm -rf "$tmp_dir"
     fi
 }
 . @libexecdir@/psu/sig_handler.sh
@@ -258,6 +259,7 @@ show_summary_NP (){
 }
 
 wrap (){ # fmt(1) is not portable accross different OSes
+    #$1 -- width
     w=$1
     shift
     awk -v w="$w" '
@@ -274,6 +276,7 @@ wrap (){ # fmt(1) is not portable accross different OSes
 }
 
 indent (){
+    # $@ -- files
     awk '{print "    " $0}' "$@"
 }
 
@@ -403,11 +406,12 @@ EOF
 
 fetch_summary_file (){
     # $1 - extension
-    verbose "Downloading pkg_summary.$1..."
+    verbose "Downloading pkg_summary.$1... "
     if test -f pkg_summary.$1; then
 	mv pkg_summary.$1 pkg_summary.$1.old
     fi
     if fetch "$REPOSITORY/All/pkg_summary.$1"; then
+	verbose done
 	case "$1" in
 	    gz)  gzip -dc  pkg_summary.gz  > pkg_summary.txt.tmp || return 1;;
 	    bz2) bzip2 -dc pkg_summary.bz2 > pkg_summary.txt.tmp || return 1;;
@@ -425,7 +429,7 @@ fetch_sha512_file (){
 	return 0;
     fi
 
-    verbose "Downloading SHA512.$1..."
+    verbose "Downloading SHA512.$1... "
     if test -f SHA512.$1; then
 	mv SHA512.$1 SHA512.$1.old
     fi
@@ -669,6 +673,7 @@ check_cksums (){
 }
 
 download_pkgs (){
+    # stdin -- list of packages to download
     (
 	ex=0
 	while read pkg; do
@@ -1991,7 +1996,7 @@ if test "$1" = history; then
 	    print substr($0, RSTART, 4) "-" substr($0, RSTART+4, 2) "-" substr($0, RSTART+6, 2) " " substr($0, RSTART+9, 2) ":" substr($0, RSTART+11, 2)}'`
 	verbose "$curr vs. $last"
 
-	if echo "$curr_fn" | grep [.]bz2 > /dev/null; then
+	if echo "$curr_fn" | grep '[.]bz2' > /dev/null; then
 	    if test "$last_fn" = "$unpacked2_fn"; then
 		tmp_fn="$unpacked1_fn"
 	    else
