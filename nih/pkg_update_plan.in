@@ -51,6 +51,8 @@
 #   -r        mark dependencies for install/update
 #   -R        mark dependent packages for install/update
 #   -B        consider packages different if their BUILD_DATE differ
+#   -w        if requested package is not found, write a warning message
+#             to stderr and continue to work.
 # <packages> may be either PKGBASEs, PKGNAMEs or PKGPATHs,
 # optionally appended by `-' (marked for removal),
 # `+' (auto-installed), or `_' (auto-installed flag is not changed).
@@ -115,6 +117,12 @@ function get_matched_pkgpair(base, pattern,        i,j,curr,patterns,cnt){
 	}
 
 	return ""
+}
+
+function pkg_not_found (pkg){
+	print "Package " pkg " cannot be found" > "/dev/stderr"
+	if (!ignore_notfound)
+		ex = 1
 }
 
 ############################################################
@@ -195,8 +203,7 @@ function process_pkg (pkg, try_out, hash_val, reqd,
 		if (pair == ""){
 			bad_package = base
 			print_eqs(0)
-			print "Package " reqd " cannot be found" > "/dev/stderr"
-			ex = 1
+			pkg_not_found(reqd)
 			return
 		}
 	}else if (base in avail_name2pair){
@@ -209,12 +216,13 @@ function process_pkg (pkg, try_out, hash_val, reqd,
 		bad_package = base
 		print_eqs(0)
 
-		if (base != rempair && sub(/;.*/, "", rempair))
+		if (base != rempair && sub(/;.*/, "", rempair)){
 			print "Update for " base "(" rempair ") cannot be found" > "/dev/stderr"
-		else
-			print "Package " base " cannot be found" > "/dev/stderr"
+			ex = 1
+		}else{
+			pkg_not_found(base)
+		}
 
-		ex = 1
 		return
 	}
 
@@ -401,6 +409,9 @@ function add_deps (summary_fn, dependent,             depsfn){
 
 BEGIN {
 	update_pkgpath_list = ""
+
+	ignore_notfound = getarg("w")
+
 	if (from_stdin){
 		while (xgetline0()){
 			process_pkg($1, try_out)
@@ -413,6 +424,8 @@ BEGIN {
 
 	for (d in fake_packages)
 		process_pkg(d "_")
+
+	ignore_notfound = 0
 
 	if (ex)
 		exitnow(ex)

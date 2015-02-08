@@ -15,7 +15,7 @@
 .fi
 ..
 .\" ------------------------------------------------------------------
-.TH NIH 1 "Nov 24, 2014" "" ""
+.TH NIH 1 "Jan 18, 2015" "" ""
 .SH NAME
 nih \- package manager for pkgsrc
 .SH SYNOPSIS
@@ -259,7 +259,7 @@ For this to work you need pkgtools/pkg_online-client package.
 Search in installed packages.
 .TP
 .B -s
-Output avalable search strategies.
+Output available search strategies.
 .TP
 .B -f
 Output available search fields. Field names (e.g. PKGNAME, COMMENT, etc)
@@ -463,6 +463,10 @@ Enable pkgdb validation before installation. This is the default.
 .B -B
 Consider packages different if their BUILD_DATE differ.
 .TP
+.B -w
+If requested package is not found, write a warning message to stderr
+and continue the installation.
+.TP
 .B -r
 Update specified packages and all their dependencies.
 .TP
@@ -503,6 +507,12 @@ can be used respectively.
 "try out" marker is set with a help of
 .br
 .I pkg_admin set try_out=yes <packages>.
+.TP
+.BI -f " file"
+Take packages for update/install from the specified
+.IR file .
+Each line contains one package. Empty lines and lines
+started with # symbol are ignored.
 .TP
 .B -D
 Enable debugging output.
@@ -564,6 +574,9 @@ Examples:
 
    # uninstall all emacs modules
    nih install emacs-- emacs/
+
+   # initial deployment
+   nih install -wf required_packages.txt
 .VE
 .P
 The output format can be changed with a help of shell functions

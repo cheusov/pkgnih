@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2011-2014, Aleksey Cheusov <vle@gmx.net>
+# Copyright (c) 2011-2015, Aleksey Cheusov <vle@gmx.net>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@ set -e
 export LC_ALL=C
 
 verbose (){
-    printf "%s\n" "$1"
+    printf "%s\n" "$1" 1>&2
 }
 
 errmsg (){
@@ -75,6 +75,12 @@ Commands:
  nih clean-cache     - Clean-up cache directory with binaries
  nih history         - Output a history of changes
 EOF
+}
+
+remove_comments (){
+    # remove empty lines and lines started with #; trim spaces
+    # "$@" --file
+    runawk -f trim.awk -e '!/^#/ && NF > 0 {print trim_lrc($0)}' "$@"
 }
 
 sysconfdir=${NIH_SYSCONFDIR-@sysconfdir@}/nih
@@ -128,7 +134,7 @@ create_cachedir (){
 process_options (){
     alt_getopt \
 	h     'usage; exit 0' \
-	V     'echo nih-@VERSION@; exit 0' \
+	V     'verbose nih-@VERSION@; exit 0' \
 	y     'always_yes=-y' \
 	D     'debug=1' \
 	=s    'summary=' \
@@ -287,7 +293,7 @@ yesno (){
 	printf '%s (y/N)? ' "$2"
 	set +e # workaround for buggy DragonFlyBSD/FreeBSD /bin/sh
 	if test -n "$always_yes" || eval 'test -n "$yes_'"$1\""; then
-	    echo Yes
+	    verbose Yes
 	    set -e # workaround for buggy DragonFlyBSD/FreeBSD /bin/sh
 	    return 0
 	fi
@@ -611,6 +617,10 @@ nih install [options] <packages>
 
       -d     download binaries only, do not update installed packages
       -k     continue downloading packages after errors are encountered
+      -w     if requested package is not found, write a warning message to stderr
+             and continue the installation.
+
+      -f <file>     take packages for update/install from the specified file
 
       -D     For debugging purposes
 
@@ -730,7 +740,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     set -- $NIH_INSTALL_OPTS "$@"
 
-    while getopts a:BdDhklLnpPrRtvV f; do
+    while getopts a:BdDf:hklLnpPrRtvVw f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -745,6 +755,8 @@ if test "_$1" = _install -o "_$1" = _update; then
 		export force_download=1;;
 	    B)
 		update_plan_opts="$update_plan_opts -B";;
+	    w)
+		update_plan_opts="$update_plan_opts -w";;
 	    t)
 		update_plan_opts="$update_plan_opts -t";;
 	    l)
@@ -762,11 +774,13 @@ if test "_$1" = _install -o "_$1" = _update; then
 	    D)
 		debug=1;;
 	    a)
-		pkg_add_local=$OPTARG;;
+		pkg_add_local="$OPTARG";;
 	    r)
 		update_plan_opts="$update_plan_opts -r";;
 	    R)
 		update_plan_opts="$update_plan_opts -R";;
+	    f)
+		packages_fn="$OPTARG";;
 	    *)
 		opts="${opts}$f";;
 	esac
@@ -820,7 +834,11 @@ if test "_$1" = _install -o "_$1" = _update; then
     update_pkgs_fn="$tmp_dir/pkgs_specs.txt"
     printf '' > "$update_pkgs_fn"
     if test $# -eq 0; then
-	echo _ > "$update_pkgs_fn"
+	if test -n "$packages_fn"; then
+	    remove_comments "$packages_fn" > "$update_pkgs_fn"
+	else
+	    echo _ > "$update_pkgs_fn"
+	fi
     else
 	for i; do
 	    if echo "$i" | grep '^/' > /dev/null; then
@@ -859,10 +877,12 @@ if test "_$1" = _install -o "_$1" = _update; then
 	debug_opt=-v
     fi
 
-    if ! $PKG_UPDATE_PLAN_CMD -iv $update_plan_opts $debug_opt \
+    if $PKG_UPDATE_PLAN_CMD -iv $update_plan_opts $debug_opt \
 	"$installed_summary" "$PKG_SUMMARY" \
 	> "$plan_summary" < "$update_pkgs_fn"
     then
+	:
+    else
 	ex=$?
 	cat "$plan_summary" 1>&2
 	exit $ex
@@ -998,14 +1018,18 @@ if test "_$1" = _install -o "_$1" = _update; then
 
 	fn_pkg=`summary2binary "$pkg1_fn"`
 
-	if grep automatic "$pkg1_fn" > /dev/null; then
+	if grep ^automatic= "$pkg1_fn" > /dev/null; then
 	    verbose "Installing package $pkg as a dependency..."
 	    if ! $PKG_ADD_CMD $pkg_opts -UDA "$fn_pkg"; then
 		cleanup_db; exit 1
 	    fi
 	elif test -n "$fn_pkg"; then
 	    verbose "Installing package $pkg..."
-	    if ! $PKG_ADD_CMD $pkg_opts -UD "$fn_pkg"; then
+	    if $PKG_ADD_CMD $pkg_opts -UD "$fn_pkg" &&
+	       $PKG_ADMIN_CMD unset automatic "$pkg"
+	    then
+		:
+	    else
 		cleanup_db; exit 1
 	    fi
 	fi
@@ -1571,7 +1595,7 @@ if test "$1" = list; then
     done
     shift `expr $OPTIND - 1`
 
-    $_cat_summary | eval $_grep_summary | $_summary4view
+    $_cat_summary | { eval $_grep_summary; } | $_summary4view
 
     exit 0
 fi
@@ -1635,7 +1659,7 @@ if test "$1" = mark; then
 	    K)
 		mode_K=1;;
 	    n)
-		exec_prefix='echo Running command:';;
+		exec_prefix='verbose Running command:';;
 	    *)
 		opts="${opts}$f";;
 	esac
@@ -1838,7 +1862,7 @@ if test "$1" = clean-cache; then
 
     comm -13 "$installed" "$present" > "$del"
     if test -s "$del"; then
-	echo 'The following files will be deleted'
+	verbose 'The following files will be deleted'
 	indent "$del"
 	if test -n "$noop" || ! yesno remove_pkgs 'Proceed'; then
 	    exit 0
@@ -1846,7 +1870,7 @@ if test "$1" = clean-cache; then
 
 	xargs rm -f < "$del"
     else
-	echo 'No binaries to remove'
+	verbose 'No binaries to remove'
 	exit 0
     fi
 
@@ -1956,7 +1980,7 @@ if test "$1" = history; then
     shift `expr $OPTIND - 1`
 
     if test -n "$NO_INSTALLED_COPY"; then
-	echo "Warning: NO_INSTALLED_COPY is set in config file!"
+	verbose "Warning: NO_INSTALLED_COPY is set in config file!"
     fi
 
     refresh_inst_summary
