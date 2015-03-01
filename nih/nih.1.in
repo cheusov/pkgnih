@@ -1050,6 +1050,224 @@ Config variables:
 .B "nih history"
 by default. The default value is "".
 .RE
+.SH CONFIG VARIABLES
+.TP
+.BR REPOSITORY
+A list of space separated repositories, for example,
+.br
+.I ftp://ftp.netbsd.org/pub/pkgsrc/packages/NetBSD/i386/6.1
+.br
+or
+.br
+.I "local_dir URL"
+.br
+If the
+speicified repositories contain the same PKGNAME multiple times, the
+first one will be used during installation. That is, from
+.I local_dir
+in example above. The default value for this variable depends on operating system.
+On NetBSD it defaults to
+.br
+.IR ftp://ftp.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver .
+.TP
+.BR CACHEDIR
+Binary packages are downloaded to the specified directory.
+The default is @cachedir@.
+.TP
+.B PKGSRCDIR
+Pkgsrc tree which is
+.I /usr/pkgsrc
+by default. This variable is used, for example, by
+.BR "nih refresh -p " and " nih search -p " commands.
+.TP
+.B PKGSRC_ADDSUBDIRS
+Additional pkgsrc directories for scanning, e.g.,
+.IR wip .
+See
+.BR "nih refresh -p" .
+.TP
+.BR FTP_OPTIONS
+Additional options passed to
+.BR ftp(1) .
+.TP
+.BR WGET_OPTIONS
+Additional options passed to
+.BR wget(1) .
+.TP
+.BR fetch_ftp
+Shell function used for downloading with a help of
+.B ftp(1)
+command.
+.TP
+.BR fetch_wget
+Shell function used for downloading with a help of
+.B wget(1)
+command.
+.TP
+.BR fetch
+Shell function used for downloading. It runs
+.B fetch_ftp
+by default.
+.TP
+.BR NO_SUMMARY_COPY
+If set to 1, ~/.nih/pkg_summary_YYYYMMDD_hhmm.txt files are not created.
+.TP
+.B NO_INSTALLED_COPY
+If set to 1, ~/.nih/installed_YYYYMMDD_hhmm.txt files are not created.
+.TP
+.B NO_PLIST_CHECK
+If set to 1, update plan is not checked for file conflicts before
+starting the installation.
+.TP
+.B PSS_SLAVES
+Used by
+.BR "nih refresh -p" .
+See
+.B pkg_src_summary(1)
+for details.
+.TP
+.B show_summary_N
+Shell function that takes a package summary on input and outputs a sorted list
+of PKGNAMEs wrapped to 70 columns.
+.TP
+.B show_summary_PNC
+Shell function that takes a package summary on input and outputs a sorted list
+of PKGPATH, PKGNAME and COMMENT separated by TAB character (one package per line).
+.TP
+.B show_summary_BC
+Shell function that takes a package summary on input and outputs a sorted list
+of PKGBASE and COMMENT (one package per line).
+.TP
+.B show_summary_NC
+Shell function that takes a package summary on input and outputs a sorted list
+of PKGNAME and COMMENT (one package per line).
+.TP
+.B show_summary_NP
+Shell function that takes a package summary on input and outputs a sorted list
+of PKGNAME and PKGPATH (one package per line).
+.TP
+.B summary2packages_to_be_installed
+Shell function which is called to output a list of packages to install.
+By default it calls
+.BR show_summary_N .
+.TP
+.B summary2packages_to_be_installed_as_dep
+Shell function which is called to output a list of packages to install
+and mark as a dependency. By default it calls
+.BR show_summary_N .
+.TP
+.B summary2packages_to_be_removed
+Shell function which is called to output a list of packages to remove.
+By default it calls
+.BR show_summary_N .
+.TP
+.B summary2meta_packages
+Shell function which is called to output a list of meta packages.
+By default it calls
+.BR show_summary_BC .
+.TP
+.B summary2available_packages
+Shell function which is called to output a list of available packages.
+By default it calls
+.BR show_summary_NC .
+.TP
+.B summary2installed_packages
+Shell function which is called to output a list of installed packages.
+By default it calls
+.BR show_summary_NC .
+.TP
+.B summary2leaf_packages
+Shell function which is called to output a list of leaf packages.
+By default it calls
+.BR show_summary_NC .
+.TP
+.B summary2markers
+Shell function which is called to output a list of packages and their special markers
+such as
+.IR try_out ", " automatic " and " keep .
+.TP
+.B summary2filelist
+Shell function which is called to output a list of packages and files they contain.
+.TP
+.B NIH_OPTS
+A list of options always applied to
+.B nih
+command.
+.TP
+.B NIH_REFRESH_OPTS
+A list of options always applied to
+.B "nih refresh"
+command.
+.TP
+.B NIH_UNINSTALL_OPTS
+A list of options always applied to
+.B "nih uninstall"
+command.
+.TP
+.B NIH_INSTALL_OPTS
+A list of options always applied to
+.B "nih install"
+command.
+.TP
+.B NIH_VERIFY_OPTS
+A list of options always applied to
+.B "nih verify"
+command.
+.TP
+.B NIH_STATUS_OPTS
+A list of options always applied to
+.B "nih status"
+command.
+.TP
+.B NIH_SEARCH_OPTS
+A list of options always applied to
+.B "nih search"
+command.
+.TP
+.B NIH_INFO_OPTS
+A list of options always applied to
+.B "nih info"
+command.
+.TP
+.B NIH_META_OPTS
+A list of options always applied to
+.B "nih meta"
+command.
+.TP
+.B NIH_LEAF_OPTS
+A list of options always applied to
+.B "nih leaf"
+command.
+.TP
+.B NIH_LIST_OPTS
+A list of options always applied to
+.B "nih list"
+command.
+.TP
+.B NIH_MARK_OPTS
+A list of options always applied to
+.B "nih MARK"
+command.
+.TP
+.B NIH_DEPS_OPTS
+A list of options always applied to
+.B "nih deps"
+command.
+.TP
+.B NIH_CLEAN_CACHE_OPTS
+A list of options always applied to
+.B "nih clean-cache"
+command.
+.TP
+.B NIH_AUDIT_OPTS
+A list of options always applied to
+.B "nih audit"
+command.
+.TP
+.B NIH_HISTORY_OPTS
+A list of options always applied to
+.B "nih HISTORY"
+command.
 .SH FILES
 .TP
 .IR "~/.nih/config" " or " @sysconfdir@/nih/config

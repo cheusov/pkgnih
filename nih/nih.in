@@ -255,7 +255,7 @@ show_summary_NP (){
     awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
          /^PKGPATH=/ {pkgpath=substr($0, 9)}
          NF == 0 {printf "%s (%s)  ", pkgname, pkgpath}
-	END {printf "\n"}' "$@" | wrap 70
+	END {printf "\n"}' "$@" | sort | wrap 70
 }
 
 wrap (){ # fmt(1) is not portable accross different OSes
