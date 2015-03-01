@@ -39,6 +39,13 @@ Display nih version.
 .B "-y"
 Answer 'Yes' to all questions.
 .TP
+.BI "-Y " "question id"
+Answer 'Yes' to
+.I "question id"
+questions. Available ids are:
+"install" for package installation and removal,
+"remove_pkgs" for package binaries removal.
+.TP
 .BI "-s" " summary_file"
 Specify the path to pkg_summary(5) file for use instead of downloaded one
 or specified in a config file. Plain text, gzip-ed of bzip2-ed files

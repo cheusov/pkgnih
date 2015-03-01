@@ -45,12 +45,13 @@ Usage:
   pkgnih [global options] command [command options] [--] [command args]
 
 Global options:
- nih -h              - Display help message
- nih -V              - Display nih version
- nih -y              - Answer 'Yes' to all questions
- nih -s <summary>    - pkg_summary(5) file
+ nih -h                 - Display help message
+ nih -V                 - Display nih version
+ nih -y                 - Answer 'Yes' to all questions
+ nih -Y <question_id>   - Answer 'Yes' to question_id question.
+ nih -s <summary>       - pkg_summary(5) file
 
- nih -D              - enable debugging
+ nih -D                 - enable debugging
 
 Commands:
  nih <command> -h    - Display help message for a <command>
@@ -129,12 +130,19 @@ create_cachedir (){
     mkdir -p "$CACHEDIR/All"
 }
 
+set_yes_var () {
+    # $1 -- yesno id
+    eval "yes_$1=1"
+    nih_opts="$nih_opts -Y$1"
+}
+
 # handling global options
 process_options (){
     alt_getopt \
 	h     'usage; exit 0' \
 	V     'verbose nih-@VERSION@; exit 0' \
-	y     'always_yes=-y' \
+	y     'set_yes_var install; set_yes_var remove_pkgs' \
+	=Y    'set_yes_var ' \
 	D     'debug=1' \
 	=s    'summary=' \
 	-- $NIH_OPTS "$@"
@@ -291,7 +299,7 @@ yesno (){
     while true; do
 	printf '%s (y/N)? ' "$2"
 	set +e # workaround for buggy DragonFlyBSD/FreeBSD /bin/sh
-	if test -n "$always_yes" || eval 'test -n "$yes_'"$1\""; then
+	if eval 'test -n "$yes_'"$1\""; then
 	    verbose Yes
 	    set -e # workaround for buggy DragonFlyBSD/FreeBSD /bin/sh
 	    return 0
@@ -1139,7 +1147,7 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
 	exit 1
     fi
 
-    $0 $always_yes install $pkg_delete_opts $plan
+    $0 $nih_opts install $pkg_delete_opts $plan
 
     exit 0
 fi
@@ -1526,7 +1534,7 @@ if test "$1" = leaf; then
 
     if test -n "$remove"; then
 	pkgnames=`sed -n 's/^PKGNAME=//p' "$leaves_fn"`
-	$0 $always_yes remove $pkg_delete_opts $pkgnames
+	$0 $nih_opts remove $pkg_delete_opts $pkgnames
     elif test -z "$raw"; then
 	summary2leaf_packages "$leaves_fn"
     else

@@ -99,14 +99,6 @@ CACHEDIR=@cachedir@
 # for details.
 #PSS_SLAVES=+2
 
-# Uncomment the folowing line if you want to always say Yes to question
-# about package installation
-#yes_install=1
-
-# Uncomment the folowing line if you want to always say Yes to question
-# about file removal from cache directory
-#yes_remove_pkgs=1
-
 # NIH provides a way to change a format of packages list by defining
 # the following shell function in @sysconfdir/nih/config file
 summary2packages_to_be_installed (){
