@@ -318,8 +318,7 @@ summary2binary (){
     /^PKGNAME=/ {pkg1 = substr($0, 9) SUFX}
     /^FILE_NAME=/ {pkg2 = substr($0, 11)}
     NF == 0 {
-	if (pkg2) print pkg2
-	else print pkg1
+	print pkg1, pkg2
 	pkg1 = pkg2 = ""
     }' "$@"
 }
@@ -405,14 +404,13 @@ EOF
 }
 
 fetch_summary_file (){
-    # $1 - extension
-    verbose "Downloading pkg_summary.$1... "
-    if test -f pkg_summary.$1; then
-	mv pkg_summary.$1 pkg_summary.$1.old
-    fi
-    if fetch "$REPOSITORY/All/pkg_summary.$1"; then
+    # $1 - repository
+    # $2 - extension
+    verbose "Downloading $1/All/pkg_summary.$2... "
+    rm -f pkg_summary.$2
+    if fetch "$1/All/pkg_summary.$2"; then
 	verbose done
-	case "$1" in
+	case "$2" in
 	    gz)  gzip -dc  pkg_summary.gz  > pkg_summary.txt.tmp || return 1;;
 	    bz2) bzip2 -dc pkg_summary.bz2 > pkg_summary.txt.tmp || return 1;;
 	    *)   errmsg 'Unknown ext'; exit 1;;
@@ -424,20 +422,19 @@ fetch_summary_file (){
 }
 
 fetch_sha512_file (){
-    # $1 - extension
+    # $1 - repository
+    # $2 - extension
     if test -n "$IGNORE_CKSUMS"; then
 	return 0;
     fi
 
-    verbose "Downloading SHA512.$1... "
-    if test -f SHA512.$1; then
-	mv SHA512.$1 SHA512.$1.old
-    fi
-    if fetch "$REPOSITORY/SHA512.$1"; then
+    verbose "Downloading $1/SHA512.$2... "
+    rm -f SHA512.$2
+    if fetch "$1/SHA512.$2"; then
 	verbose done
-	case "$1" in
-	    gz)   gzip  -dc SHA512.$1 > SHA512.txt.tmp || return 1;;
-	    bz2)  bzip2 -dc SHA512.$1 > SHA512.txt.tmp || return 1;;
+	case "$2" in
+	    gz)   gzip  -dc SHA512.$2 > SHA512.txt.tmp || return 1;;
+	    bz2)  bzip2 -dc SHA512.$2 > SHA512.txt.tmp || return 1;;
 	    *)    errmsg 'Unknown ext'; exit 1;;
 	esac
 	mv SHA512.txt.tmp SHA512.txt
@@ -447,22 +444,31 @@ fetch_sha512_file (){
 }
 
 refresh_bin_summary (){
-    cd "$confdir"
+    cd "$tmp_dir"
 
-    if ! fetch_summary_file bz2 && ! fetch_summary_file gz; then
-	errmsg 'pkg_summary(5) file cannot be downloaded.'
-	exit 1
-    fi
-
-    if ! grep -l '^FILE_CKSUM=' pkg_summary.txt > /dev/null; then
-	if ! fetch_sha512_file bz2 && ! fetch_sha512_file gz; then
-	    errmsg 'SHA512 file cannot be downloaded.'
+    rm -f new_summary.txt
+    for repo in $REPOSITORY; do
+	if ! fetch_summary_file "$repo" bz2 && ! fetch_summary_file "$repo" gz; then
+	    errmsg 'pkg_summary(5) file cannot be downloaded.'
 	    exit 1
 	fi
-	pkg_cksum2summary -c SHA512.txt pkg_summary.txt > pkg_summary.txt.tmp
-	mv pkg_summary.txt.tmp pkg_summary.txt
-	rm -f SHA512.txt SHA512.bz2 SHA512.gz
-    fi
+
+	if ! grep -l '^FILE_CKSUM=' pkg_summary.txt > /dev/null; then
+	    if ! fetch_sha512_file "$repo" bz2 && ! fetch_sha512_file "$repo" gz; then
+		errmsg 'SHA512 file cannot be downloaded.'
+		exit 1
+	    fi
+	    pkg_cksum2summary -c SHA512.txt pkg_summary.txt > pkg_summary.txt.tmp
+	    mv pkg_summary.txt.tmp pkg_summary.txt
+	    rm -f SHA512.txt SHA512.bz2 SHA512.gz
+	fi
+	sed 's,^\(FILE_NAME= *\)\(.*\),\1'"$repo"'/All/\2,' pkg_summary.txt >> new_summary.txt
+	rm pkg_summary.txt
+    done
+    cd "$confdir"
+    pkg_uniq_summary -Fpb "$tmp_dir"/new_summary.txt > pkg_summary.txt.tmp
+    mv pkg_summary.txt.tmp pkg_summary.txt
+    rm "$tmp_dir"/new_summary.txt
 
     if test -z "$NO_SUMMARY_COPY"; then
 	date_sufx=`get_date`
@@ -535,7 +541,7 @@ if test -z "$PKG_SUMMARY"; then
     if test -z "$IGNORE_CKSUMS"; then
 	cksums=1 # checksums will be checked according to SHA512.txt
     fi
-    PKG_SUMMARY=$confdir/pkg_summary.txt
+    PKG_SUMMARY="$confdir/pkg_summary.txt"
 fi
 
 summary_exists (){
@@ -681,15 +687,15 @@ check_cksums (){
 }
 
 download_pkgs (){
-    # stdin -- list of packages to download
+    # stdin -- list of (pkg url) packages to download
     (
 	ex=0
-	while read pkg; do
+	while read pkg url; do
 	    cd "$CACHEDIR/All"
 	    verbose "  $pkg"
 	    if ! test -f "$pkg" || ! check_cksums "$pkg"; then
 		printf '    downloading... '
-		if ! fetch "$REPOSITORY/All/$pkg"; then
+		if ! fetch "$URL"; then
 		    ex=1
 		    verbose 'failed'
 		    if test -z "$force_download"; then
@@ -816,16 +822,26 @@ if test "_$1" = _install -o "_$1" = _update; then
 	save_installed_packages
 	case "$pkg_add_local" in
 	    1)
-		export PKG_PATH=$CACHEDIR/All;;
+		pkg_paths="$CACHEDIR";;
 	    2)
-		export PKG_PATH=$REPOSITORY/All;;
+		pkg_paths="$REPOSITORY";;
 	    *)
 		errmsg 'Bad argument for -a option'
 		errmsg 'See nih install -h for details'
 		exit 1;;
 	esac
-	$PKG_ADD_CMD "$@"
-	exit 0
+	ex=0
+	for path in $pkg_paths; do
+	    verbose "Trying $PKG_PATH repository"
+	    export PKG_PATH="$path/All"
+	    if $PKG_ADD_CMD "$@"; then
+		break
+	    else
+		ex=$?
+	    fi
+	done
+	unset PKG_PATH || true
+	exit $ex
     fi
 
     # 
@@ -959,7 +975,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     ##################################################################
     ########################## installing ############################
     summary2binary "$inst_user_summary" "$inst_auto_summary" |
-    grep -v '^[/.]' |
+    awk '$2 !~ /^[\/.]/' |
     awk 'NR==1 {print "Downloading binary packages..." > "/dev/stderr"} {print}' |
     download_pkgs
 
@@ -1023,7 +1039,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 	cat "$inst_auto_summary" "$inst_user_summary" |
 	pkg_grep_summary -r -s PKGNAME "$pkg" > "$pkg1_fn"
 
-	fn_pkg=`summary2binary "$pkg1_fn"`
+	fn_pkg=`summary2binary "$pkg1_fn" | awk '{sub(/^[^\/.].*\//, "", $2); print $2}'`
 
 	if grep ^automatic= "$pkg1_fn" > /dev/null; then
 	    verbose "Installing package $pkg as a dependency..."
@@ -1862,7 +1878,7 @@ if test "$1" = clean-cache; then
 		find "$confdir" -name 'installed_*.txt' | xargs cat
 		find "$confdir" -name 'installed_*.bz2' | xargs bzip2 -dc
 	    fi
-	} | summary2binary | sort -u > "$installed"
+	} | summary2binary | awk '{print $1}' | sort -u > "$installed"
     fi
 
     ls -1 | grep "$SUFX"'$' | sort > "$present"

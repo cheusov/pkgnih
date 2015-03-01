@@ -47,7 +47,8 @@ fetch_cp (){
 
 # Command to download binaries, pkg_summary and SHA512
 fetch (){
-    if echo "$REPOSITORY" | grep -v ^/ > /dev/null; then
+    # $1 -- URL or file
+    if echo "$1" | grep -v ^/ > /dev/null; then
 	fetch_ftp "$@"
 #	fetch_lftp "$@"
 #	fetch_wget "$@"
