@@ -546,9 +546,6 @@ fi
 ######################################################################
 # ensure that pkg_summary.txt exists and refresh it
 if test -z "$PKG_SUMMARY"; then
-    if test -z "$IGNORE_CKSUMS"; then
-	cksums=1 # checksums will be checked according to SHA512.txt
-    fi
     PKG_SUMMARY="$confdir/pkg_summary.txt"
 fi
 
@@ -672,7 +669,7 @@ EOF
 
 check_cksums (){
     # $1 - foobar-1.2.3.tgz
-    if test -z "$cksums"; then
+    if test -n "$IGNORE_CKSUMS"; then
 	return
     fi
 

@@ -2,10 +2,6 @@
 
 ----------------------------------------------------------------------------
 
-multiple repositories: official binaries + local packages
-
-----------------------------------------------------------------------------
-
 nih verify -ZZZ show package which no longer is binary repository
 
 ----------------------------------------------------------------------------
@@ -15,8 +11,6 @@ PROVIDES/REQUIRES -- ignore this type of errors for specific packages.
 ----------------------------------------------------------------------------
 
 wrap function vs. format function
-
-remove cksum variable, IGNORE_CKSUMS is enough
 
 pkg_digger: remove -i option, add -s option for sorted output.
 
