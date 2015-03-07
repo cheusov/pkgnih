@@ -38,7 +38,9 @@ fetch_wget (){
 fetch_cp (){
     _base=`basename $1`
     rm -f "$_base"
-    cp "$1" .
+    if ! ln "$1" . 2>/dev/null; then
+	cp "$1" .
+    fi
 }
 
 # Command to download binaries, pkg_summary and SHA512
