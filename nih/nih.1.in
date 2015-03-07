@@ -1112,9 +1112,10 @@ Shell function used for downloading with a help of
 command.
 .TP
 .BR fetch
-Shell function used for downloading. It runs
-.B fetch_ftp
-by default.
+Shell function used for downloading. It can run either
+.BR fetch_ftp " or " fetch_wget "."
+The default is
+.BR fetch_ftp .
 .TP
 .BR NO_SUMMARY_COPY
 If set to 1, ~/.nih/pkg_summary_YYYYMMDD_hhmm.txt files are not created.

@@ -78,6 +78,21 @@ Commands:
 EOF
 }
 
+fetch_uni (){
+    # $1 -- URL or file
+    if test -n "${1##/*}"; then
+	_base=`basename $1`
+	rm -f "$_base"
+
+	fetch "$@"
+    elif test "${1%/*}" != `pwd`; then
+	_base=`basename $1`
+	rm -f "$_base"
+
+	fetch_cp "$@"
+    fi
+}
+
 remove_comments (){
     # remove empty lines and lines started with #; trim spaces
     # "$@" --file
@@ -421,7 +436,7 @@ fetch_summary_file (){
     # $2 - extension
     verbose "Downloading $1/All/pkg_summary.$2... "
     rm -f pkg_summary.$2
-    if fetch "$1/All/pkg_summary.$2"; then
+    if fetch_uni "$1/All/pkg_summary.$2"; then
 	verbose done
 	case "$2" in
 	    gz)  gzip -dc  pkg_summary.gz  > pkg_summary.txt.tmp || return 1;;
@@ -443,7 +458,7 @@ fetch_sha512_file (){
 
     verbose "Downloading $1/SHA512.$2... "
     rm -f SHA512.$2
-    if fetch "$1/SHA512.$2"; then
+    if fetch_uni "$1/SHA512.$2"; then
 	verbose done
 	case "$2" in
 	    gz)   gzip  -dc SHA512.$2 > SHA512.txt.tmp || return 1;;
@@ -705,7 +720,7 @@ download_pkgs (){
 	    verbose "  $pkg"
 	    if ! test -f "$pkg" || ! check_cksums "$pkg"; then
 		printf '    downloading... '
-		if ! fetch "$url"; then
+		if ! fetch_uni "$url"; then
 		    ex=1
 		    verbose 'failed'
 		    if test -z "$force_download"; then
