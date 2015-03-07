@@ -78,6 +78,22 @@ Commands:
 EOF
 }
 
+fetch_ftp (){
+    ${NIH_FTP_CMD-@FTP_CMD@} -o "$_base" -V -q1800 $FTP_OPTIONS "$1"
+}
+
+fetch_wget (){
+    ${NIH_WGET_CMD-@WGET_CMD@} -O "$_base" --timeout=1800 --progress=bar $WGET_OPTIONS "$1"
+}
+
+fetch_cp (){
+    _base=`basename $1`
+    rm -f "$_base"
+    if ! ln "$1" . 2>/dev/null; then
+	cp "$1" .
+    fi
+}
+
 fetch_uni (){
     # $1 -- URL or file
     if test -n "${1##/*}"; then
