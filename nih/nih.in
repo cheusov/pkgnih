@@ -703,7 +703,7 @@ download_pkgs (){
 	    verbose "  $pkg"
 	    if ! test -f "$pkg" || ! check_cksums "$pkg"; then
 		printf '    downloading... '
-		if ! fetch "$URL"; then
+		if ! fetch "$url"; then
 		    ex=1
 		    verbose 'failed'
 		    if test -z "$force_download"; then
