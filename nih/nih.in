@@ -331,6 +331,11 @@ summary2binary (){
     }' "$@"
 }
 
+summary2full_pkg_filename (){
+    summary2binary "$@" |
+    awk -v dir="$CACHEDIR/All" '$2 !~ /^\// {sub(/.*\//, dir "/", $2)} {print $2}'
+}
+
 # saves list of installed packages
 save_installed_packages (){
     if test -n "$NO_INSTALLED_COPY"; then
@@ -1002,7 +1007,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 	conflicts_fn="$tmp_dir/conflicts"
 
 	# packages to install
-	awk '{print $0 '"\"$SUFX\"}" "$inst_all_pkgs_fn" |
+	summary2full_pkg_filename "$inst_user_summary" "$inst_auto_summary" |
 	xargs pkg_bin_summary -e -f PKGNAME,PKGPATH,PLIST > "$toinst_plist_summary"
 
 	# inst packages
