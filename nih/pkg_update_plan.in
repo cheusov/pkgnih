@@ -87,6 +87,11 @@ BEGIN {
 	inst_deps_ok = 0
 }
 
+function indent (str, spaces){
+	gsub(/\n/, ("\n" spaces), str)
+	return (spaces str)
+}
+
 function get_largest_version(base,         i,best,curr){
 	if (! (base in avail_base_cnt))
 		return ""
@@ -541,6 +546,15 @@ function get_imghash (){
 	return length(hash_to_indices(rem_pkgs)) " " length(hash_to_indices(add_pkgs)) " " length(hash_to_indices(add_auto_pkgs))
 }
 
+function add_line_to_hash (hash, idx, value){
+	if (++hash [SUBSEP idx SUBSEP value] == 1){ # no repetitions
+		if (hash [idx] != "")
+			hash [idx] = hash [idx] "\n"
+
+		hash [idx] = hash [idx] value
+	}
+}
+
 function show_progress (){
 	if (verbose_mode){
 		printf "    R:%d U:%d A:%d\n", length(rem_pkgs), length(add_pkgs),
@@ -591,18 +605,18 @@ function resolve (flags){
 			depbase = pkgname2pkgbase(dep1)
 
 			if (! (pkgbase in add_base)){
-				expl_line [pkgbase] = $0
+				add_line_to_hash(expl_line, pkgbase, $0)
 				expl_next [pkgbase] = depbase
 				addme [pkgbase] = ""
 			}else if (! (depbase in add_base)){
-				expl_line [depbase] = $0
+				add_line_to_hash(expl_line, depbase, $0)
 				expl_next [depbase] = pkgbase
 				addme [depbase] = $3
 			}else{
 				if (!bad_package)
 					print "Update plan cannot be built" > "/dev/stderr"
-				expl_line [depbase] = $0
-				expl_line [pkgbase] = $0
+				add_line_to_hash(expl_line, depbase, $0)
+				add_line_to_hash(expl_line, pkgbase, $0)
 				bad_package = pkgbase
 				ex = ex2 = 1
 			}
@@ -611,15 +625,15 @@ function resolve (flags){
 			cnfbase = pkgname2pkgbase($5)
 
 			if ((pkgbase in add_base) && !(cnfbase in add_base)){
-				expl_line [cnfbase] = $0
+				add_line_to_hash(expl_line, cnfbase, $0)
 				expl_next [cfgbase] = pkgbase
 				if (! (cnfbase in addme))
 					addme [cnfbase] = ""
 			}else{
 				if (!bad_package)
 					print "Update plan cannot be built" > "/dev/stderr"
-				expl_line [cnfbase] = $0
-				expl_line [pkgbase] = $0
+				add_line_to_hash(expl_line, cnfbase, $0)
+				add_line_to_hash(expl_line, pkgbase, $0)
 				bad_package = pkgbase
 				ex = ex2 = 1
 			}
@@ -628,7 +642,7 @@ function resolve (flags){
 
 			if (!bad_package)
 				print "Update plan cannot be built" > "/dev/stderr"
-			expl_line [pkgbase] = $0
+			add_line_to_hash(expl_line, pkgbase, $0)
 			expl_next [pkgbase] = ""
 			bad_package = pkgbase
 			ex = ex2 = 1
@@ -636,7 +650,7 @@ function resolve (flags){
 			pkgbase = pkgname2pkgbase($5)
 
 			if (!(pkgbase in add_base)){
-				expl_line [pkgbase] = $0
+				add_line_to_hash(expl_line, pkgbase, $0)
 				expl_next [pkgbase] = pkgpana2pkgbase(inst_provides [$3])
 				if (! (pkgbase in addme))
 					addme [pkgbase] = ""
@@ -646,7 +660,7 @@ function resolve (flags){
 				# mark package as installed by user, otherwise it will be removed
 				# from update plan as an auto-installed leaf
 				pkg = avail_provides [$3]
-				expl_line [pkg] = $0
+				add_line_to_hash(expl_line, pkg, $0)
 				expl_next [pkg] = pkgpana2pkgbase(inst_provides [$3])
 				addme [pkg] = "1"
 			}else{
@@ -721,7 +735,7 @@ function show_trace (){
 		new_name = pair2name(add_base2pair(pkg))
 		if (!new_name)
 			new_name = "?"
-		msg = ("   " expl_line [pkg] "\n" msg)
+		msg = (indent(expl_line [pkg], "   ") "\n" msg)
 		msg = (old_name " --> " new_name "\n" msg)
 		pkg = expl_next [pkg]
 	}
