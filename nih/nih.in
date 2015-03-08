@@ -995,7 +995,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 	awk '{print $0 '"\"$SUFX\"}" "$inst_all_pkgs_fn" |
 	xargs pkg_bin_summary -e -f PKGNAME,PKGPATH,PLIST > "$toinst_plist_summary"
 
-	# inst packages
+	# installed packages
 	pkg_grep_summary -f PKGNAME,PKGPATH,PLIST -v \
 	    -t strfile PKGNAME "$rem_pkgs" < "$installed_summary" |
 	sed 's/^PKGPATH=/PKGPATH=nih-installed-/' > "$inst_plist_summary"
@@ -1006,7 +1006,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 	repl_fake_fn="$tmp_dir/repl_fake"
 	@libexecdir@/nih/analyse_conflicts "$conflicts_fn" > "$repl_fake_fn"
 	while read p; do
-	    ver=`pkg_grep_summary -f PKGNAME -s PKGBASE "$p" < "$toinst_plist_summary" | sed -n 's/^PKGNAME=.*-//p'`
+	    ver=`pkg_grep_summary -f PKGNAME -s PKGBASE "$p" < "$inst_plist_summary" | sed -n 's/^PKGNAME=.*-//p'`
 	    verbose "Replacing $p with fake package $p-$ver..."
 	    test -n "$ver"
 	    save_installed_packages
