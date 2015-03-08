@@ -217,46 +217,6 @@ fi
 ######################################################################
 ######################################################################
 # functions
-format (){
-    # $1 - indentation (a number of spaces)
-    # $2 - max line size
-    spcs="$1"
-    shift
-    maxsz="$1"
-    shift
-
-    runawk -v spcs="$spcs" -v maxsz="$maxsz" -e '
-BEGIN {
-   pad = ""
-   for (i=1; i < spcs; ++i){ # spcs-1 spaces
-      pad = pad " "
-   }
-   nl=1
-}
-
-{
-   for (i=1; i <= NF; ++i){
-      if (nl){
-         printf "%s", pad
-         nl = 0
-         rest = maxsz
-      }
-      printf " %s", $i
-      rest = rest - length($i) - 1
-      if (rest < 0){
-         nl = 1
-         printf "\n"
-      }
-   }
-}
-
-END {
-   if (!nl)
-      printf "\n"
-}
-' "$@"
-}
-
 show_summary_PNC (){
     # PKGPATH <tab> (PKGNAME) <tab> COMMENT <nl>
     awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
