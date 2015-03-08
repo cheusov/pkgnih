@@ -10,8 +10,6 @@ PROVIDES/REQUIRES -- ignore this type of errors for specific packages.
 
 ----------------------------------------------------------------------------
 
-wrap function vs. format function
-
 pkg_digger: remove -i option, add -s option for sorted output.
 
 ----------------------------------------------------------------------------
@@ -36,10 +34,6 @@ nih status -- pkgin-like output
 
 nih verify -s vs. 6.0_STABLE/6.0_RELEASE
 nih install -N - do not alter auto-installed flag
-
-to fix: "Checking packages from update plan for common files..."
-  tries to find packages in current directory even if
-  package was installed using full path.
 
 plan -1:
 - nih install -u mark as installed -a autoinstalled
@@ -67,7 +61,6 @@ plan2:
   using different mirrors (for those who have very fast internet connection).
 - nih status: -S   -- analyse symbols?
 - nih clean-cache:    use FILE_NAME
-- autoverifying pkgdb after installation
 - separate pkg_install_plan script from nih
 - {sha512,pkg_summary} -> {sha512,pkg_summary}_YYYYMMDD only if they differ
 - pkg_refresh_summary needs to be speeded-up
