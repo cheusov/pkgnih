@@ -665,7 +665,7 @@ check_cksums (){
     fi
 
     printf '    ckecksum... ' 1>&2
-    expected_sha512=`pkg_grep_summary -s FILE_NAME "$1" < "$confdir/pkg_summary.txt" |
+    expected_sha512=`pkg_grep_summary -t suffix FILE_NAME "/$1" < "$confdir/pkg_summary.txt" |
 	sed -n 's,^FILE_CKSUM= *sha512  *,,p'`
     if test -z "$expected_sha512"; then
 	verbose 'skipped'
@@ -986,7 +986,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     # common files
     if test -z "$NO_PLIST_CHECK" -a -s "$inst_all_pkgs_fn"; then
 	verbose "Analysing PLIST..."
-	plist_summary="$tmp_dir/plist_summary"
+#	plist_summary="$tmp_dir/plist_summary"
 	toinst_plist_summary="$tmp_dir/toinst_plist_summary"
 	inst_plist_summary="$tmp_dir/inst_plist_summary"
 	conflicts_fn="$tmp_dir/conflicts"
@@ -1000,11 +1000,18 @@ if test "_$1" = _install -o "_$1" = _update; then
 	    -t strfile PKGNAME "$rem_pkgs" < "$installed_summary" |
 	sed 's/^PKGPATH=/PKGPATH=nih-installed-/' > "$inst_plist_summary"
 
+	# 
+	pkg_uniq_summary -Fb "$toinst_plist_summary" "$inst_plist_summary" |
+	pkg_lint_summary -f
+
+	#
 	pkg_lint_summary -f "$toinst_plist_summary" \
 	    "$inst_plist_summary" > "$conflicts_fn" || true
 
 	repl_fake_fn="$tmp_dir/repl_fake"
-	@libexecdir@/nih/analyse_conflicts "$conflicts_fn" > "$repl_fake_fn"
+	@libexecdir@/nih/analyse_conflicts "$conflicts_fn" |
+	sort -u > "$repl_fake_fn"
+
 	while read p; do
 	    ver=`pkg_grep_summary -f PKGNAME -s PKGBASE "$p" < "$inst_plist_summary" | sed -n 's/^PKGNAME=.*-//p'`
 	    verbose "Replacing $p with fake package $p-$ver..."
