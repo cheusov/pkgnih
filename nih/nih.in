@@ -490,7 +490,8 @@ refresh_inst_summary (){
     else
 	verbose 'Updating pkg_inst_summary...'
 	pkg_bin_summary -a PLIST,automatic,try_out,keep,COMMENT \
-	    > "$PKG_INST_SUMMARY"
+	    > "$PKG_INST_SUMMARY".tmp
+	mv "$PKG_INST_SUMMARY".tmp "$PKG_INST_SUMMARY"
     fi
 }
 
