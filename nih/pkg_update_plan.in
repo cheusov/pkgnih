@@ -92,12 +92,18 @@ function indent (str, spaces){
 	return (spaces str)
 }
 
-function get_largest_version(base,         i,best,curr){
+function get_largest_version(base, pkgpath,
+        i,best,curr)\
+{
 	if (! (base in avail_base_cnt))
 		return ""
 
 	for (i=1; i <= avail_base_cnt[base]; ++i){
 		curr = avail_base2pairs[base, i]
+
+		if (pkgpath != "" && pkgpana2pkgpath(curr) != pkgpath)
+			continue
+
 		if (!best || pkgname_gt_pkgname(curr, best))
 			best = curr
 	}
@@ -200,10 +206,21 @@ function process_pkg (pkg, try_out, hash_val, reqd,
 	}
 
 	if ((base SUBSEP 1) in avail_base2pairs){
-		if (reqd == "")
-			pair = get_largest_version(base)
-		else
+		if (reqd == ""){
+			if (rempair == "")
+				pair = get_largest_version(base)
+			else if (! (rempair in inst_pairs))
+				pair = get_largest_version(base)
+			else if ((rempair in rem_pkgs) && \
+					 ! (pkgpana2pkgbase(rempair) in add_base))
+			{
+				pair = get_largest_version(base)
+			}else{
+				pair = get_largest_version(base, pkgpana2pkgpath(rempair))
+			}
+		}else{
 			pair = get_matched_pkgpair(base, reqd)
+		}
 
 		if (pair == ""){
 			bad_package = base
@@ -321,6 +338,7 @@ BEGIN {
 			if (fake)
 				fake_packages [pkgbase] = 0
 
+			inst_pairs     [pkgpair] = 1
 			inst_name2pair [pkgname] = pkgpair
 			inst_base2pair [pkgbase] = pkgpair
 			inst_path2pair [pkgpath] = pkgpair
