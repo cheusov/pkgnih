@@ -799,7 +799,7 @@ if test "_$1" = _install -o "_$1" = _update; then
     # -V
     if test -n "$verify_pkgdb"; then
 	verbose 'Verifying pkgdb'
-	pkg_status -k -lLdc | awk '{print "  ", $0}'
+	pkg_status -k -lLdc | awk '/^.:/ {$0 = "   " $0} {print "  ", $0}'
     fi
 
     # -p
