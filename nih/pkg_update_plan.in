@@ -220,13 +220,13 @@ function process_pkg (pkg, try_out, hash_val, reqd,
 			}
 		}else{
 			pair = get_matched_pkgpair(base, reqd)
-		}
 
-		if (pair == ""){
-			bad_package = base
-			print_eqs(0)
-			pkg_not_found(reqd)
-			return
+			if (pair == ""){
+				bad_package = base
+				print_eqs(0)
+				pkg_not_found(reqd)
+				return
+			}
 		}
 	}else if (base in avail_name2pair){
 		pair = avail_name2pair [base]
