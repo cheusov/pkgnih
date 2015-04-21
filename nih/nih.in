@@ -1137,11 +1137,6 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
 	plan="$plan $i--"
     done
 
-    if test -z "$plan"; then
-	verbose 'No packages to be removed.'
-	exit 1
-    fi
-
     $0 $nih_opts install $pkg_delete_opts $plan
 
     exit 0
