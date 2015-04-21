@@ -622,14 +622,14 @@ function resolve (flags){
 			pkgbase = pkgname2pkgbase($6)
 			depbase = pkgname2pkgbase(dep1)
 
-			if (! (pkgbase in add_base)){
-				add_line_to_hash(expl_line, pkgbase, $0)
-				expl_next [pkgbase] = depbase
-				addme [pkgbase] = ""
-			}else if (! (depbase in add_base)){
+			if (! (depbase in add_base)){
 				add_line_to_hash(expl_line, depbase, $0)
 				expl_next [depbase] = pkgbase
 				addme [depbase] = $3
+			}else if (! (pkgbase in add_base)){
+				add_line_to_hash(expl_line, pkgbase, $0)
+				expl_next [pkgbase] = depbase
+				addme [pkgbase] = ""
 			}else{
 				if (!bad_package)
 					print "Update plan cannot be built" > "/dev/stderr"
