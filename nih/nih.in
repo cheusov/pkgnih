@@ -1977,9 +1977,9 @@ nih history [options] [pkgs...]
       using saved ~/.nih/installed_*.txt files.
 
    options:
-      -h    display this help message
-      -B    consider packages different if their BUILD_DATE differ
-
+      -h           display this help message
+      -B           consider packages different if their BUILD_DATE differ
+      -p <pager>   output history to the specified "more"-like pager program
 Examples:
    nih history -h
    nih history
@@ -1992,7 +1992,8 @@ if test "$1" = history; then
 
     set -- $NIH_HISTORY_OPTS "$@"
 
-    while getopts hB f; do
+    nih_pager='cat'
+    while getopts Bhp: f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -2001,6 +2002,8 @@ if test "$1" = history; then
 		exit 0;;
 	    B)
 		cmp_summary_opts=-b;;
+	    p)
+		nih_pager="$OPTARG";;
 	esac
     done
     shift `expr $OPTIND - 1`
@@ -2021,7 +2024,7 @@ if test "$1" = history; then
     while read curr_fn; do
 	curr=`echo $curr_fn | awk 'match($0, /[0-9].*[0-9]/) {
 	    print substr($0, RSTART, 4) "-" substr($0, RSTART+4, 2) "-" substr($0, RSTART+6, 2) " " substr($0, RSTART+9, 2) ":" substr($0, RSTART+11, 2)}'`
-	verbose "$curr vs. $last"
+	verbose "$curr vs. $last" 2>&1
 
 	if echo "$curr_fn" | grep '[.]bz2' > /dev/null; then
 	    if test "$last_fn" = "$unpacked2_fn"; then
@@ -2039,7 +2042,8 @@ if test "$1" = history; then
 
 	last="$curr"
 	last_fn="$curr_fn"
-    done
+    done |
+    eval "$nih_pager"
 
     exit 0
 fi

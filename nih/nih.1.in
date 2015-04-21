@@ -1052,6 +1052,10 @@ Display help message.
 .B -B
 Consider packages different if their BUILD_DATE differ.
 .TP
+.BI -p " pager"
+Output history to the specified more-like
+.IR pager .
+.TP
 Config variables:
 .BR NIH_HISTORY_OPTS " -- options passed to"
 .B "nih history"
