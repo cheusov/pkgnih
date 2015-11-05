@@ -1,4 +1,57 @@
 ======================================================================
+Version 0.14.0, by Aleksey Cheusov, Thu,  5 Nov 2015 23:45:38 +0300
+
+  All messages shown to user are sent to stderr
+
+  nih:
+    - CACHEDIR is initialized in nih.default.conf (thanks to wiz@).
+    - IPv4-only for download is not the default anymore (thanks to gdt@).
+    - Binary package checksums are kept in pkg_summary.txt.
+    - Preliminary support for multiple repositories.
+    - Clean-ups for function "fetch".
+      It just runs either fetch_wget or fetch_ftp and does nothing else.
+    - Atomic update for pkg_inst_summary.txt was implemented
+      (thanks to wiz@ for pointing out!).
+
+  nih history:
+    - Option -p was introduced.
+
+  nih list:
+    - Fix: bug in -f (unexpected line: `Updating pkg_inst_summary...`).
+
+  nih remove:
+    - "nih remove" without arguments uninstalls leaf packages.
+      This is correct according to the documentation.
+      "nih install" works the same way (thanks to wiz@ for the report).
+
+  nih install:
+    - Missing dependencies are fixed in a different way.
+      When nih finds the missing dependency it tries to install
+      the dependency and then update the installed package.
+      This is more correct way to fix consequences of 'pkg_delete -f'.
+    - Fix: the rule "do not change PKGPATHs of installed packages"
+      was broken in 0.13.0 (thanks to wiz@ for the report!).
+    - Fix: packages are no longer installed as a dependency by mistake.
+    - Fix: flag "automatic" is unset correctly
+      ("pkg_add -UD" does not change it).
+    - Fix: "fake" package creation.
+    - New option -w was added for ignoring non-existing package.
+    - New option -f was added for getting package list from a file.
+    - If "package could not be found", nih exits with non-zero status.
+    - Configuration variables yes_install and yes_remove_pkgs were removed.
+      New option -Y was added as a replacement (See NIH_OPTS for details).
+    - Unnecessary variable "cksums" was removed.
+    - Better explanation for update plan build failures.
+
+  pkg_update_plan:
+    - New option -w was added for the same purpose as in "nih install".
+    - Man page was updated.
+
+  nih.1:
+    - A number of typos were fixed (thanks to wiz@).
+    - All configuration variables were documented.
+
+======================================================================
 Version 0.13.0, by Aleksey Cheusov, Sun, 30 Nov 2014 03:55:27 +0300
 
   NIH_<subcommand>_OPTS variables were introduced. With their help one
