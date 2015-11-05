@@ -1,3 +1,7 @@
+nih install -ZZZ -- do not run checksums after succsessful fownloads
+
+----------------------------------------------------------------------------
+
 "nih verify" should check for something by default (gdt@)
 
 ----------------------------------------------------------------------------
