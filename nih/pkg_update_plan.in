@@ -276,10 +276,10 @@ function process_pkg (pkg, try_out, hash_val, reqd,
 		rem_pkgs [rempair] = 0
 		for (p in add_auto_pkgs)
 			if (pkgpana2pkgbase(p) == base)
-				delete add_auto_pkgs
+				delete add_auto_pkgs[p]
 		for (p in add_pkgs)
 			if (pkgpana2pkgbase(p) == base)
-				delete add_pkgs
+				delete add_pkgs[p]
 		delete add_base [base]
 	}else if (suff == "+"){
 		if (! (pair in add_pkgs)){
