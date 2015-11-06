@@ -1,3 +1,11 @@
+nih install fails is autoinstalled dependency has been moved to
+another PKGPATH. This kind of problems can easily be solved automatically
+without "nih install _ dep- newpkgpath/dep".
+
+In above situation "nih install _ dep-" should work but does not.
+
+----------------------------------------------------------------------------
+
 nih install -ZZZ -- do not run checksums after succsessful fownloads
 
 ----------------------------------------------------------------------------
