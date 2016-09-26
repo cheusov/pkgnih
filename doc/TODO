@@ -6,11 +6,7 @@ In above situation "nih install _ dep-" should work but does not.
 
 ----------------------------------------------------------------------------
 
-"nih verify" should check for something by default (gdt@)
-
-----------------------------------------------------------------------------
-
-nih verify -ZZZ show package which no longer is binary repository
+nih verify -ZZZ show package which no longer in binary repository
 
 ----------------------------------------------------------------------------
 

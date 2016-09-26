@@ -695,6 +695,10 @@ Check if dependencies are present and their versions match.
 Compare "uname -r" output
 and the version of the OS on which the packages were built.
 .TP
+If neither of the above options were specified, options
+.BR -l " and " -d
+are applied.
+.TP
 Config variables:
 .BR NIH_VERIFY_OPTS " -- options passed to"
 .B "nih verify"

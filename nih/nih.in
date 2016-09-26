@@ -1203,8 +1203,7 @@ if test "$1" = verify; then
     shift `expr $OPTIND - 1`
 
     if test k = "$opts"; then
-	usage_verify
-	exit 1
+	opts="kdU"
     fi
 
     pkg_status "-$opts" "$@"
