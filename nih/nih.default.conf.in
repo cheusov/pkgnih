@@ -66,10 +66,6 @@ CACHEDIR=@cachedir@
 # installed packages in ~/.nih/installed_YYYYMMDD_hhmm.txt
 #NO_INSTALLED_COPY=1
 
-# Uncomment the following line if you don't want to check packages
-# from update plan for common files.
-#NO_PLIST_CHECK=1
-
 # If your machine is multi-CPU, it makes sense to uncomment the following
 # line in order to make some operations faster. See pkg_src_summary(1)
 # for details.
@@ -128,7 +124,7 @@ summary2filelist (){
 NIH_OPTS=''
 NIH_REFRESH_OPTS=''
 NIH_UNINSTALL_OPTS=''
-NIH_INSTALL_OPTS='-LPC'
+NIH_INSTALL_OPTS='-LPCE'
 NIH_VERIFY_OPTS=''
 NIH_STATUS_OPTS=''
 NIH_SEARCH_OPTS=''

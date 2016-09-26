@@ -409,16 +409,14 @@ variable is set in the config file. The same applies to
 .IR uninstall " and " leaf
 commands.
 
-Once the binaries have been downloaded, the packages to be installed
+Once binaries have been downloaded, the packages to be installed
 are checked for common files in order to prevent file name clashes and
 the consequent
 failures in the middle of the process. This is in addition to analysing
 the CONFLICTS variable set for this purpose.
-Setting
-.I NO_PLIST_CHECK
-variable to a non-empty string disables
-the additional checking procedure,
-the CONFLICTS variable is still examined.
+Applying option
+.B -e
+disables this check, the packages' CONFLICTS variable is still examined.
 .P
 .RS
 .B "nih install" 
@@ -477,6 +475,18 @@ is applied, the second check is skipped.
 .B -C
 Run the second cksum check. This is the default. See
 .B -c
+for more information.
+.TP
+.B -e
+By default packages to install are
+checked for common files in order to avod conflicts at
+the time of installation. If flag
+.B -e
+is applied, this check is disabled.
+.TP
+.B -E
+Enable checking packages to install for common files. This is the default. See
+.B -e
 for more information.
 .TP
 .B -B
@@ -539,7 +549,7 @@ Enable debugging output.
 Config variables:
 .BR NIH_INSTALL_OPTS " -- options passed to"
 .B "nih install"
-by default. The default value is "-LPC".
+by default. The default value is "-LPCE".
 .RE
 .P
 .RS
@@ -1138,10 +1148,6 @@ If set to 1, ~/.nih/pkg_summary_YYYYMMDD_hhmm.txt files are not created.
 .TP
 .B NO_INSTALLED_COPY
 If set to 1, ~/.nih/installed_YYYYMMDD_hhmm.txt files are not created.
-.TP
-.B NO_PLIST_CHECK
-If set to 1, update plan is not checked for file conflicts before
-starting the installation.
 .TP
 .B PSS_SLAVES
 Used by

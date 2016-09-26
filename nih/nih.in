@@ -750,7 +750,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     set -- $NIH_INSTALL_OPTS "$@"
 
-    while getopts a:BcCdDf:hklLnpPrRtvVw f; do
+    while getopts a:BcCdDeEf:hklLnpPrRtvVw f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -781,6 +781,10 @@ if test "_$1" = _install -o "_$1" = _update; then
 		unset reqprov_check || true;;
 	    P)
 		reqprov_check=1;;
+	    e)
+		unset plist_check || true;;
+	    E)
+		plist_check=1;;
 	    v)
 		unset verify_pkgdb || true;;
 	    V)
@@ -989,7 +993,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     # Ensure that packages that will be be installed do not have
     # common files
-    if test -z "$NO_PLIST_CHECK" -a -s "$inst_all_pkgs_fn"; then
+    if test -n "$plist_check" -a -s "$inst_all_pkgs_fn"; then
 	verbose "Analysing PLIST..."
 #	plist_summary="$tmp_dir/plist_summary"
 	toinst_plist_summary="$tmp_dir/toinst_plist_summary"
