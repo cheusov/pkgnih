@@ -702,7 +702,7 @@ download_pkgs (){
 		fi
 		verbose 'ok'
 
-		if ! check_cksums "$pkg"; then
+		if test -n "$check_second_cksum" && ! check_cksums "$pkg"; then
 		    ex=1
 		    verbose 'Try to update pkg_summary(5) file (nih refresh)'
 		    if test -z "$force_download"; then
@@ -750,7 +750,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 
     set -- $NIH_INSTALL_OPTS "$@"
 
-    while getopts a:BdDf:hklLnpPrRtvVw f; do
+    while getopts a:BcCdDf:hklLnpPrRtvVw f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -765,6 +765,10 @@ if test "_$1" = _install -o "_$1" = _update; then
 		export force_download=1;;
 	    B)
 		update_plan_opts="$update_plan_opts -B";;
+	    c)
+		unset check_second_cksum || true;;
+	    C)
+		check_second_cksum=1;;
 	    w)
 		update_plan_opts="$update_plan_opts -w";;
 	    t)

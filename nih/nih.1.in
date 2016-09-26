@@ -467,6 +467,18 @@ Disable pkgdb validation before installation.
 .B -V
 Enable pkgdb validation before installation. This is the default.
 .TP
+.B -c
+By default the package file is checked against cksum provided
+by pkg_summary(5) just before and after downloading.
+If flag
+.B -c
+is applied, the second check is skipped.
+.TP
+.B -C
+Run the second cksum check. This is the default. See
+.B -c
+for more information.
+.TP
 .B -B
 Consider packages different if their BUILD_DATE differ.
 .TP
@@ -527,7 +539,7 @@ Enable debugging output.
 Config variables:
 .BR NIH_INSTALL_OPTS " -- options passed to"
 .B "nih install"
-by default. The default value is "-LP".
+by default. The default value is "-LPC".
 .RE
 .P
 .RS
