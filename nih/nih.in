@@ -727,6 +727,14 @@ replace_with_fake (){
 ######################################################################
 # install
 
+is_pkg_summary_required() {
+    for pkg in "$@"; do
+	printf '%s\n' "$pkg"
+    done | grep -vq -- '-$'
+
+    return $?
+}
+
 do_install() {
     verify_pkgdb=1
     remove_leaves=1
@@ -833,7 +841,9 @@ do_install() {
     fi
 
     #
-    refresh_summary
+    if is_pkg_summary_required "$@"; then
+	refresh_summary
+    fi
     refresh_inst_summary
 
     installed_summary="$tmp_dir/installed_summary"
