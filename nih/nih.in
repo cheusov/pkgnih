@@ -1478,7 +1478,10 @@ nih leaf [options]
 
    options:
       -h    display this help message
-      -a    output all leaf packages
+
+      -a    output auto-installed leaf packages
+      -u    output leaf packages installed by user
+
       -A    output auto-installed leaf packages (the default)
       -R    remove auto-installed leaf packages
       -n    pass -n to pkg_delete
@@ -1493,24 +1496,28 @@ EOF
 
 if test "$1" = leaf; then
     shift
-    opts='-r'
+    opts=''
     pkg_delete_opts=''
 
     set -- $NIH_LEAF_OPTS "$@"
 
-    while getopts haARnr f; do
+    leaves_opts=''
+    while getopts hauARnr f; do
 	case "$f" in
 	    '?')
 		exit 1;;
 	    h)
 		usage_leaf
 		exit 0;;
-	    a)
-		unset remove || true
-		opts='';;
 	    A)
 		unset remove || true
-		opts='-r';;
+		leaves_opts='';;
+	    a)
+		unset remove || true
+		leaves_opts='-a';;
+	    u)
+		unset remove || true
+		leaves_opts='-u';;
 	    R)
 		opts='-r'
 		remove=1;;
@@ -1527,7 +1534,7 @@ if test "$1" = leaf; then
     verbose "Finding leaf packages..."
 
     leaves_fn="$tmp_dir/leaves"
-    pkg_summary2leaves $opts "$PKG_INST_SUMMARY" > "$leaves_fn"
+    pkg_summary2leaves $leaves_opts "$PKG_INST_SUMMARY" > "$leaves_fn"
 
     if test -n "$remove"; then
 	pkgnames=`sed -n 's/^PKGNAME=//p' "$leaves_fn"`

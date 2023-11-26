@@ -1,6 +1,6 @@
 .\"     $NetBSD$
 .\"
-.\" Copyright (c) 2010-2014 by Aleksey Cheusov (vle@gmx.net)
+.\" Copyright (c) 2010-2023 by Aleksey Cheusov (vle@gmx.net)
 .\" This man page may contain portions of pkgin.1 by Emile Heitor.
 .\" Absolutely no warranty.
 .\"
@@ -15,7 +15,7 @@
 .fi
 ..
 .\" ------------------------------------------------------------------
-.TH NIH 1 "Jan 18, 2015" "" ""
+.TH NIH 1 "Nov 26, 2023" "" ""
 .SH NAME
 nih \- package manager for pkgsrc
 .SH SYNOPSIS
@@ -828,10 +828,13 @@ accepts the following options:
 Display help message.
 .TP
 .B -a
-Output all leaf packages.
+Output auto-installed leaf packages.
+.TP
+.B -u
+Output leaf packages installed by user.
 .TP
 .B -A
-Output auto-installed leaf packages. This is the default.
+Output all leaf packages. This is the default.
 .TP
 .B -R
 Remove auto-installed leaf packages.
