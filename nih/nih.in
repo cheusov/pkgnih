@@ -26,10 +26,94 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-set -e 
-
+set -e
 export LC_ALL=C
 
+######################################################################
+sysconfdir=${NIH_SYSCONFDIR-@sysconfdir@}/nih
+confdir="$HOME/.nih"
+
+dfltconfdir=${NIH_DFLTCONFDIR-@dfltconfdir@}
+
+: ${PKG_INFO_CMD:=@PKG_INFO_CMD@}
+: ${PKG_ADMIN_CMD:=@PKG_ADMIN_CMD@}
+: ${PKG_DELETE_CMD:=@PKG_DELETE_CMD@}
+: ${PKG_UPDATE_PLAN_CMD:=pkg_update_plan}
+: ${PKG_ADD_CMD:=@PKG_ADD_CMD@}
+: ${PKG_DBDIR:=@PKG_DBDIR@}
+: ${SUFX:=.tgz}
+
+pkgdb="${PKG_DBDIR}/pkgdb.byfile.db"
+
+######################################################################
+if ! test -r "$pkgdb"; then
+    errmsg "Cannot find pkgdb."
+    exit 1
+fi
+
+# loading config files
+if test -r "$confdir/config"; then
+    conffile="$confdir/config"
+elif test -r "$sysconfdir/config"; then
+    conffile="$sysconfdir/config"
+else
+    cat <<EOF
+Neither $sysconfdir/config nor $confdir/config are readable.
+Sorry, I cannot help.
+EOF
+    exit 1
+fi
+
+. "$dfltconfdir/nih.default.conf"
+. "$conffile"
+
+######################################################################
+# handling global options
+process_options (){
+    alt_getopt \
+	h     'usage; exit 0' \
+	V     'verbose nih-@VERSION@; exit 0' \
+	y     'set_yes_var install; set_yes_var remove_pkgs' \
+	=Y    'set_yes_var ' \
+	D     'debug=1' \
+	=s    'summary=' \
+	-- $NIH_OPTS "$@"
+}
+
+PKG_INST_SUMMARY="$confdir/pkg_inst_summary.txt"
+PKG_SRC_SUMMARY="$confdir/pkg_src_summary.txt"
+
+export PKGSRCDIR PSS_SLAVES PSS_OPTIONS
+
+mkdir -p "$confdir"
+cmds=`process_options "$@"`
+eval "$cmds"
+
+. @libexecdir@/psu/sig_handler.sh
+tmp_dir=`mktemp -d /tmp/nih.XXXXXX`
+test -n "$tmp_dir" || exit 1
+
+#
+if test $# -eq 0; then
+    usage
+    exit 1
+fi
+
+# -s
+if test -n "$summary"; then
+    case "$summary" in
+	*.gz)
+	    PKG_SUMMARY="$tmp_dir/pkg_summary.txt"
+	    gzip -dc "$summary" > "$PKG_SUMMARY";;
+	*.bz2)
+	    PKG_SUMMARY="$tmp_dir/pkg_summary.txt"
+	    bzip2 -dc "$summary" > "$PKG_SUMMARY";;
+	*)
+	    PKG_SUMMARY="$summary"
+    esac
+fi
+
+######################################################################
 verbose (){
     printf "%s\n" "$1" 1>&2
 }
@@ -115,48 +199,6 @@ remove_comments (){
     runawk -f trim.awk -e '!/^#/ && NF > 0 {print trim_lrc($0)}' "$@"
 }
 
-sysconfdir=${NIH_SYSCONFDIR-@sysconfdir@}/nih
-confdir="$HOME/.nih"
-
-dfltconfdir=${NIH_DFLTCONFDIR-@dfltconfdir@}
-
-: ${PKG_INFO_CMD:=@PKG_INFO_CMD@}
-: ${PKG_ADMIN_CMD:=@PKG_ADMIN_CMD@}
-: ${PKG_DELETE_CMD:=@PKG_DELETE_CMD@}
-: ${PKG_UPDATE_PLAN_CMD:=pkg_update_plan}
-: ${PKG_ADD_CMD:=@PKG_ADD_CMD@}
-: ${PKG_DBDIR:=@PKG_DBDIR@}
-: ${SUFX:=.tgz}
-
-pkgdb="${PKG_DBDIR}/pkgdb.byfile.db"
-if ! test -r "$pkgdb"; then
-    errmsg "Cannot find pkgdb."
-    exit 1
-fi
-
-# loading config files
-if test -r "$confdir/config"; then
-    conffile="$confdir/config"
-elif test -r "$sysconfdir/config"; then
-    conffile="$sysconfdir/config"
-else
-    cat <<EOF
-Neither $sysconfdir/config nor $confdir/config are readable.
-Sorry, I cannot help.
-EOF
-    exit 1
-fi
-
-. "$dfltconfdir/nih.default.conf"
-. "$conffile"
-
-PKG_INST_SUMMARY="$confdir/pkg_inst_summary.txt"
-PKG_SRC_SUMMARY="$confdir/pkg_src_summary.txt"
-
-export PKGSRCDIR PSS_SLAVES PSS_OPTIONS
-
-mkdir -p "$confdir"
-
 create_cachedir (){
     mkdir -p "$CACHEDIR/All"
 }
@@ -167,20 +209,6 @@ set_yes_var () {
     nih_opts="$nih_opts -Y$1"
 }
 
-# handling global options
-process_options (){
-    alt_getopt \
-	h     'usage; exit 0' \
-	V     'verbose nih-@VERSION@; exit 0' \
-	y     'set_yes_var install; set_yes_var remove_pkgs' \
-	=Y    'set_yes_var ' \
-	D     'debug=1' \
-	=s    'summary=' \
-	-- $NIH_OPTS "$@"
-}
-cmds=`process_options "$@"`
-eval "$cmds"
-
 # temp directory
 on_exit () {
     if test -n "$debug"; then
@@ -189,29 +217,6 @@ on_exit () {
 	rm -rf "$tmp_dir"
     fi
 }
-. @libexecdir@/psu/sig_handler.sh
-tmp_dir=`mktemp -d /tmp/nih.XXXXXX`
-test -n "$tmp_dir" || exit 1
-
-#
-if test $# -eq 0; then
-    usage
-    exit 1
-fi
-
-# -s
-if test -n "$summary"; then
-    case "$summary" in
-	*.gz)
-	    PKG_SUMMARY="$tmp_dir/pkg_summary.txt"
-	    gzip -dc "$summary" > "$PKG_SUMMARY";;
-	*.bz2)
-	    PKG_SUMMARY="$tmp_dir/pkg_summary.txt"
-	    bzip2 -dc "$summary" > "$PKG_SUMMARY";;
-	*)
-	    PKG_SUMMARY="$summary"
-    esac
-fi
 
 ######################################################################
 ######################################################################
@@ -369,15 +374,6 @@ cat_src_summary (){
 ######################################################################
 ######################################################################
 ######################################################################
-# help
-if test "$1" = help; then
-    usage
-    exit 0
-fi
-
-######################################################################
-######################################################################
-######################################################################
 # refresh
 usage_refresh (){
     cat <<'EOF'
@@ -495,12 +491,8 @@ refresh_inst_summary (){
     fi
 }
 
-if test "$1" = refresh; then
-    shift
-
+do_refresh() {
     func=refresh_bin_summary
-
-    set -- $NIH_REFRESH_OPTS "$@"
 
     while getopts hbipP f; do
 	case "$f" in
@@ -531,15 +523,7 @@ EOF
     fi
 
     $func
-
-    exit 0
-fi
-
-######################################################################
-# ensure that pkg_summary.txt exists and refresh it
-if test -z "$PKG_SUMMARY"; then
-    PKG_SUMMARY="$confdir/pkg_summary.txt"
-fi
+}
 
 summary_exists (){
     # $1 -- summary file
@@ -728,8 +712,6 @@ rev_lines (){
     END { for (i=NR; i >= 1; --i) print line [i] }' "$@"
 }
 
-fake_pkg_fn="$tmp_dir/fake.tgz"
-
 replace_with_fake (){
     # $1 - pkgbase
     # $2 - version
@@ -740,16 +722,17 @@ replace_with_fake (){
     $PKG_ADMIN_CMD set fake=yes "$1-$2"
 }
 
-if test "_$1" = _install -o "_$1" = _update; then
-    cmd="$1"
-    shift
+######################################################################
+######################################################################
+######################################################################
+# install
 
+do_install() {
     verify_pkgdb=1
     remove_leaves=1
     reqprov_check=1
 
-    set -- $NIH_INSTALL_OPTS "$@"
-
+#    cmd="$1"
     while getopts a:BcCdDeEf:hklLnpPrRtvVw f; do
 	case "$f" in
 	    '?')
@@ -849,7 +832,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 	exit $ex
     fi
 
-    # 
+    #
     refresh_summary
     refresh_inst_summary
 
@@ -1009,7 +992,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 	    -t strfile PKGNAME "$rem_pkgs" < "$installed_summary" |
 	sed 's/^PKGPATH=/PKGPATH=nih-installed-/' > "$inst_plist_summary"
 
-	# 
+	#
 	pkg_uniq_summary -Fb "$toinst_plist_summary" "$inst_plist_summary" |
 	pkg_lint_summary -f
 
@@ -1075,9 +1058,7 @@ if test "_$1" = _install -o "_$1" = _update; then
 	    fi
 	fi
     done
-
-    exit 0
-fi
+}
 
 ######################################################################
 ######################################################################
@@ -1109,11 +1090,7 @@ Examples:
 EOF
 }
 
-if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
-    shift
-
-    set -- $NIH_UNINSTALL_OPTS "$@"
-
+do_uninstall() {
     while getopts hnlLpPt f; do
 	case "$f" in
 	    '?')
@@ -1146,9 +1123,7 @@ if test "_$1" = _uninstall -o "_$1" = _remove -o "_$1" = _delete; then
     done
 
     $0 $nih_opts install $pkg_delete_opts $plan
-
-    exit 0
-fi
+}
 
 ######################################################################
 ######################################################################
@@ -1179,12 +1154,8 @@ Examples:
 EOF
 }
 
-if test "$1" = verify; then
-    shift
+do_verify() {
     opts='k'
-
-    set -- $NIH_VERIFY_OPTS "$@"
-
     while getopts hmUlLdcs f; do
 	case "$f" in
 	    '?')
@@ -1207,9 +1178,7 @@ if test "$1" = verify; then
     fi
 
     pkg_status "-$opts" "$@"
-
-    exit 0
-fi
+}
 
 ######################################################################
 ######################################################################
@@ -1246,12 +1215,8 @@ Examples:
 EOF
 }
 
-if test "$1" = status; then
-    shift
+do_status() {
     opts='b'
-
-    set -- $NIH_STATUS_OPTS "$@"
-
     while getopts hbsruaqAB f; do
 	case "$f" in
 	    '?')
@@ -1272,9 +1237,7 @@ if test "$1" = status; then
     fi
 
     pkg_status "-$opts" "$@"
-
-    exit 0
-fi
+}
 
 ######################################################################
 ######################################################################
@@ -1388,7 +1351,7 @@ Examples:
 EOF
 }
 
-if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
+do_search_info_meta() {
     op="$1"
     shift
 
@@ -1461,9 +1424,7 @@ if test "_$1" = _search -o "_$1" = _info -o "_$1" = _meta; then
 	*)
 	    pkg_digger ${opts+-$opts} "$@" | $_summary2filelist;;
     esac
-
-    exit 0
-fi
+}
 
 ######################################################################
 ######################################################################
@@ -1494,12 +1455,9 @@ Examples:
 EOF
 }
 
-if test "$1" = leaf; then
-    shift
+do_leaf() {
     opts=''
     pkg_delete_opts=''
-
-    set -- $NIH_LEAF_OPTS "$@"
 
     leaves_opts=''
     while getopts hauARnr f; do
@@ -1544,9 +1502,7 @@ if test "$1" = leaf; then
     else
 	cat "$leaves_fn"
     fi
-
-    exit 0
-fi
+}
 
 ######################################################################
 ######################################################################
@@ -1581,13 +1537,10 @@ Examples:
 EOF
 }
 
-if test "$1" = list; then
-    shift
+do_list() {
     _cat_summary=cat_bin_summary
     _summary4view=summary2available_packages
     _grep_summary=cat
-
-    set -- $NIH_LIST_OPTS "$@"
 
     while getopts hbauiIrtkfp f; do
 	case "$f" in
@@ -1631,9 +1584,7 @@ if test "$1" = list; then
     shift `expr $OPTIND - 1`
 
     $_cat_summary | { eval $_grep_summary; } | $_summary4view
-
-    exit 0
-fi
+}
 
 ######################################################################
 ######################################################################
@@ -1668,12 +1619,8 @@ Examples:
 EOF
 }
 
-if test "$1" = mark; then
-    shift
+do_mark() {
     opts='l'
-
-    set -- $NIH_MARK_OPTS "$@"
-
     while getopts aAhkKntTuU f; do
 	case "$f" in
 	    '?')
@@ -1730,8 +1677,7 @@ if test "$1" = mark; then
     save_installed_packages
     $exec_prefix touch $pkgdb
     $exec_prefix $PKG_ADMIN_CMD $cmd "$@"
-    exit 0
-fi
+}
 
 ######################################################################
 ######################################################################
@@ -1774,14 +1720,10 @@ Examples:
 EOF
 }
 
-if test "$1" = deps; then
-    shift
+do_deps() {
     sb_opts=''
     pn_opts=''
     _cat_summary=cat_bin_summary
-
-    set -- $NIH_DEPS_OPTS "$@"
-
     while getopts hrlBNPtiIbp1 f; do
 	case "$f" in
 	    '?')
@@ -1823,8 +1765,7 @@ if test "$1" = deps; then
     else
 	pkg_subgraph_deps $sb_opts -p "$*" | sort -u
     fi
-    exit 0
-fi
+}
 
 ######################################################################
 ######################################################################
@@ -1851,11 +1792,7 @@ Examples:
 EOF
 }
 
-if test "$1" = clean-cache; then
-    shift
-
-    set -- $NIH_CLEAN_CACHE_OPTS "$@"
-
+do_clean_cache() {
     while getopts hnai f; do
 	case "$f" in
 	    '?')
@@ -1908,9 +1845,7 @@ if test "$1" = clean-cache; then
 	verbose 'No binaries to remove'
 	exit 0
     fi
-
-    exit 0
-fi
+}
 
 ######################################################################
 ######################################################################
@@ -1939,13 +1874,9 @@ Examples:
 EOF
 }
 
-if test "$1" = audit; then
-    shift
-
+do_audit() {
     check=1
     download=1
-
-    set -- $NIH_AUDIT_OPTS "$@"
 
     while getopts hdc f; do
 	case "$f" in
@@ -1970,9 +1901,7 @@ if test "$1" = audit; then
 	verbose 'Checking packages for vulnerabilities'
 	$PKG_ADMIN_CMD audit "$@"
     fi
-
-    exit 0
-fi
+}
 
 ######################################################################
 ######################################################################
@@ -1996,11 +1925,7 @@ Examples:
 EOF
 }
 
-if test "$1" = history; then
-    shift
-
-    set -- $NIH_HISTORY_OPTS "$@"
-
+do_history() {
     nih_pager='cat'
     while getopts Bhp: f; do
 	case "$f" in
@@ -2053,13 +1978,112 @@ if test "$1" = history; then
 	last_fn="$curr_fn"
     done |
     eval "$nih_pager"
+}
 
-    exit 0
+######################################################################
+######################################################################
+######################################################################
+# main code
+
+# ensure that pkg_summary.txt exists and refresh it
+if test -z "$PKG_SUMMARY"; then
+    PKG_SUMMARY="$confdir/pkg_summary.txt"
 fi
 
-######################################################################
-######################################################################
-######################################################################
-# <bad> command
-errmsg "Unknown command '$1', see 'nih -h' for more information"
-exit 2
+fake_pkg_fn="$tmp_dir/fake.tgz"
+
+case "$1" in
+    help)
+	usage
+	exit 0;;
+    refresh)
+	shift
+	set -- $NIH_REFRESH_OPTS "$@"
+
+	do_refresh "$@"
+
+	exit 0;;
+    install|update)
+	shift
+	set -- $NIH_INSTALL_OPTS "$@"
+
+	do_install "$@"
+
+	exit 0;;
+    uninstall|remove|delete)
+	shift
+	set -- $NIH_UNINSTALL_OPTS "$@"
+
+	do_uninstall "$@"
+
+	exit 0;;
+    verify)
+	shift
+	set -- $NIH_VERIFY_OPTS "$@"
+
+	do_verify "$@"
+
+	exit 0;;
+    status)
+	shift
+	set -- $NIH_STATUS_OPTS "$@"
+
+	do_status "$@"
+
+	exit 0;;
+    search|info|meta)
+	do_search_info_meta "$@"
+	exit 0;;
+    leaf)
+	shift
+	set -- $NIH_LEAF_OPTS "$@"
+
+	do_leaf "$@"
+
+	exit 0;;
+    list)
+	shift
+	set -- $NIH_LIST_OPTS "$@"
+
+	do_list "$@"
+
+	exit 0;;
+    mark)
+	shift
+	set -- $NIH_MARK_OPTS "$@"
+
+	do_mark "$@"
+
+	exit 0;;
+    deps)
+	shift
+	set -- $NIH_DEPS_OPTS "$@"
+
+	do_deps "$@"
+
+	exit 0;;
+    clean-cache)
+	shift
+	set -- $NIH_CLEAN_CACHE_OPTS "$@"
+
+	do_clean_cache "$@"
+
+	exit 0;;
+    audit)
+	shift
+	set -- $NIH_AUDIT_OPTS "$@"
+
+	do_audit "$@"
+
+	exit 0;;
+    history)
+	shift
+	set -- $NIH_HISTORY_OPTS "$@"
+
+	do_history "$@"
+
+	exit 0;;
+    *)
+	errmsg "Unknown command '$1', see 'nih -h' for more information"
+	exit 2
+esac
