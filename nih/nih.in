@@ -1529,13 +1529,13 @@ nih list [options]
 
       -b       output packages from binary repository (the default)
       -p       output packages from pkg_src_summary file
-      -i       output all installed packages
+      -i       output installed packages
 
-      -a       output all installed packages
-      -u       output packages installed by user
-      -t       output installed packages marked as "try out"
-      -k       output installed packages marked as "keep"
-      -f       output installed packages marked as "fake"
+      -a       output all installed packages (implies -i)
+      -u       output packages installed by user (implies -i)
+      -t       output installed packages marked as "try out" (implies -i)
+      -k       output installed packages marked as "keep" (implies -i)
+      -f       output installed packages marked as "fake" (implies -i)
 
       -r       output raw summaries
 

@@ -885,10 +885,10 @@ Output packages from pkg_src_summary.txt file built from pkgsrc tree by
 Output packages installed by user.
 .TP
 .B -t
-Output packages marked "try out". See "nih mark -t" for details.
+Output installed packages marked "try out". See "nih mark -t" for details.
 .TP
 .B -k
-Output packages marked "keep".  See "nih mark -k" for details.
+Output installed packages marked "keep".  See "nih mark -k" for details.
 .TP
 .B -r
 Show raw package summaries.
@@ -1108,7 +1108,7 @@ first one will be used during installation. That is, from
 in example above. The default value for this variable depends on operating system.
 On NetBSD it defaults to
 .br
-.IR ftp://ftp.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver .
+.IR https://cdn.netbsd.org/pub/pkgsrc/packages/$opsys/$arch/$osver .
 .TP
 .BR CACHEDIR
 Binary packages are downloaded to the specified directory.
