@@ -22,7 +22,7 @@ case "$opsys" in
 	REPOSITORY='https://pkgsrc.smartos.org/packages/Darwin/trunk/$arch'
 	;;
     *)
-	REPOSITORY="https://cdn.netbsd.org/pub/pkgsrc/packages/$opsys/$arch/$osver
+	REPOSITORY="https://cdn.netbsd.org/pub/pkgsrc/packages/$opsys/$arch/$osver"
 	;;
 esac
 
