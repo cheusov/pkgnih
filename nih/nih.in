@@ -1627,11 +1627,11 @@ NOTES:
    -a and -U are synonyms
    -u and -A are synonyms
 Examples:
-   nih mark -a libmaa
-   nih mark -u ffmpeg # we use ffmpeg(1)
-   nih mark -t wmii openbox fluxfox sawfish xfce4
-   nih mark -T ctwm # my primary window manager
-   nih mark -k lua-mode ruby-mode dictem # manually built for emacs-22
+   nih mark -a     libmaa
+   nih mark -u     ffmpeg # we use ffmpeg(1)
+   nih mark -t     wmii openbox fluxfox sawfish xfce4
+   nih mark -Tu    ctwm # my primary window manager
+   nih mark -k     lua-mode ruby-mode dictem # manually built for emacs-22
 EOF
 }
 
