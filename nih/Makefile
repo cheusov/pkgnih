@@ -2,7 +2,7 @@ EGDIR ?=		${DATADIR}/examples/nih # specific to pkgsrc
 PACKAGES ?=		/usr/pkgsrc/packages
 CACHEDIR ?=		${PACKAGES}
 DFLTCONFDIR ?=		${LIBDIR}/nih
-PKG_DBDIR ?=		/var/db/pkg
+PKG_DBDIR ?=		${PREFIX}/pkgdb
 
 REAL_ROOT_USER ?=	root
 REAL_ROOT_GROUP ?=	wheel
