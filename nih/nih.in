@@ -1201,7 +1201,7 @@ usage_status (){
     cat <<'EOF'
 nih status -h
 nih status [-b] [-a|-u] [-r|-q|-A|-B] [PKGBASEs]
-nih status -s           [-r|-q|-A|-B] [PKGBASEs]
+nih status -p           [-r|-q|-A|-B] [PKGBASEs]
 
       Compare installed packages with pkg_summary.txt (default) or
       pkgsrc tree.
@@ -1210,9 +1210,9 @@ nih status -s           [-r|-q|-A|-B] [PKGBASEs]
       -h     display this help message
 
       -b     compare installed packages against pkg_summary.txt (default)
-      -s     compare installed packages against pkgsrc tree
+      -p     compare installed packages against pkgsrc tree
 
-      -u     analyse packages marked as installed by user (the default, see -a)
+      -u     analyse packages installed by user (the default, see -a)
       -a     analyse all installed packages (see -u)
 
       -r     raw output (pkg_summary format)
@@ -1224,13 +1224,13 @@ nih status -s           [-r|-q|-A|-B] [PKGBASEs]
 Examples:
    nih status -a
    nih status -uq
-   nih status -sqr pkglint
+   nih status -pqr pkglint
 EOF
 }
 
 do_status() {
     opts='b'
-    while getopts hbsruaqAB f; do
+    while getopts hbpruaqAB f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1239,6 +1239,8 @@ do_status() {
 		exit 0;;
 	    a)
 		opts="${opts}aT";;
+	    p)
+		opts="${opts}s";;
 	    *)
 		opts="${opts}$f";;
 	esac

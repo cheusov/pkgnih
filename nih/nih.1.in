@@ -736,7 +736,7 @@ Display help message.
 .B -b
 Compare installed packages against pkg_summary(5). This is the default.
 .TP
-.B -s
+.B -p
 Compare installed packages against pkgsrc tree.
 .TP
 .B -r
