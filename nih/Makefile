@@ -14,7 +14,7 @@ PKG_DELETE ?=		${SBINDIR}/pkg_delete
 PKG_CREATE ?=		${SBINDIR}/pkg_create
 
 FTP ?=			ftp
-WGET ?=			wget
+WGET ?=		wget
 
 INTEXTS_REPLS +=	PKG_INFO_CMD   ${PKG_INFO}
 INTEXTS_REPLS +=	PKG_ADMIN_CMD  ${PKG_ADMIN}
