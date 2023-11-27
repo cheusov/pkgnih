@@ -46,6 +46,11 @@ dfltconfdir=${NIH_DFLTCONFDIR-@dfltconfdir@}
 pkgdb="${PKG_DBDIR}/pkgdb.byfile.db"
 
 ######################################################################
+errmsg (){
+    # $1 -- error message
+    printf "%s\n" "$1" 1>&2
+}
+
 if ! test -r "$pkgdb"; then
     errmsg "Cannot find pkgdb."
     exit 1
@@ -115,11 +120,6 @@ fi
 
 ######################################################################
 verbose (){
-    printf "%s\n" "$1" 1>&2
-}
-
-errmsg (){
-    # $1 -- error message
     printf "%s\n" "$1" 1>&2
 }
 
