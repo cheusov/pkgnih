@@ -1,4 +1,27 @@
 ======================================================================
+Version 0.15.0, by Aleksey Cheusov, Mon, 27 Nov 2023 16:32:18 +0400
+
+  nih remove:
+    - now this command works correctly without external package
+      repository
+
+  nih leaf:
+    - new option "-u" for printing user-installed leaf packages
+
+  nih status:
+    - option -s has been renamed to "-p"
+
+  Primary extension for pkg_summary(5) is now "gz"
+
+  Updates in man.1
+
+  nih.default.conf:
+    - update default URLs to package repositories
+
+  root Makefile:
+    - +PKG_DBDIR defaults to ${PREFIX}/pkgdb
+
+======================================================================
 Version 0.14.1, by Aleksey Cheusov, Sat,  7 Nov 2015 02:23:23 +0300
 
   Fix in pkg_update_plan (nih install)

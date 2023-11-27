@@ -6,6 +6,14 @@ In above situation "nih install _ dep-" should work but does not.
 
 ----------------------------------------------------------------------------
 
+nih install -ZZZ -- do not run checksums after succsessful fownloads
+
+----------------------------------------------------------------------------
+
+"nih verify" should check for something by default (gdt@)
+
+----------------------------------------------------------------------------
+
 nih verify -ZZZ show package which no longer in binary repository
 
 ----------------------------------------------------------------------------
