@@ -379,7 +379,7 @@ usage_refresh (){
     cat <<'EOF'
 nih refresh [options]
 
-      Download pkg_summary.bz2 and SHA512.bz2, save them to ~/.nih/, and
+      Download pkg_summary.gz and SHA512.gz, save them to ~/.nih/, and
       then unpack them to .txt files.
 
    options:
@@ -391,7 +391,7 @@ nih refresh [options]
              is regenerated from scratch
 
 ~/.nih/config:
-   REPOSITORY      - URL or file name for pkg_summary.bz2/pkg_summary.txt
+   REPOSITORY      - URL or file name for pkg_summary.gz/pkg_summary.txt
    PKG_SUMMARY     - path to pkg_summary.txt, set this variable if you use
                    local pkg_summary, otherwise keep it unset
    fetch function  - download command
@@ -443,13 +443,13 @@ refresh_bin_summary (){
 
     rm -f new_summary.txt
     for repo in $REPOSITORY; do
-	if ! fetch_summary_file "$repo" bz2 && ! fetch_summary_file "$repo" gz; then
+	if ! fetch_summary_file "$repo" gz && ! fetch_summary_file "$repo" bz2; then
 	    errmsg 'pkg_summary(5) file cannot be downloaded.'
 	    exit 1
 	fi
 
 	if ! grep -l '^FILE_CKSUM=' pkg_summary.txt > /dev/null; then
-	    if ! fetch_sha512_file "$repo" bz2 && ! fetch_sha512_file "$repo" gz; then
+	    if ! fetch_sha512_file "$repo" gz && ! fetch_sha512_file "$repo" bz2; then
 		errmsg 'SHA512 file cannot be downloaded.'
 		exit 1
 	    fi
