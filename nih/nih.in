@@ -1456,10 +1456,10 @@ nih leaf [options]
    options:
       -h    display this help message
 
-      -a    output auto-installed leaf packages
+      -a    output all leaf packages
       -u    output leaf packages installed by user
-
       -A    output auto-installed leaf packages (the default)
+
       -R    remove auto-installed leaf packages
       -n    pass -n to pkg_delete
       -r    raw output (pkg_summary format)
@@ -1475,7 +1475,7 @@ do_leaf() {
     opts=''
     pkg_delete_opts=''
 
-    leaves_opts=''
+    leaves_opts='-a'
     while getopts hauARnr f; do
 	case "$f" in
 	    '?')
@@ -1485,10 +1485,10 @@ do_leaf() {
 		exit 0;;
 	    A)
 		unset remove || true
-		leaves_opts='';;
+		leaves_opts='-a';;
 	    a)
 		unset remove || true
-		leaves_opts='-a';;
+		leaves_opts='';;
 	    u)
 		unset remove || true
 		leaves_opts='-u';;

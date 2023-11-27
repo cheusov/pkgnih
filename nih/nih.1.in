@@ -828,13 +828,13 @@ accepts the following options:
 Display help message.
 .TP
 .B -a
-Output auto-installed leaf packages.
+Output all leaf packages.
 .TP
 .B -u
 Output leaf packages installed by user.
 .TP
 .B -A
-Output all leaf packages. This is the default.
+Output auto-installed leaf packages. This is the default.
 .TP
 .B -R
 Remove auto-installed leaf packages.
