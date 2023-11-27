@@ -1710,7 +1710,7 @@ nih deps [options] [pkgs...]
 
       -b    analyse packages from binary repository
       -p    analyse packages from pkg_src_summary file
-      -i    analyse installed packages
+      -i    analyse installed packages (the default)
 
       -r    output dependencies, by default packages
             that depend on "pkgs" are output.
