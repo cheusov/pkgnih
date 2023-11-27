@@ -98,6 +98,8 @@ eval "$cmds"
 tmp_dir=`mktemp -d /tmp/nih.XXXXXX`
 test -n "$tmp_dir" || exit 1
 
+fake_pkg_fn="$tmp_dir/fake.tgz"
+
 #
 if test $# -eq 0; then
     usage
@@ -357,6 +359,7 @@ save_installed_packages (){
 }
 
 cat_bin_summary (){
+    set_pkg_summary
     summary_exists "$PKG_SUMMARY" ''
     cat "$PKG_SUMMARY"
 }
@@ -556,6 +559,7 @@ NF == 0 {
 }
 
 refresh_summary (){
+    set_pkg_summary
     summary_exists "$PKG_SUMMARY" ''
 
     tiny_summary="$tmp_dir/tiny_summary"
@@ -898,6 +902,7 @@ do_install() {
 	debug_opt=-v
     fi
 
+    set_pkg_summary
     if $PKG_UPDATE_PLAN_CMD -iv $update_plan_opts $debug_opt \
 	"$installed_summary" "$PKG_SUMMARY" \
 	> "$plan_summary" < "$update_pkgs_fn"
@@ -1117,8 +1122,6 @@ do_uninstall() {
 	esac
     done
     shift `expr $OPTIND - 1`
-
-    touch "$PKG_SUMMARY"
 
     if test -n "$try_out"; then
 	tryout_pkgs="$tmp_dir/tryout"
@@ -1365,6 +1368,7 @@ do_search_info_meta() {
     op="$1"
     shift
 
+    set_pkg_summary
     export PKG_DIGGER_BACKEND=pkg_digger_summary
     export PKG_DIGGER_SUMMARY="$PKG_SUMMARY"
 
@@ -1996,11 +2000,11 @@ do_history() {
 # main code
 
 # ensure that pkg_summary.txt exists and refresh it
-if test -z "$PKG_SUMMARY"; then
-    PKG_SUMMARY="$confdir/pkg_summary.txt"
-fi
-
-fake_pkg_fn="$tmp_dir/fake.tgz"
+set_pkg_summary() {
+    if test -z "$PKG_SUMMARY"; then
+	PKG_SUMMARY="$confdir/pkg_summary.txt"
+    fi
+}
 
 case "$1" in
     help)
