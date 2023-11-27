@@ -1404,7 +1404,7 @@ do_search_info_meta() {
 	    h)
 		usage_$op
 		exit 0;;
-	    *)
+	    *) # -1 -3 -9 -s -f -q -l
 		opts="${opts}$f";;
 	esac
     done
