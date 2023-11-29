@@ -117,52 +117,12 @@ EOF
 }
 
 ######################################################################
-# handling global options
-process_options (){
-    alt_getopt \
-	h     'usage; exit 0' \
-	V     'verbose nih-@VERSION@; exit 0' \
-	y     'set_yes_var install; set_yes_var remove_pkgs' \
-	=Y    'set_yes_var ' \
-	D     'debug=1' \
-	=s    'summary=' \
-	-- $NIH_OPTS "$@"
+# ensure that pkg_summary.txt exists and refresh it
+set_pkg_summary() {
+    if test -z "$PKG_SUMMARY"; then
+	PKG_SUMMARY="$confdir/pkg_summary.txt"
+    fi
 }
-
-PKG_INST_SUMMARY="$confdir/pkg_inst_summary.txt"
-PKG_SRC_SUMMARY="$confdir/pkg_src_summary.txt"
-
-export PKGSRCDIR PSS_SLAVES PSS_OPTIONS
-
-mkdir -p "$confdir"
-cmds=`process_options "$@"`
-eval "$cmds"
-
-. @libexecdir@/psu/sig_handler.sh
-tmp_dir=`mktemp -d /tmp/nih.XXXXXX`
-test -n "$tmp_dir" || exit 1
-
-fake_pkg_fn="$tmp_dir/fake.tgz"
-
-#
-if test $# -eq 0; then
-    usage
-    exit 1
-fi
-
-# -s
-if test -n "$summary"; then
-    case "$summary" in
-	*.gz)
-	    PKG_SUMMARY="$tmp_dir/pkg_summary.txt"
-	    gzip -dc "$summary" > "$PKG_SUMMARY";;
-	*.bz2)
-	    PKG_SUMMARY="$tmp_dir/pkg_summary.txt"
-	    bzip2 -dc "$summary" > "$PKG_SUMMARY";;
-	*)
-	    PKG_SUMMARY="$summary"
-    esac
-fi
 
 fetch_ftp (){
     ${NIH_FTP_CMD-@FTP_CMD@} -o "$_base" -V -q1800 $FTP_OPTIONS "$1"
@@ -2001,12 +1961,52 @@ do_history() {
 ######################################################################
 # main code
 
-# ensure that pkg_summary.txt exists and refresh it
-set_pkg_summary() {
-    if test -z "$PKG_SUMMARY"; then
-	PKG_SUMMARY="$confdir/pkg_summary.txt"
-    fi
+# handling global options
+process_options (){
+    alt_getopt \
+	h     'usage; exit 0' \
+	V     'verbose nih-@VERSION@; exit 0' \
+	y     'set_yes_var install; set_yes_var remove_pkgs' \
+	=Y    'set_yes_var ' \
+	D     'debug=1' \
+	=s    'summary=' \
+	-- $NIH_OPTS "$@"
 }
+
+PKG_INST_SUMMARY="$confdir/pkg_inst_summary.txt"
+PKG_SRC_SUMMARY="$confdir/pkg_src_summary.txt"
+
+export PKGSRCDIR PSS_SLAVES PSS_OPTIONS
+
+mkdir -p "$confdir"
+cmds=`process_options "$@"`
+eval "$cmds"
+
+. @libexecdir@/psu/sig_handler.sh
+tmp_dir=`mktemp -d /tmp/nih.XXXXXX`
+test -n "$tmp_dir" || exit 1
+
+fake_pkg_fn="$tmp_dir/fake.tgz"
+
+#
+if test $# -eq 0; then
+    usage
+    exit 1
+fi
+
+# -s
+if test -n "$summary"; then
+    case "$summary" in
+	*.gz)
+	    PKG_SUMMARY="$tmp_dir/pkg_summary.txt"
+	    gzip -dc "$summary" > "$PKG_SUMMARY";;
+	*.bz2)
+	    PKG_SUMMARY="$tmp_dir/pkg_summary.txt"
+	    bzip2 -dc "$summary" > "$PKG_SUMMARY";;
+	*)
+	    PKG_SUMMARY="$summary"
+    esac
+fi
 
 case "$1" in
     help)
