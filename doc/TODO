@@ -1,3 +1,11 @@
+----------------------------------------------------------------------------
+nih list -A: output auto-installed packages.
+
+----------------------------------------------------------------------------
+sync options for "nih install" and "nih uninstall".
+
+----------------------------------------------------------------------------
+
 nih install fails is autoinstalled dependency has been moved to
 another PKGPATH. This kind of problems can easily be solved automatically
 without "nih install _ dep- newpkgpath/dep".
