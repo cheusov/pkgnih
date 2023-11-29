@@ -73,6 +73,50 @@ fi
 . "$conffile"
 
 ######################################################################
+verbose (){
+    printf "%s\n" "$1" 1>&2
+}
+
+usage (){
+    cat 1>&2 <<'EOF'
+Usage:
+  pkgnih [global options] command [command options] [--] [command args]
+
+Global options:
+ nih -h                 - Display help message
+ nih -V                 - Display nih version
+ nih -y                 - Answer 'Yes' to all questions
+ nih -Y <question_id>   - Answer 'Yes' to question_id question.
+ nih -s <summary>       - pkg_summary(5) file
+
+ nih -D                 - enable debugging
+
+Commands:
+ nih <command> -h    - Display help message for a <command>
+ nih help            - Display help message
+ nih refresh         - Download pkg_summary/SHA512 files
+                       or update pkg_src_summary file
+ nih install
+   nih update        - Install or update packages
+ nih uninstall
+   nih delete
+   nih remove        - Uninstall packages
+ nih verify          - Verify packages integrity
+ nih status          - Show the status of installed packages
+ nih search          - Search on packages
+ nih audit           - Check the installed packages for vulnerabilities
+ nih info            - Show information about package
+ nih meta            - Output available or installed meta packages
+ nih leaf            - Output or remove leaf packages
+ nih list            - List packages
+ nih mark            - Mark packages
+ nih deps            - Show dependencies
+ nih clean-cache     - Clean-up cache directory with binaries
+ nih history         - Output a history of changes
+EOF
+}
+
+######################################################################
 # handling global options
 process_options (){
     alt_getopt \
@@ -119,50 +163,6 @@ if test -n "$summary"; then
 	    PKG_SUMMARY="$summary"
     esac
 fi
-
-######################################################################
-verbose (){
-    printf "%s\n" "$1" 1>&2
-}
-
-usage (){
-    cat 1>&2 <<'EOF'
-Usage:
-  pkgnih [global options] command [command options] [--] [command args]
-
-Global options:
- nih -h                 - Display help message
- nih -V                 - Display nih version
- nih -y                 - Answer 'Yes' to all questions
- nih -Y <question_id>   - Answer 'Yes' to question_id question.
- nih -s <summary>       - pkg_summary(5) file
-
- nih -D                 - enable debugging
-
-Commands:
- nih <command> -h    - Display help message for a <command>
- nih help            - Display help message
- nih refresh         - Download pkg_summary/SHA512 files
-                       or update pkg_src_summary file
- nih install
-   nih update        - Install or update packages
- nih uninstall
-   nih delete
-   nih remove        - Uninstall packages
- nih verify          - Verify packages integrity
- nih status          - Show the status of installed packages
- nih search          - Search on packages
- nih audit           - Check the installed packages for vulnerabilities
- nih info            - Show information about package
- nih meta            - Output available or installed meta packages
- nih leaf            - Output or remove leaf packages
- nih list            - List packages
- nih mark            - Mark packages
- nih deps            - Show dependencies
- nih clean-cache     - Clean-up cache directory with binaries
- nih history         - Output a history of changes
-EOF
-}
 
 fetch_ftp (){
     ${NIH_FTP_CMD-@FTP_CMD@} -o "$_base" -V -q1800 $FTP_OPTIONS "$1"
