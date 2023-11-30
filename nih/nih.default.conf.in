@@ -19,7 +19,7 @@ case "$opsys" in
 	REPOSITORY="https://pkgsrc.smartos.org/packages/SmartOS/trunk/$arch"
 	;;
     Darwin)
-	REPOSITORY='https://pkgsrc.smartos.org/packages/Darwin/trunk/$arch'
+	REPOSITORY="https://pkgsrc.smartos.org/packages/Darwin/trunk/$arch"
 	;;
     *)
 	REPOSITORY="https://cdn.netbsd.org/pub/pkgsrc/packages/$opsys/$arch/$osver"
