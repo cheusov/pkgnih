@@ -1,3 +1,34 @@
+----------------------------------------------------------------------------
+24.03.2021
+
+Installing package tex-ltxcmds-1.24 as a dependency...
+pkg_add: Warning: package `tex-ltxcmds-1.24' was built for a platform:
+pkg_add: NetBSD/x86_64 9.0 (pkg) vs. NetBSD/x86_64 9.99.48 (this host)
+Installing package p5-Mozilla-CA-20200520...
+pkg_add: Warning: package `p5-Mozilla-CA-20200520' was built for a platform:
+pkg_add: NetBSD/x86_64 9.0 (pkg) vs. NetBSD/x86_64 9.99.48 (this host)
+pkg_add: Conflicting PLIST with p5-Mozilla-CA-20180117nb2: lib/perl5/vendor_perl/man/man3/Mozilla::CA.3
+pkg_add: 1 package addition failed
+Updating pkgdb...
+
+----------------------------------------------------------------------------
+nih refresh -p:
+
+progress bar for a number of processed packages
+
+----------------------------------------------------------------------------
+nih refresh -p:
+
+check for PKGSRC directory existance and warn if it does not exist.
+
+----------------------------------------------------------------------------
+nih verify -m:
+
+  - should list only packages with failed cksums and store broken
+    files in temporary file
+
+----------------------------------------------------------------------------
+
 nih install fails is autoinstalled dependency has been moved to
 another PKGPATH. This kind of problems can easily be solved automatically
 without "nih install _ dep- newpkgpath/dep".
