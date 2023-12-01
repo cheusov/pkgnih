@@ -9,4 +9,4 @@
 
 # If you don't like the default REPOSITORY,
 # comment out and modify the following line
-#REPOSITORY="ftp://ftp.NetBSD.org/pub/pkgsrc/packages/$opsys/$arch/$osver"
+#REPOSITORY="https://cdn.netbsd.org/pub/pkgsrc/packages/$opsys/$arch/$osver"
