@@ -1,4 +1,11 @@
 ======================================================================
+Version 0.15.2, by Aleksey Cheusov, Fri,  1 Dec 2023 15:15:10 +0400
+
+  Fix default REPOSITORY for Darwin
+
+  First, try to download SHA512.bz2, and then SHA512.gz
+
+======================================================================
 Version 0.15.1, by Aleksey Cheusov, Thu, 30 Nov 2023 01:40:06 +0400
 
   Fix "nih -h" and "nih -V" broken in nih-0.15.0
