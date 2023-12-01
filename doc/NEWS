@@ -1,4 +1,11 @@
 ======================================================================
+Version 0.15.1, by Aleksey Cheusov, Thu, 30 Nov 2023 01:40:06 +0400
+
+  Fix "nih -h" and "nih -V" broken in nih-0.15.0
+
+  Update man page and TODO
+
+======================================================================
 Version 0.15.0, by Aleksey Cheusov, Mon, 27 Nov 2023 16:32:18 +0400
 
   nih remove:
