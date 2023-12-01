@@ -412,7 +412,7 @@ refresh_bin_summary (){
 	fi
 
 	if ! grep -l '^FILE_CKSUM=' pkg_summary.txt > /dev/null; then
-	    if ! fetch_sha512_file "$repo" gz && ! fetch_sha512_file "$repo" bz2; then
+	    if ! fetch_sha512_file "$repo" bz2 && ! fetch_sha512_file "$repo" gz; then
 		errmsg 'SHA512 file cannot be downloaded.'
 		exit 1
 	    fi
