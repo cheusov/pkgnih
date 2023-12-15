@@ -355,8 +355,7 @@ usage_refresh (){
     cat <<'EOF'
 nih refresh [options]
 
-      Download pkg_summary.gz and SHA512.gz, save them to ~/.nih/, and
-      then unpack them to .txt files.
+   Refresh remote package lists.
 
    options:
       -h     display this help message

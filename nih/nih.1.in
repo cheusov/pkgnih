@@ -62,7 +62,8 @@ The following sub-commands are provided.
 Display help message
 .TP
 .B  refresh
-By default pkg_summary(5) and SHA512 files are downloaded from
+Refresh remote package lists.
+In pkgsrc pkg_summary(5) and SHA512 files are downloaded from
 remote repository, and
 unpacked to ~/.nih/. The URL is specified
 by REPOSITORY configuration variable.
