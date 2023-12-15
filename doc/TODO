@@ -1,4 +1,8 @@
 ----------------------------------------------------------------------------
+Use fmt(1) instead of home-made implementation
+and provide USE_FMT configuration variable
+
+----------------------------------------------------------------------------
 nih list -A: output auto-installed packages.
 
 ----------------------------------------------------------------------------
