@@ -282,7 +282,7 @@ yesno (){
 	case "$answer" in
 	    y|Y|yes|Yes|YES)
 		return 0;;
-	    n|N|no|No|NO)
+	    *)
 		return 1;;
 	esac
     done
