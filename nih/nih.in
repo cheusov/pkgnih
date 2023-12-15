@@ -195,6 +195,18 @@ show_summary_PNC (){
     awk -F'\t' '{printf "%s (%s)\n     %s\n", $1, $2, $3}'
 }
 
+show_summary_NPC (){
+    # output:
+    #    PKGNAME (PKGPATH) <LF>
+    #        COMMENT <LF>
+    awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
+         /^PKGPATH=/ {pkgpath=substr($0, 9)}
+         /^COMMENT=/ {comment=substr($0, 9)}
+         NF == 0 {printf "%s\t%s\t%s\n", pkgname, pkgpath, comment}' "$@" |
+    sort |
+    awk -F'\t' '{printf "%s (%s)\n     %s\n", $1, $2, $3}'
+}
+
 show_summary_BC (){
     # output: PKGBASE     COMMENT <LF>
     awk '/^PKGNAME=/ {pkgbase=substr($0, 9); sub(/-[^-]*$/, "", pkgbase)}
