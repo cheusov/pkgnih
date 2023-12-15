@@ -348,7 +348,7 @@ cat_inst_summary (){ # TBD: adapt for rpmdb
 }
 
 cat_src_summary (){
-    summary_exists "$PKG_SRC_SUMMARY" ' -p'
+    summary_exists "$PKG_SRC_SUMMARY" '-p'
     cat "$PKG_SRC_SUMMARY"
 }
 
@@ -511,7 +511,7 @@ summary_exists (){
     if ! test -s "$1"; then
 	cat 1>&2 <<EOF
 '$1' file doesn't exist or is empty.
-Perhaps you need to run 'nih refresh$2'
+Perhaps you need to run 'nih refresh $2'
 EOF
 	exit 1
     fi
@@ -1375,7 +1375,7 @@ do_search_info_meta() {
 		export PKG_DIGGER_BACKEND=pkg_digger_summary #pkg_digger_installed
 		export PKG_DIGGER_SUMMARY="$PKG_INST_SUMMARY";;
 	    p)
-		nih_refresh_opt=' -p'
+		nih_refresh_opt='-p'
 		export PKG_DIGGER_BACKEND=pkg_digger_summary
 		export PKG_DIGGER_SUMMARY="$PKG_SRC_SUMMARY";;
 	    l)
