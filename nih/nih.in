@@ -209,7 +209,7 @@ show_summary_NPC (){
 
 show_summary_BC (){
     # output: PKGBASE     COMMENT <LF>
-    awk '/^PKGNAME=/ {pkgbase=substr($0, 9); sub(/-[^-]*$/, "", pkgbase)}
+    awk '/^PKGNAME=/ {pkgbase=substr($0, 9); sub(/-[0-9].*$/, "", pkgbase)}
          /^COMMENT=/ {comment=substr($0, 9)}
          NF == 0 {printf "%-19s %s\n", pkgbase, comment}' "$@" |
     sort
