@@ -293,6 +293,11 @@ get_date (){
 }
 
 summary2binary (){
+    # input: summary
+    # output:
+    #    PKGNAME1 FILE_NAME1
+    #    ...
+    #    PKGNAMEn FILE_NAMEn
     awk -v SUFX="$SUFX" '
     /^PKGNAME=/ {pkg1 = substr($0, 9) SUFX}
     /^FILE_NAME=/ {pkg2 = substr($0, 11)}
@@ -331,13 +336,13 @@ save_installed_packages (){
     bzip2 > "$installed_fn"
 }
 
-cat_bin_summary (){
+cat_bin_summary (){ # TBD: adapt for rpmdb
     set_pkg_summary
     summary_exists "$PKG_SUMMARY" ''
     cat "$PKG_SUMMARY"
 }
 
-cat_inst_summary (){
+cat_inst_summary (){ # TBD: adapt for rpmdb
     refresh_inst_summary
     cat "$PKG_INST_SUMMARY"
 }
@@ -413,7 +418,7 @@ fetch_sha512_file (){
     fi
 }
 
-refresh_bin_summary (){
+refresh_bin_summary (){ # TBD: adapt for rpmdb
     cd "$tmp_dir"
 
     rm -f new_summary.txt
@@ -446,14 +451,14 @@ refresh_bin_summary (){
     fi
 }
 
-refresh_src_summary (){
+refresh_src_summary (){ # TBD: adapt for rpmdb
     verbose 'Updating pkg_src_summary. This may take a while...'
     all_pkgs="$confdir/pkgsrc_packages"
     pkg_list_all_pkgs -a "$PKGSRC_ADDSUBDIRS" > "$all_pkgs"
     pkg_update_src_summary -d "$confdir" -f "$all_pkgs" -v
 }
 
-refresh_inst_summary (){
+refresh_inst_summary (){ # TBD: adapt for rpmdb
     if test -r "$PKG_INST_SUMMARY" &&
 	test "$pkgdb" -ot "$PKG_INST_SUMMARY"
     then
