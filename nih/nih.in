@@ -171,7 +171,6 @@ set_yes_var () {
     nih_opts="$nih_opts -Y$1"
 }
 
-# temp directory
 on_exit () {
     if test -n "$debug"; then
 	errmsg "temporary directory: $tmp_dir"
@@ -185,7 +184,9 @@ on_exit () {
 ######################################################################
 # functions
 show_summary_PNC (){
-    # PKGPATH <tab> (PKGNAME) <tab> COMMENT <nl>
+    # output:
+    #    PKGPATH (PKGNAME) <LF>
+    #        COMMENT <LF>
     awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
          /^PKGPATH=/ {pkgpath=substr($0, 9)}
          /^COMMENT=/ {comment=substr($0, 9)}
@@ -195,7 +196,7 @@ show_summary_PNC (){
 }
 
 show_summary_BC (){
-    # PKGBASE     COMMENT <nl>
+    # output: PKGBASE     COMMENT <LF>
     awk '/^PKGNAME=/ {pkgbase=substr($0, 9); sub(/-[^-]*$/, "", pkgbase)}
          /^COMMENT=/ {comment=substr($0, 9)}
          NF == 0 {printf "%-19s %s\n", pkgbase, comment}' "$@" |
@@ -203,7 +204,7 @@ show_summary_BC (){
 }
 
 show_summary_NC (){
-    # PKGNAME     COMMENT <nl>
+    # output: PKGNAME     COMMENT <LF>
     awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
          /^COMMENT=/ {comment=substr($0, 9)}
          NF == 0 {printf "%-19s %s\n", pkgname, comment}' "$@" |
@@ -211,13 +212,13 @@ show_summary_NC (){
 }
 
 show_summary_N (){
-    # PKGNAME
+    # output: PKGNAME
     awk '/^PKGNAME=/ {printf "%s\n", substr($0, 9)}' "$@" | sort | tr '
 ' ' ' | wrap 70
 }
 
 show_summary_NP (){
-    # PKGNAME(PKGNAME)
+    # output: PKGNAME(PKGPATH)
     awk '/^PKGNAME=/ {pkgname=substr($0, 9)}
          /^PKGPATH=/ {pkgpath=substr($0, 9)}
          NF == 0 {printf "%s (%s)  ", pkgname, pkgpath}
