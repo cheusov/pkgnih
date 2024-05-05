@@ -65,7 +65,7 @@ Display help message
 Refresh remote package lists.
 In pkgsrc pkg_summary(5) and SHA512 files are downloaded from
 remote repository, and
-unpacked to ~/.nih/. The URL is specified
+unpacked to (by default) @pkg_summary_dir@ directory. The URL is specified
 by REPOSITORY configuration variable.
 Unless
 .I NO_SUMMARY_COPY
@@ -405,7 +405,7 @@ To get package updated, run the following:
 .VE
 
 Before installation starts, a list of installed packages
-is saved to the history file ~/.nih/installed_YYYYMMDD_hhmm.bz2 unless
+is saved to the history file (by default) @historydir@/installed_YYYYMMDD_hhmm.bz2 unless
 .I NO_INSTALLED_COPY
 variable is set in the config file. The same applies to
 .IR uninstall " and " "leaf -R"
@@ -1049,13 +1049,13 @@ List files to be removed, do not actually remove anything.
 Remove all binaries, including binaries of the installed packages.
 .TP
 .B -i
-Do not remove binaries of packages listed in ~/.nih/installed_* files.
+Do not remove binaries of packages listed in (by default) @historydir@/installed_* files.
 Unlike running plain
 .I
 nih clean-cache
 without options, running it with -i option
 does not remove binaries of packages that the user ever tried, since these
-packages are reflected in the history files ~/.nih/installed_*.
+packages are reflected in the history files (by default) @historydir@/installed_*.
 .TP
 Config variables:
 .BR NIH_CLEAN_CACHE_OPTS " -- options passed to"
@@ -1066,7 +1066,7 @@ by default. The default value is "".
 .B history
 Show the history of changes that include package installs, removals, upgrades,
 downgrades, replacements and flag changes.
-The history is recorded in ~/.nih/installed_* files.
+The history is recorded in (by default) @historydir@/installed_* files.
 .P
 .RS
 .B "nih history"
@@ -1105,16 +1105,24 @@ first one will be used during installation. That is, from
 in example above. The default value for this variable depends on operating system.
 On NetBSD it defaults to
 .br
-.IR https://cdn.netbsd.org/pub/pkgsrc/packages/$opsys/$arch/$osver .
+.I https://cdn.netbsd.org/pub/pkgsrc/packages/$opsys/$arch/$osver
 .TP
 .BR CACHEDIR
 Binary packages are downloaded to the specified directory.
 The default is @cachedir@.
 .TP
+.BR HISTORYDIR
+Directory where files
+"pkg_summary_YYYYMMDD_hhmm.txt" and "pkg_summary_YYYYMMDD_hhmm.txt" are stored.
+The default is @historydir@.
+.TP
+.BR PKG_SUMMARY_DIR
+Directory where summaries are downloaded or generated.
+The default is @pkg_summary_dir@.
+.TP
 .B PKGSRCDIR
-Pkgsrc tree which is
-.I /usr/pkgsrc
-by default. This variable is used, for example, by
+Directory with pkgsrc tree.
+The default /usr/pkgsrc. This variable is used, for example, by
 .BR "nih refresh -p " and " nih search -p " commands.
 .TP
 .B PKGSRC_ADDSUBDIRS
@@ -1148,10 +1156,10 @@ The default is
 .BR fetch_ftp .
 .TP
 .BR NO_SUMMARY_COPY
-If set to 1, ~/.nih/pkg_summary_YYYYMMDD_hhmm.txt files are not created.
+If set to 1, @historydir@/pkg_summary_YYYYMMDD_hhmm.txt files are not created.
 .TP
 .B NO_INSTALLED_COPY
-If set to 1, ~/.nih/installed_YYYYMMDD_hhmm.txt files are not created.
+If set to 1, @historydir@/installed_YYYYMMDD_hhmm.txt files are not created.
 .TP
 .B PSS_SLAVES
 Used by
@@ -1304,17 +1312,10 @@ A list of options always applied to
 command.
 .SH FILES
 .TP
-.IR "~/.nih/config" " or " @sysconfdir@/nih/config
+.IR "~/.nihrc" " or " @sysconfdir@/nih.conf
 Configuration file for nih.
 .br
 See @dfltconfdir@/nih.default.conf for details.
-.TP
-.I "~/.nih"
-Directory where pkg_inst_summary.txt (summaries for installed
-packages), pkg_src_summary.txt (summaries for pkgsrc tree),
-pkg_summary.txt (downloaded summaries for binary packages),
-pkg_summary_YYYYMMDD_hhmm.txt, and
-installed_YYYYMMDD_hhmm.txt files are stored.
 .SH NOTES
 .I Auto-installed package
 means this package was auto-installed, see
