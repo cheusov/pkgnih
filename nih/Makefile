@@ -1,6 +1,6 @@
 EGDIR ?=		${DATADIR}/examples/nih # specific to pkgsrc
 PACKAGES ?=		/usr/pkgsrc/packages
-CACHEDIR ?=		${VARDIR}/cache/nih/package
+CACHEDIR ?=		${VARDIR}/cache/nih/packages
 HISTORYDIR ?=		${VARDIR}/cache/nih/history
 PKG_SUMMARY_DIR ?=	${VARDIR}/cache/nih/summary
 DFLTCONFDIR ?=		${LIBDIR}/nih
