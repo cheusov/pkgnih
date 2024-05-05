@@ -683,11 +683,14 @@ download_pkgs (){ # TODO: adapt for rpmdb
 
 grep_lines (){
     # $1 - file with lines
+    # input: stdin
+    # output: lines present in $1 and stdin
     awk 'FILENAME != "-" { hash [$0] = 0; next }
 	($0 in hash) {print $0 }' "$1" -
 }
 
 rev_lines (){
+    # Reverse input lines
     # $@ - files
     awk '{ line [NR] = $0 }
     END { for (i=NR; i >= 1; --i) print line [i] }' "$@"
