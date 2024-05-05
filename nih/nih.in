@@ -2007,6 +2007,11 @@ test -n "$tmp_dir" || exit 1
 
 fake_pkg_fn="$tmp_dir/fake.tgz"
 
+# update PKG_INST_SUMMARY for unprivileged user
+if ! touch "$PKG_INST_SUMMARY.tmp" 2>/dev/null; then
+    PKG_INST_SUMMARY="$tmp_dir/pkg_inst_summary.tmp"
+fi
+
 #
 if test $# -eq 0; then
     usage
