@@ -8,5 +8,6 @@
 #WGET_OPTIONS='-4'
 
 # If you don't like the default REPOSITORY,
-# comment out and modify the following line
+# modify the following lines.
+#REPOSITORY=$(pkg_admin config-var PKG_PATH | sed 's,/All,,')
 #REPOSITORY="https://cdn.netbsd.org/pub/pkgsrc/packages/$opsys/$arch/$osver"
