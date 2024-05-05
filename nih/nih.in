@@ -542,9 +542,6 @@ refresh_summary (){
     tiny_summary="$tmp_dir/tiny_summary"
     make_tiny_summary "$PKG_SUMMARY" > "$tiny_summary"
     export PKG_SUMMARY="$tiny_summary"
-
-    refreshed_summary="$tmp_dir/refreshed_summary"
-    pkg_refresh_summary "$tiny_summary" > "$refreshed_summary"
 }
 
 ######################################################################
