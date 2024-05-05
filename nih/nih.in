@@ -521,13 +521,13 @@ make_tiny_summary (){
     # remove unnecessary fields and add PKGPATH with "fake" category if it is absent
     awk '
 ! /^$|^(PKGNAME|PKGPATH|COMMENT|automatic|CONFLICTS|DEPENDS|BUILD_DATE|PROVIDES|REQUIRES|FILE_NAME)=/ {next}
-/^PKGPATH=/ {ok = 1}
-/^PKGNAME=/ {name = substr($0, 9)}
+/^PKGPATH=/ {pkgpath_presents = 1}
+/^PKGNAME=/ {pkgname = substr($0, 9)}
 NF == 0 {
-        if (!ok) {
-                sub(/-[^-]*$/, "", name)
-                print "PKGPATH=fake/" name
-                name = ""; ok = 0
+        if (!pkgpath_presents) {
+                sub(/-[^-]*$/, "", pkgname)
+                print "PKGPATH=fake/" pkgname
+                pkgname = ""; pkgpath_presents = 0
         }
         print ""; next
 }
