@@ -1,4 +1,20 @@
 ----------------------------------------------------------------------------
+Fix URL to default repository to pkgsrc.smartos.org
+
+----------------------------------------------------------------------------
+CACHEDIR should default to $PREFIX/var/cache/nih/bin-package
+
+----------------------------------------------------------------------------
+cache directory for history files should default to
+$PREFIX/var/cache/nih/history all other caches should be moved to $PREFIX/var/cache
+
+----------------------------------------------------------------------------
+nih status -B -- show dates or other different criteria?
+
+----------------------------------------------------------------------------
+nih update --> easier to understand duplicateed package warning?
+
+----------------------------------------------------------------------------
 Use fmt(1) instead of home-made implementation
 and provide USE_FMT configuration variable
 
