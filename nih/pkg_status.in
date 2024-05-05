@@ -31,7 +31,7 @@
 # user settable variables
 
 PKG_SRC_SUMMARY_CMD=${PKG_SRC_SUMMARY_CMD-pkg_micro_src_summary}
-PKG_SUMMARY=${PKG_SUMMARY-@PACKAGES@/All/pkg_summary.txt}
+PKG_SUMMARY=${PKG_SUMMARY-@PACKAGES@/All/pkg_bin_summary.txt}
 
 ############################################################
 set -e
@@ -87,7 +87,7 @@ OPTIONS for -k:
 Environment:
    PKG_STATUS_OPTIONS - additional options passed to pkg_status
    PKG_SUMMARY      - path to pkg_summary.{txt,gx,bz2},
-                      it defaults to @PACKAGES@/All/pkg_summary.txt
+                      it defaults to @PACKAGES@/All/pkg_bin_summary.txt
    PKG_SRC_SUMMARY_CMD - command for generating micro summary,
                       it defaults to pkg_micro_src_summary,
                       reasonable (but slower) alternative is pkg_src_summary.
@@ -285,7 +285,7 @@ if test -z "$pkgpaths_fn"; then
     }
 else
     generate_pkgpaths (){
-    	true;
+	true;
     }
 fi
 

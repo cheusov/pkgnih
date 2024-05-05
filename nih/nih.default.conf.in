@@ -50,7 +50,7 @@ PSS_OPTIONS='-m'
 #FTP_OPTIONS='-4'
 
 # Uncomment the following line if you use prebuild local packages
-#PKG_SUMMARY=/usr/pkgsrc/packages/All/pkg_summary.txt
+#PKG_SUMMARY=/usr/pkgsrc/packages/All/pkg_bin_summary.txt
 
 # Uncomment the following line if you keep binaries in non-standard
 # location

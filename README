@@ -39,7 +39,7 @@ Why NIH:
     and NetBSD and I consider it rather stable.
 
   - I've got pkg_status, small tool for checking status of
-    installed packages against pkg_summary.txt or pkgsrc source tree.
+    installed packages against pkg_bin_summary.txt or pkgsrc source tree.
     It also provides other features usually implemented by
     full-featured package management tools. It is very small and
     stable.

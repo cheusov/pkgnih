@@ -70,7 +70,7 @@ by REPOSITORY configuration variable.
 Unless
 .I NO_SUMMARY_COPY
 variable is set in the configuration file, previous version of
-pkg_summary.txt is backed up into "pkg_summary_YYYYMMDD_hhmm.txt".
+pkg_bin_summary.txt is backed up into "pkg_summary_YYYYMMDD_hhmm.txt".
 So, it can be restored and used again
 at any time in the future.
 If
