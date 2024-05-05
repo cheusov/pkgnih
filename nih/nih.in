@@ -336,13 +336,13 @@ save_installed_packages (){
     bzip2 > "$installed_fn"
 }
 
-cat_bin_summary (){ # TBD: adapt for rpmdb
+cat_bin_summary (){ # TODO: adapt for rpmdb
     set_pkg_summary
     summary_exists "$PKG_SUMMARY" ''
     cat "$PKG_SUMMARY"
 }
 
-cat_inst_summary (){ # TBD: adapt for rpmdb
+cat_inst_summary (){ # TODO: adapt for rpmdb
     refresh_inst_summary
     cat "$PKG_INST_SUMMARY"
 }
@@ -418,7 +418,7 @@ fetch_sha512_file (){
     fi
 }
 
-refresh_bin_summary (){ # TBD: adapt for rpmdb
+refresh_bin_summary (){ # TODO: adapt for rpmdb
     cd "$tmp_dir"
 
     rm -f new_summary.txt
@@ -451,14 +451,14 @@ refresh_bin_summary (){ # TBD: adapt for rpmdb
     fi
 }
 
-refresh_src_summary (){ # TBD: adapt for rpmdb
+refresh_src_summary (){ # TODO: adapt for rpmdb
     verbose 'Updating pkg_src_summary. This may take a while...'
     all_pkgs="$confdir/pkgsrc_packages"
     pkg_list_all_pkgs -a "$PKGSRC_ADDSUBDIRS" > "$all_pkgs"
     pkg_update_src_summary -d "$confdir" -f "$all_pkgs" -v
 }
 
-refresh_inst_summary (){ # TBD: adapt for rpmdb
+refresh_inst_summary (){ # TODO: adapt for rpmdb
     if test -r "$PKG_INST_SUMMARY" &&
 	test "$pkgdb" -ot "$PKG_INST_SUMMARY"
     then
@@ -624,7 +624,7 @@ Examples:
 EOF
 }
 
-check_cksums (){
+check_cksums (){ # TODO: adapt for rpmdb
     # $1 - foobar-1.2.3.tgz
     if test -n "$IGNORE_CKSUMS"; then
 	return
@@ -648,7 +648,7 @@ check_cksums (){
     fi
 }
 
-download_pkgs (){
+download_pkgs (){ # TODO: adapt for rpmdb
     # stdin -- list of (pkg url) packages to download
     (
 	ex=0
@@ -693,7 +693,7 @@ rev_lines (){
     END { for (i=NR; i >= 1; --i) print line [i] }' "$@"
 }
 
-replace_with_fake (){
+replace_with_fake (){ # TODO: adapt for rpmdb
     # $1 - pkgbase
     # $2 - version
     deps=`$PKG_INFO_CMD -X "$1" | sed -n 's/^DEPENDS=//p'`
