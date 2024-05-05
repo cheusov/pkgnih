@@ -56,6 +56,11 @@ PSS_OPTIONS='-m'
 # location
 CACHEDIR=@cachedir@
 
+# Uncomment the following like if you want to store history in alternative directory
+HISTORYDIR=@historydir@
+
+PKG_SUMMARYDIR=@pkg_summarydir@
+
 # Uncomment the following line if you use .tbz packages
 #SUFX=.tbz
 

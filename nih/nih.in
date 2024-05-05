@@ -30,8 +30,8 @@ set -e
 export LC_ALL=C
 
 ######################################################################
-sysconfdir=${NIH_SYSCONFDIR-@sysconfdir@}/nih
-confdir="$HOME/.nih"
+sysconf=${NIH_SYSCONFDIR-@sysconfdir@}/nih.conf
+userconf="$HOME/.nihrc"
 
 dfltconfdir=${NIH_DFLTCONFDIR-@dfltconfdir@}
 
@@ -57,13 +57,13 @@ if ! test -r "$pkgdb"; then
 fi
 
 # loading config files
-if test -r "$confdir/config"; then
-    conffile="$confdir/config"
-elif test -r "$sysconfdir/config"; then
-    conffile="$sysconfdir/config"
+if test -r "$userconf"; then
+    conffile="$userconf"
+elif test -r "$sysconf"; then
+    conffile="$sysconf"
 else
     cat <<EOF
-Neither $sysconfdir/config nor $confdir/config are readable.
+Neither $sysconf nor $userconf are readable.
 Sorry, I cannot help.
 EOF
     exit 1
@@ -120,7 +120,7 @@ EOF
 # ensure that pkg_summary.txt exists and refresh it
 set_pkg_summary() {
     if test -z "$PKG_SUMMARY"; then
-	PKG_SUMMARY="$confdir/pkg_summary.txt"
+	PKG_SUMMARY="$PKG_SUMMARYDIR/pkg_summary.txt"
     fi
 }
 
@@ -320,7 +320,7 @@ save_installed_packages (){
     summary_aleady_saved=1
 
     #
-    installed_fn=$confdir/installed_`get_date`
+    installed_fn="$PKG_SUMMARYDIR"/installed_`get_date`
     counter=''
     while test -f "${installed_fn}$counter.bz2"; do
 	counter=${counter-0}
@@ -440,7 +440,7 @@ refresh_bin_summary (){ # TODO: adapt for rpmdb
 	sed 's,^\(FILE_NAME= *\)\(.*\),\1'"$repo"'/All/\2,' pkg_summary.txt >> new_summary.txt
 	rm pkg_summary.txt
     done
-    cd "$confdir"
+    cd "$PKG_SUMMARYDIR"
     pkg_uniq_summary -Fpb "$tmp_dir"/new_summary.txt > pkg_summary.txt.tmp
     mv pkg_summary.txt.tmp pkg_summary.txt
     rm "$tmp_dir"/new_summary.txt
@@ -631,7 +631,7 @@ check_cksums (){ # TODO: adapt for rpmdb
     fi
 
     printf '    ckecksum... ' 1>&2
-    expected_sha512=`pkg_grep_summary -t suffix FILE_NAME "/$1" < "$confdir/pkg_summary.txt" |
+    expected_sha512=`pkg_grep_summary -t suffix FILE_NAME "/$1" < "$PKG_SUMMARYDIR/pkg_summary.txt" |
 	sed -n 's,^FILE_CKSUM= *sha512  *,,p'`
     if test -z "$expected_sha512"; then
 	verbose 'skipped'
@@ -1817,8 +1817,8 @@ do_clean_cache() {
 	    pkg_info -Xa
 
 	    if test -n "$keep_installed"; then
-		find "$confdir" -name 'installed_*.txt' | xargs cat
-		find "$confdir" -name 'installed_*.bz2' | xargs bzip2 -dc
+		find "$PKG_SUMMARYDIR" -name 'installed_*.txt' | xargs cat
+		find "$PKG_SUMMARYDIR" -name 'installed_*.bz2' | xargs bzip2 -dc
 	    fi
 	} | summary2binary | awk '{print $1}' | sort -u > "$installed"
     fi
@@ -1947,7 +1947,7 @@ do_history() {
     unpacked1_fn="$tmp_dir/unpacked1.txt"
     unpacked2_fn="$tmp_dir/unpacked2.txt"
 
-    ls -r $confdir/installed_????????_????.* |
+    ( cd "$HISTORYDIR"; ls -1r installed_????????_????.* 2>/dev/null; ) |
     while read curr_fn; do
 	curr=`echo $curr_fn | awk 'match($0, /[0-9].*[0-9]/) {
 	    print substr($0, RSTART, 4) "-" substr($0, RSTART+4, 2) "-" substr($0, RSTART+6, 2) " " substr($0, RSTART+9, 2) ":" substr($0, RSTART+11, 2)}'`
@@ -1959,7 +1959,7 @@ do_history() {
 	    else
 		tmp_fn="$unpacked2_fn"
 	    fi
-	    bzip2 -dc "$curr_fn" > "$tmp_fn"
+	    bzip2 -dc "$HISTORYDIR/$curr_fn" > "$tmp_fn"
 	    curr_fn="$tmp_fn"
 	fi
 
@@ -1990,12 +1990,11 @@ process_options (){
 	-- $NIH_OPTS "$@"
 }
 
-PKG_INST_SUMMARY="$confdir/pkg_inst_summary.txt"
-PKG_SRC_SUMMARY="$confdir/pkg_src_summary.txt"
+PKG_INST_SUMMARY="$PKG_SUMMARYDIR/pkg_inst_summary.txt"
+PKG_SRC_SUMMARY="$PKG_SUMMARYDIR/pkg_src_summary.txt"
 
 export PKGSRCDIR PSS_SLAVES PSS_OPTIONS
 
-mkdir -p "$confdir"
 cmds=`process_options "$@"`
 eval "$cmds"
 
