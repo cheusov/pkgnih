@@ -1,10 +1,10 @@
 EGDIR ?=		${DATADIR}/examples/nih # specific to pkgsrc
 PACKAGES ?=		/usr/pkgsrc/packages
 CACHEDIR ?=		${VARDIR}/cache/nih/package
+HISTORYDIR ?=		${VARDIR}/cache/nih/history
+PKG_SUMMARY_DIR ?=	${VARDIR}/cache/nih/summary
 DFLTCONFDIR ?=		${LIBDIR}/nih
 PKG_DBDIR ?=		${PREFIX}/pkgdb
-HISTORYDIR ?=		${VARDIR}/cache/nih/history
-PKG_SUMMARYDIR ?=	${VARDIR}/cache/nih
 
 REAL_ROOT_USER ?=	root
 REAL_ROOT_GROUP ?=	wheel
@@ -34,7 +34,7 @@ INTEXTS_REPLS +=	PREFIX         ${PREFIX}
 INTEXTS_REPLS +=	PACKAGES       ${PACKAGES}
 INTEXTS_REPLS +=	PKG_DBDIR      ${PKG_DBDIR}
 
-INTEXTS_REPLS +=	pkg_summarydir ${PKG_SUMMARYDIR}
+INTEXTS_REPLS +=	pkg_summary_dir ${PKG_SUMMARY_DIR}
 INTEXTS_REPLS +=	historydir     ${HISTORYDIR}
 INTEXTS_REPLS +=	cachedir       ${CACHEDIR}
 INTEXTS_REPLS +=	dfltconfdir    ${DFLTCONFDIR}

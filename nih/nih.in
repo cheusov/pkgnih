@@ -120,7 +120,7 @@ EOF
 # ensure that pkg_summary.txt exists and refresh it
 set_pkg_summary() {
     if test -z "$PKG_SUMMARY"; then
-	PKG_SUMMARY="$PKG_SUMMARYDIR/pkg_summary.txt"
+	PKG_SUMMARY="$PKG_SUMMARY_DIR/pkg_summary.txt"
     fi
 }
 
@@ -440,7 +440,7 @@ refresh_bin_summary (){ # TODO: adapt for rpmdb
 	sed 's,^\(FILE_NAME= *\)\(.*\),\1'"$repo"'/All/\2,' pkg_summary.txt >> new_summary.txt
 	rm pkg_summary.txt
     done
-    cd "$PKG_SUMMARYDIR"
+    cd "$PKG_SUMMARY_DIR"
     pkg_uniq_summary -Fpb "$tmp_dir"/new_summary.txt > pkg_summary.txt.tmp
     mv pkg_summary.txt.tmp pkg_summary.txt
     rm "$tmp_dir"/new_summary.txt
@@ -631,7 +631,7 @@ check_cksums (){ # TODO: adapt for rpmdb
     fi
 
     printf '    ckecksum... ' 1>&2
-    expected_sha512=`pkg_grep_summary -t suffix FILE_NAME "/$1" < "$PKG_SUMMARYDIR/pkg_summary.txt" |
+    expected_sha512=`pkg_grep_summary -t suffix FILE_NAME "/$1" < "$PKG_SUMMARY_DIR/pkg_summary.txt" |
 	sed -n 's,^FILE_CKSUM= *sha512  *,,p'`
     if test -z "$expected_sha512"; then
 	verbose 'skipped'
@@ -1993,8 +1993,8 @@ process_options (){
 	-- $NIH_OPTS "$@"
 }
 
-PKG_INST_SUMMARY="$PKG_SUMMARYDIR/pkg_inst_summary.txt"
-PKG_SRC_SUMMARY="$PKG_SUMMARYDIR/pkg_src_summary.txt"
+PKG_INST_SUMMARY="$PKG_SUMMARY_DIR/pkg_inst_summary.txt"
+PKG_SRC_SUMMARY="$PKG_SUMMARY_DIR/pkg_src_summary.txt"
 
 export PKGSRCDIR PSS_SLAVES PSS_OPTIONS
 
