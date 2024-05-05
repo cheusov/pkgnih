@@ -320,7 +320,7 @@ save_installed_packages (){
     summary_aleady_saved=1
 
     #
-    installed_fn="$PKG_SUMMARYDIR"/installed_`get_date`
+    installed_fn="$HISTORYDIR"/installed_`get_date`
     counter=''
     while test -f "${installed_fn}$counter.bz2"; do
 	counter=${counter-0}
@@ -1820,8 +1820,8 @@ do_clean_cache() {
 	    pkg_info -Xa
 
 	    if test -n "$keep_installed"; then
-		find "$PKG_SUMMARYDIR" -name 'installed_*.txt' | xargs cat
-		find "$PKG_SUMMARYDIR" -name 'installed_*.bz2' | xargs bzip2 -dc
+		find "$HISTORYDIR" -name 'installed_*.txt' | xargs cat
+		find "$HISTORYDIR" -name 'installed_*.bz2' | xargs bzip2 -dc
 	    fi
 	} | summary2binary | awk '{print $1}' | sort -u > "$installed"
     fi
