@@ -72,6 +72,8 @@ fi
 . "$dfltconfdir/nih.default.conf"
 . "$conffile"
 
+: ${PKG_TINY_BIN_SUMMARY:=${PKG_SUMMARY_DIR}/pkg_tiny_bin_summary.txt}
+
 ######################################################################
 verbose (){
     printf "%s\n" "$1" 1>&2
@@ -445,6 +447,9 @@ refresh_bin_summary (){ # TODO: adapt for rpmdb
     mv pkg_bin_summary.txt.tmp pkg_bin_summary.txt
     rm "$tmp_dir"/new_summary.txt
 
+    make_tiny_summary pkg_bin_summary.txt > "$PKG_TINY_BIN_SUMMARY.tmp"
+    mv "$PKG_TINY_BIN_SUMMARY.tmp" "$PKG_TINY_BIN_SUMMARY"
+
     if test -z "$NO_SUMMARY_COPY"; then
 	date_sufx=`get_date`
 	cp pkg_bin_summary.txt pkg_bin_summary_${date_sufx}.txt
@@ -535,13 +540,14 @@ NF == 0 {
 ' "$@"
 }
 
-refresh_summary (){
+refresh_tiny_bin_summary (){
     set_pkg_summary
     summary_exists "$PKG_SUMMARY" ''
-
-    tiny_summary="$tmp_dir/tiny_summary"
-    make_tiny_summary "$PKG_SUMMARY" > "$tiny_summary"
-    export PKG_SUMMARY="$tiny_summary"
+    if test "$PKG_SUMMARY" -nt "$PKG_TINY_BIN_SUMMARY"; then
+	PKG_TINY_BIN_SUMMARY="$tmp_dir/tiny_summary"
+	make_tiny_summary "$PKG_SUMMARY" > "$PKG_TINY_BIN_SUMMARY".tmp
+	mv "$PKG_TINY_BIN_SUMMARY".tmp "$PKG_TINY_BIN_SUMMARY"
+    fi
 }
 
 ######################################################################
@@ -823,7 +829,8 @@ do_install() {
 
     #
     if is_pkg_summary_required "$@"; then
-	refresh_summary
+	refresh_tiny_bin_summary
+	export PKG_SUMMARY="$PKG_TINY_BIN_SUMMARY"
     fi
     refresh_inst_summary
 
@@ -852,13 +859,13 @@ do_install() {
 		fi
 		pkg_info -X "$fn" |
 		sed "s ^FILE_NAME=.*$ FILE_NAME=$fn " |
-		tee "$tiny_summary".tmp |
+		tee "$PKG_TINY_BIN_SUMMARY".tmp |
 		awk -v suffix="$suffix" '
 		     /^PKGPATH=/ {p=substr($0, 9)}
 		     /^PKGNAME=/ {n=substr($0, 9)}
 		     END {print p ";" n suffix}' >> "$update_pkgs_fn"
-		cat "$tiny_summary" >> "$tiny_summary".tmp
-		pkg_uniq_summary "$tiny_summary".tmp > "$tiny_summary"
+		cat "$PKG_TINY_BIN_SUMMARY" >> "$PKG_TINY_BIN_SUMMARY".tmp
+		pkg_uniq_summary "$PKG_TINY_BIN_SUMMARY".tmp > "$PKG_TINY_BIN_SUMMARY"
 	    else
 		printf '%s\n' "$i" >> "$update_pkgs_fn"
 	    fi
@@ -1225,7 +1232,8 @@ do_status() {
     shift `expr $OPTIND - 1`
 
     if echo "$opts" | grep 'b[^s]*$' > /dev/null; then
-	refresh_summary
+	refresh_tiny_bin_summary
+	export PKG_SUMMARY="$PKG_TINY_BIN_SUMMARY"
     fi
 
     pkg_status "-$opts" "$@"
