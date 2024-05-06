@@ -30,8 +30,8 @@
 ############################################################
 # user settable variables
 
-PKG_SRC_SUMMARY_CMD=${PKG_SRC_SUMMARY_CMD-pkg_micro_src_summary}
-PKG_SUMMARY=${PKG_SUMMARY-@PACKAGES@/All/pkg_bin_summary.txt}
+: ${PKG_SRC_SUMMARY_CMD:=pkg_micro_src_summary}
+: ${PKG_SUMMARY:=@pkg_summary_dir@/pkg_bin_summary.txt}
 
 ############################################################
 set -e
@@ -41,9 +41,9 @@ set -e
 export LC_ALL=C
 
 ############################################################
-PKG_INFO_CMD="${PKG_INFO_CMD-@PKG_INFO_CMD@}"
-PKG_DELETE_CMD="${PKG_DELETE_CMD-@PKG_DELETE_CMD@}"
-PKG_ADMIN_CMD="${PKG_ADMIN_CMD-@PKG_ADMIN_CMD@}"
+: ${PKG_INFO_CMD:=@PKG_INFO_CMD@}
+: ${PKG_DELETE_CMD:=@PKG_DELETE_CMD@}
+: ${PKG_ADMIN_CMD:=@PKG_ADMIN_CMD@}
 
 ############################################################
 usage (){
