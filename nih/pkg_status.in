@@ -187,15 +187,18 @@ fi
 ######################################################################
 # top-level options
 
-# temporarty directory
-tmp_dir=`mktemp -d /tmp/pkg_status.XXXXXX`
-if test -z "$debug"; then
-    trap "rm -rf $tmp_dir" 0 1 2 15
-else
-    echo "Temp directory: $tmp_dir" 1>&2
-fi
+on_exit () {
+    if test -n "$debug"; then
+	errmsg "temporary directory: $tmp_dir"
+    else
+	rm -rf "$tmp_dir"
+    fi
+}
 
-test "$tmp_dir" || exit 1
+. @libexecdir@/psu/sig_handler.sh
+tmp_dir=`mktemp -d /tmp/pkg_status.XXXXXX`
+test -n "$tmp_dir" || exit 1
+
 
 #
 if test -z "${mode_src}${mode_bin}${mode_leaves}${mode_checks}"; then
