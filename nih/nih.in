@@ -474,6 +474,9 @@ refresh_inst_summary (){ # TODO: adapt for rpmdb
 	pkg_bin_summary -a PLIST,automatic,try_out,keep,COMMENT \
 	    > "$PKG_INST_SUMMARY".tmp
 	mv "$PKG_INST_SUMMARY".tmp "$PKG_INST_SUMMARY"
+
+	make_tiny_summary "$PKG_INST_SUMMARY" > "$PKG_TINY_INST_SUMMARY.tmp"
+	mv "$PKG_TINY_INST_SUMMARY.tmp" "$PKG_TINY_INST_SUMMARY"
     fi
 }
 
@@ -526,7 +529,7 @@ EOF
 make_tiny_summary (){
     # remove unnecessary fields and add PKGPATH with "fake" category if it is absent
     awk '
-! /^$|^(PKGNAME|PKGPATH|COMMENT|automatic|CONFLICTS|DEPENDS|BUILD_DATE|PROVIDES|REQUIRES|FILE_NAME)=/ {next}
+! /^$|^(PKGNAME|PKGPATH|COMMENT|automatic|try_out|CONFLICTS|DEPENDS|BUILD_DATE|PROVIDES|REQUIRES|FILE_NAME)=/ {next}
 /^PKGPATH=/ {pkgpath_presents = 1}
 /^PKGNAME=/ {pkgname = substr($0, 9)}
 NF == 0 {
