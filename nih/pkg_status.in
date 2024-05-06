@@ -31,7 +31,8 @@
 # user settable variables
 
 : ${PKG_SRC_SUMMARY_CMD:=pkg_micro_src_summary}
-: ${PKG_SUMMARY:=@pkg_summary_dir@/pkg_bin_summary.txt}
+: ${PKG_SUMMARY:=@pkg_summary_dir@/pkg_tiny_bin_summary.txt}
+: ${PKG_INST_SUMMARY:=@pkg_summary_dir@/pkg_tiny_inst_summary.txt}
 
 ############################################################
 set -e
