@@ -1,7 +1,7 @@
 #!/bin/sh
 #-*-mode:  sh -*-
 
-# Copyright (c) 2010-2014, Aleksey Cheusov <vle@gmx.net>
+# Copyright (c) 2010-2024, Aleksey Cheusov <vle@gmx.net>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -63,10 +63,10 @@ OPTIONS:
   -V         display version
   -r         raw output
   -D         for debugging purposes, temp files are not removed
-OPTIONS common for -s and -b:
   -s         compare against pkgsrc source tree
   -b         compare against pkg_summary(5) database,
              a path to which is stored in PKG_SUMMARY environment variable
+OPTIONS common for -s and -b:
   -u         analyse packages marked as installed by user (the default, see -a)
   -a         analyse all installed packages (see -u)
   -A         by default up-to-date packages are skipped,
@@ -87,7 +87,7 @@ OPTIONS for -k:
 Environment:
    PKG_STATUS_OPTIONS - additional options passed to pkg_status
    PKG_SUMMARY      - path to pkg_summary.{txt,gx,bz2},
-                      it defaults to @PACKAGES@/All/pkg_bin_summary.txt
+                      it defaults to @cachedir@/pkg_bin_summary.txt
    PKG_SRC_SUMMARY_CMD - command for generating micro summary,
                       it defaults to pkg_micro_src_summary,
                       reasonable (but slower) alternative is pkg_src_summary.
