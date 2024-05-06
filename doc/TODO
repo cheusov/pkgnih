@@ -1,12 +1,14 @@
+Do not regenerate tiny_bin_summary every time we run 'nih status'.
+Generate it once.
+
+----------------------------------------------------------------------------
+asrock# PSS_SLAVES=20 nih refresh -p
+Updating pkg_src_summary. This may take a while...
+pkg_update_src_summary: -d option is mandatory
+asrock#
+
 ----------------------------------------------------------------------------
 Fix URL to default repository to pkgsrc.smartos.org
-
-----------------------------------------------------------------------------
-CACHEDIR should default to $PREFIX/var/cache/nih/bin-package
-
-----------------------------------------------------------------------------
-cache directory for history files should default to
-$PREFIX/var/cache/nih/history all other caches should be moved to $PREFIX/var/cache
 
 ----------------------------------------------------------------------------
 nih status -B -- show dates or other different criteria?
