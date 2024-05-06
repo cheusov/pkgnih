@@ -335,7 +335,8 @@ save_installed_packages (){
 
     grep -E '^$|^(PKGNAME|PKGPATH|automatic|try_out|keep|BUILD_DATE)=' \
 	"$PKG_INST_SUMMARY" |
-    bzip2 > "$installed_fn"
+	bzip2 > "$installed_fn".bz2
+    mv "$installed_fn".bz2 "$installed_fn"
 }
 
 cat_bin_summary (){ # TODO: adapt for rpmdb
