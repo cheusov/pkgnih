@@ -45,13 +45,15 @@
 #   -h        display this help
 #   -v        verbose mode
 #   -i        obtains packages specifications from stdin
-#   -t        mark packages to be installed with "try out" marker.
+#   -t        mark <packages> to be installed with "try out" marker.
 #   -l        do not mark leaf packages installed as a dependency for removal
 #   -p        do not run REQUIRES/PROVIDES consistency check
 #   -r        mark dependencies for install/update
 #   -R        mark dependent packages for install/update
 #   -B        consider packages different if their BUILD_DATE differ
 #   -w        if requested package is not found, write a warning message
+#             to stderr and continue to work.
+#   -W        if package requested for removal is not found, write a warning message
 #             to stderr and continue to work.
 # <packages> may be either PKGBASEs, PKGNAMEs or PKGPATHs,
 # optionally appended by `-' (marked for removal),
@@ -185,8 +187,12 @@ function process_pkg (pkg, try_out, hash_val, reqd,
 			rempair = base
 	}else if (suff == "-" || suff == "--"){
 		print_eqs(0)
-		print "Package " base " is marked for removal but not installed" > "/dev/stderr"
-		ex = 1
+		if (!warning[base]++){
+			print "Package " base " is marked for removal but not installed" > "/dev/stderr"
+		}
+		if (!ignore_notfound_removal) {
+			ex = 1
+		}
 		return
 	}
 
@@ -434,6 +440,7 @@ BEGIN {
 	update_pkgpath_list = ""
 
 	ignore_notfound = getarg("w")
+	ignore_notfound_removal = getarg("W")
 
 	if (from_stdin){
 		while (xgetline0()){
