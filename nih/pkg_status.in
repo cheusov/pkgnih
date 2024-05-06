@@ -225,27 +225,27 @@ if test -n "$mode_checks"; then
 	    $PKG_INFO_CMD -X -a
 	else
 	    $PKG_INFO_CMD -X "$@"
-	fi > $tmp_dir/bin_summary.txt
+	fi > "$tmp_dir/inst_summary.txt"
     fi
 
     if test -n "$check_reqs_provs"; then
 	echo 'REQUIRES/PROVIDES coherence:'
-	pkg_lint_summary -l $tmp_dir/bin_summary.txt || ex=1
+	pkg_lint_summary -l "$tmp_dir/inst_summary.txt" || ex=1
     fi
 
     if test -n "$check_reqs_exist"; then
 	echo 'REQUIRES vs. filesystem:'
-	pkg_lint_summary -L $tmp_dir/bin_summary.txt || ex=1
+	pkg_lint_summary -L "$tmp_dir/inst_summary.txt" || ex=1
     fi
 
     if test -n "$check_deps$check_conflicts"; then
 	echo 'Missing dependencies and conflicts:'
-	pkg_lint_summary $check_deps $check_conflicts $tmp_dir/bin_summary.txt || ex=1
+	pkg_lint_summary $check_deps $check_conflicts "$tmp_dir/inst_summary.txt" || ex=1
     fi
 
     if test -n "$os_ver"; then
 	echo 'OS_VERSION:'
-	runpipe_base pkg_lint_summary -s $tmp_dir/bin_summary.txt '|' \
+	runpipe_base pkg_lint_summary -s "$tmp_dir/inst_summary.txt" '|' \
 	awk '$1 == "s:" {print $1, $2, $3, $4, $6}'
 	if test "$pipestatus_1" -ne 0; then
 	    ex=1
@@ -293,10 +293,10 @@ else
 fi
 
 ###
-src_summary_fn=$tmp_dir/src_summary.txt
-bin_summary_fn=$tmp_dir/bin_summary.txt
-ext_summary_fn=$tmp_dir/ext_summary.txt
-res_fn=$tmp_dir/result.txt
+src_summary_fn="$tmp_dir/src_summary.txt"
+inst_summary_fn="$tmp_dir/inst_summary.txt"
+bin_summary_fn="$tmp_dir/bin_summary.txt"
+res_fn="$tmp_dir/result.txt"
 
 show_output_format (){
     if test -z "$quiet" -a -z "$submode_raw"; then
@@ -348,13 +348,13 @@ fi
 # -s
 if test -n "$mode_src"; then
     pkg_bin_summary -f PKGPATH,PKGNAME,automatic,try_out -- $pkg_info_opts "$@" \
-	> "$bin_summary_fn"
+	> "$inst_summary_fn"
     generate_pkgpaths "$@"
 
     $PKG_SRC_SUMMARY_CMD < "$pkgpaths_fn" > "$src_summary_fn"
     runpipe0 \
 	pkg_cmp_summary $pkg_cmp_opts \
-	    "$bin_summary_fn" "$src_summary_fn" '|' \
+	    "$inst_summary_fn" "$src_summary_fn" '|' \
 	skip_uptodate '|' \
 	raw2hr > "$res_fn"
 
@@ -364,7 +364,7 @@ fi
 
 ########################################
 # -b
-cat_ext_summary (){
+cat_bin_summary (){
     case "$PKG_SUMMARY" in
 	*.gz)
 	    gzip -dc "$PKG_SUMMARY";;
@@ -377,11 +377,11 @@ cat_ext_summary (){
 
 if test -n "$mode_bin"; then
     pkg_bin_summary -f PKGPATH,PKGNAME,automatic,try_out,BUILD_DATE -- $pkg_info_opts "$@" \
-	> "$bin_summary_fn"
-    cat_ext_summary | pkg_refresh_summary > "$ext_summary_fn"
+	> "$inst_summary_fn"
+    cat_bin_summary | pkg_refresh_summary > "$bin_summary_fn"
     runpipe0 \
 	pkg_cmp_summary $pkg_cmp_opts \
-	    "$bin_summary_fn" "$ext_summary_fn" '|' \
+	    "$inst_summary_fn" "$bin_summary_fn" '|' \
 	skip_uptodate '|' \
 	raw2hr > "$res_fn"
 
