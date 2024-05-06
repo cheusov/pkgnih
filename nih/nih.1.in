@@ -499,6 +499,10 @@ only package version is checked.
 If requested package is not found, write a warning message to stderr
 and continue the installation.
 .TP
+.B -W
+If package requested for removal is not found, write a warning message to stderr
+and continue the installation.
+.TP
 .B -r
 Update specified packages and all their dependencies.
 .TP

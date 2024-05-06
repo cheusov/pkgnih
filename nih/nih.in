@@ -729,7 +729,7 @@ do_install() {
     reqprov_check=1
 
 #    cmd="$1"
-    while getopts a:BcCdDeEf:hklLnpPrRtvVw f; do
+    while getopts a:BcCdDeEf:hklLnpPrRtvVwW f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -750,6 +750,8 @@ do_install() {
 		check_second_cksum=1;;
 	    w)
 		update_plan_opts="$update_plan_opts -w";;
+	    W)
+		update_plan_opts="$update_plan_opts -W";;
 	    t)
 		update_plan_opts="$update_plan_opts -t";;
 	    l)
