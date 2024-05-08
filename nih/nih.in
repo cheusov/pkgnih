@@ -73,6 +73,7 @@ fi
 . "$conffile"
 
 : ${PKG_TINY_BIN_SUMMARY:=${PKG_SUMMARY_DIR}/pkg_tiny_bin_summary.txt}
+: ${PKG_TINY_INST_SUMMARY:=${PKG_SUMMARY_DIR}/pkg_tiny_inst_summary.txt}
 
 ######################################################################
 verbose (){
