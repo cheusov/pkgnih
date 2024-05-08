@@ -3,6 +3,7 @@ PACKAGES ?=		/usr/pkgsrc/packages # unused at this moment
 CACHEDIR ?=		${VARDIR}/cache/nih/packages
 HISTORYDIR ?=		${VARDIR}/cache/nih/history
 PKG_SUMMARY_DIR ?=	${VARDIR}/cache/nih/summary
+PKG_SRC_SUMMARY_DIR ?=	${VARDIR}/cache/nih/src_summary
 DFLTCONFDIR ?=		${LIBDIR}/nih
 PKG_DBDIR ?=		${PREFIX}/pkgdb
 
@@ -34,7 +35,8 @@ INTEXTS_REPLS +=	PREFIX         ${PREFIX}
 INTEXTS_REPLS +=	PACKAGES       ${PACKAGES}
 INTEXTS_REPLS +=	PKG_DBDIR      ${PKG_DBDIR}
 
-INTEXTS_REPLS +=	pkg_summary_dir ${PKG_SUMMARY_DIR}
+INTEXTS_REPLS +=	pkg_summary_dir	${PKG_SUMMARY_DIR}
+INTEXTS_REPLS +=	pkg_src_summary_dir	${PKG_SRC_SUMMARY_DIR}
 INTEXTS_REPLS +=	historydir     ${HISTORYDIR}
 INTEXTS_REPLS +=	cachedir       ${CACHEDIR}
 INTEXTS_REPLS +=	dfltconfdir    ${DFLTCONFDIR}

@@ -61,6 +61,8 @@ HISTORYDIR=@historydir@
 
 PKG_SUMMARY_DIR=@pkg_summary_dir@
 
+PKG_SRC_SUMMARY_DIR=@pkg_src_summary_dir@
+
 # Uncomment the following line if you use .tbz packages
 #SUFX=.tbz
 

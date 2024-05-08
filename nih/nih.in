@@ -459,9 +459,9 @@ refresh_bin_summary (){ # TODO: adapt for rpmdb
 
 refresh_src_summary (){ # TODO: adapt for rpmdb
     verbose 'Updating pkg_src_summary. This may take a while...'
-    all_pkgs="$confdir/pkgsrc_packages"
+    all_pkgs="$PKG_SRC_SUMMARY_DIR/pkgsrc_packages"
     pkg_list_all_pkgs -a "$PKGSRC_ADDSUBDIRS" > "$all_pkgs"
-    pkg_update_src_summary -d "$confdir" -f "$all_pkgs" -v
+    pkg_update_src_summary -d "$PKG_SRC_SUMMARY_DIR" -f "$all_pkgs" -v
 }
 
 refresh_inst_summary (){ # TODO: adapt for rpmdb
@@ -2019,7 +2019,7 @@ process_options (){
 }
 
 PKG_INST_SUMMARY="$PKG_SUMMARY_DIR/pkg_inst_summary.txt"
-PKG_SRC_SUMMARY="$PKG_SUMMARY_DIR/pkg_src_summary.txt"
+PKG_SRC_SUMMARY="$PKG_SRC_SUMMARY_DIR/pkg_src_summary.txt"
 
 export PKGSRCDIR PSS_SLAVES PSS_OPTIONS
 
