@@ -837,6 +837,8 @@ do_install() {
     if is_pkg_summary_required "$@"; then
 	refresh_tiny_bin_summary
 	export PKG_SUMMARY="$PKG_TINY_BIN_SUMMARY"
+    else
+	export PKG_SUMMARY=/dev/null
     fi
     refresh_inst_summary
 
