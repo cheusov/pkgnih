@@ -1999,7 +1999,8 @@ check_for_obsolete_dotnih(){
 	cat <<EOF
 $HOME/.nih directory is obsolete.
   Move installed_*.* files to $HISTORYDIR directory.
-  Move summary_* files to $PKG_SUMMARY_DIR directory.
+  Move pkg_src_summary_* files to $PKG_SRC_SUMMARY_DIR directory.
+  Move other summary_* files to $PKG_SUMMARY_DIR directory.
   Move downloaded packages to $CACHEDIR directory.
 EOF
 	exit 1
