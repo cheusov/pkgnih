@@ -1,4 +1,5 @@
 EGDIR ?=		${DATADIR}/examples/nih # specific to pkgsrc
+PKGSRCDIR ?=		/usr/pkgsrc
 PACKAGES ?=		/usr/pkgsrc/packages # unused at this moment
 CACHEDIR ?=		${VARDIR}/cache/nih/packages
 HISTORYDIR ?=		${VARDIR}/cache/nih/history
@@ -40,7 +41,7 @@ INTEXTS_REPLS +=	pkg_src_summary_dir	${PKG_SRC_SUMMARY_DIR}
 INTEXTS_REPLS +=	historydir     ${HISTORYDIR}
 INTEXTS_REPLS +=	cachedir       ${CACHEDIR}
 INTEXTS_REPLS +=	dfltconfdir    ${DFLTCONFDIR}
-
+INTEXTS_REPLS +=	pkgsrcdir      ${PKGSRCDIR}
 INTEXTS_REPLS +=	libexecdir     ${LIBEXECDIR}
 
 INSCRIPTS =		nih pkg_update_plan pkg_status cmp2hr \

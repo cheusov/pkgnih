@@ -36,7 +36,7 @@ fetch (){
 }
 
 # Default directory for pkgsrc tree
-PKGSRCDIR=/usr/pkgsrc
+PKGSRCDIR=@pkgsrcdir@
 
 # Default pkg_src_summary options
 PSS_OPTIONS='-m'
