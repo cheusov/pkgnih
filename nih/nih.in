@@ -374,10 +374,10 @@ nih refresh [options]
       -P     the same as -p but pkg_src_summary file
              is regenerated from scratch
 
-~/.nih/config:
+nih.conf:
    REPOSITORY      - URL or file name for pkg_summary.gz/pkg_bin_summary.txt
    PKG_SUMMARY     - path to pkg_bin_summary.txt, set this variable if you use
-                   local pkg_summary, otherwise keep it unset
+                     local pkg_summary, otherwise keep it unset
    fetch function  - download command
 EOF
 }
@@ -1792,7 +1792,7 @@ nih clean-cache [options] [pkgs...]
       -h    display this help message
       -n    output files to be removed
       -a    remove all binaries
-      -i    binaries for packages listed in ~/.nih/installed_*
+      -i    binaries for packages listed in @pkg_summarydir@/installed_*
             are not removed.
 
 Examples:

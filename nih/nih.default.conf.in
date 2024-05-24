@@ -67,11 +67,11 @@ PKG_SRC_SUMMARY_DIR=@pkg_src_summary_dir@
 #SUFX=.tbz
 
 # Uncomment the following line if you don't want to keep old package
-# summaries in ~/.nih/pkg_summary_YYYYMMDD_hhmm.txt files
+# summaries in @pkg_summarydir@/pkg_summary_YYYYMMDD_hhmm.txt files
 #NO_SUMMARY_COPY=1
 
 # Uncomment the following line if you don't want to keep list of
-# installed packages in ~/.nih/installed_YYYYMMDD_hhmm.txt
+# installed packages in @pkg_summarydir@/installed_YYYYMMDD_hhmm.txt
 #NO_INSTALLED_COPY=1
 
 # If your machine is multi-CPU, it makes sense to uncomment the following
