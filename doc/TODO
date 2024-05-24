@@ -1,3 +1,28 @@
+----------------------------------------------------------------------------
+nih status -apq:
+Use only one PYTHON_VERSION_REQD=nn 
+
+       devel/libevent                 libevent        2.1.12nb1    2.1.12nb2   
+       www/libpsl                     libpsl          0.21.2nb1    0.21.5      
+       www/libpsl:PYTHON_VERSION_REQD=27 libpsl          0.21.2nb1    0.21.5      
+       www/libpsl:PYTHON_VERSION_REQD=310 libpsl          0.21.2nb1    0.21.5      
+       www/libpsl:PYTHON_VERSION_REQD=312 libpsl          0.21.2nb1    0.21.5      
+       www/libpsl:PYTHON_VERSION_REQD=38 libpsl          0.21.2nb1    0.21.5      
+       www/libpsl:PYTHON_VERSION_REQD=39 libpsl          0.21.2nb1    0.21.5      
+  u>   wip/nih-current                nih             0.15.2nb20240512 0.15.2      
+
+
+----------------------------------------------------------------------------
+nih mark -n -- correct documentation message?
+
+----------------------------------------------------------------------------
+nih mark -n mk-configure -- does not work?
+
+----------------------------------------------------------------------------
+nih mark mk-configure -- shows raw summary?
+
+
+----------------------------------------------------------------------------
 Do not regenerate tiny_bin_summary every time we run 'nih status'.
 Generate it once.
 
