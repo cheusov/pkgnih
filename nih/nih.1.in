@@ -100,6 +100,10 @@ configuration variable contains options passed to
 .B pkg_src_summary(1)
 .RB ( -m
 by default).
+.I PSS_SLAVES
+-- see
+.B pkg_src_summary
+for details.
 .I PKGSRC_ADDSUBDIRS
 configuration variable contains a list of additional
 subdirectories for pkgsrc packages, for example,
@@ -1165,7 +1169,7 @@ If set to 1, @historydir@/pkg_summary_YYYYMMDD_hhmm.txt files are not created.
 .B NO_INSTALLED_COPY
 If set to 1, @historydir@/installed_YYYYMMDD_hhmm.txt files are not created.
 .TP
-.B PSS_SLAVES
+.BR PSS_SLAVES " and " PSS_OPTIONS
 Used by
 .BR "nih refresh -p" .
 See
