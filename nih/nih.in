@@ -1702,9 +1702,9 @@ nih deps [options] [pkgs...]
    options:
       -h    display this help message
 
-      -b    analyse packages from binary repository
+      -b    analyse packages from binary repository (the default)
       -p    analyse packages from pkg_src_summary file
-      -i    analyse installed packages (the default)
+      -i    analyse installed packages
 
       -r    output dependencies, by default packages
             that depend on "pkgs" are output.
