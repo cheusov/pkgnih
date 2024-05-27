@@ -1658,6 +1658,11 @@ do_mark() {
     done
     shift `expr $OPTIND - 1`
 
+    if test $# -eq 0; then
+	errmsg 'No packages were specified'
+	exit 1
+    fi
+
     if test -z "$mode_u$mode_a$mode_t$mode_T$mode_k$mode_K"; then
 	pkg_bin_summary -e -a try_out,keep,automatic "$@" |
 	summary2markers
@@ -1677,11 +1682,6 @@ do_mark() {
 	cmd='set keep=yes'
     elif test -n "$mode_K"; then
 	cmd='unset keep'
-    fi
-
-    if test $# -eq 0; then
-	errmsg 'No packages were specified'
-	exit 1
     fi
 
     save_installed_packages
