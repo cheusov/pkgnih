@@ -2051,6 +2051,11 @@ if ! touch "$PKG_INST_SUMMARY.tmp" 2>/dev/null; then
     PKG_INST_SUMMARY="$tmp_dir/pkg_inst_summary.tmp"
 fi
 
+# update PKG_TINY_INST_SUMMARY for unprivileged user
+if ! touch "$PKG_TINY_INST_SUMMARY.tmp" 2>/dev/null; then
+    PKG_TINY_INST_SUMMARY="$tmp_dir/pkg_tiny_inst_summary.tmp"
+fi
+
 #
 if test $# -eq 0; then
     usage
