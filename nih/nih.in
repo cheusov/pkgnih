@@ -1792,7 +1792,7 @@ nih clean-cache [options] [pkgs...]
       -h    display this help message
       -n    output files to be removed
       -a    remove all binaries
-      -i    binaries for packages listed in @pkg_summarydir@/installed_*
+      -i    binaries for packages listed in @pkg_summary_dir@/installed_*
             are not removed.
 
 Examples:

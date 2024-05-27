@@ -19,6 +19,9 @@ Version 0.16.0, by Aleksey Cheusov, Mon, 27 May 2024 23:21:05 +0400
   nih install:
     - Add option -W.
 
+  nih clean-cache:
+    - Fix help message.
+
   nih remove:
     - Fix issue when binary repository is not available.
 
