@@ -1935,6 +1935,14 @@ Examples:
 EOF
 }
 
+do_history_show() {
+    # $1 -- summary_new filename
+    # $2 -- summary_old filename
+    pkg_cmp_summary -EA automatic,try_out,keep $cmp_summary_opts -p \
+		    "$1" "$2" |
+	awk '$1 != "="' | @libexecdir@/nih/cmp2hr
+}
+
 do_history() {
     nih_pager='cat'
     while getopts Bhp: f; do
@@ -1965,28 +1973,30 @@ do_history() {
     unpacked2_fn="$tmp_dir/unpacked2.txt"
 
     ( cd "$HISTORYDIR"; ls -1r installed_????????_????.* 2>/dev/null; ) |
-    while read curr_fn; do
-	curr=`echo $curr_fn | awk 'match($0, /[0-9].*[0-9]/) {
-	    print substr($0, RSTART, 4) "-" substr($0, RSTART+4, 2) "-" substr($0, RSTART+6, 2) " " substr($0, RSTART+9, 2) ":" substr($0, RSTART+11, 2)}'`
-	verbose "$curr vs. $last" 2>&1
+	{
+	    while read curr_fn; do
+		curr=`echo $curr_fn | awk 'match($0, /[0-9].*[0-9]/) {
+		    print substr($0, RSTART, 4) "-" substr($0, RSTART+4, 2) "-" substr($0, RSTART+6, 2) " " substr($0, RSTART+9, 2) ":" substr($0, RSTART+11, 2)}'`
+		verbose "$curr vs. $last" 2>&1
 
-	if echo "$curr_fn" | grep '[.]bz2' > /dev/null; then
-	    if test "$last_fn" = "$unpacked2_fn"; then
-		tmp_fn="$unpacked1_fn"
-	    else
-		tmp_fn="$unpacked2_fn"
-	    fi
-	    bzip2 -dc "$HISTORYDIR/$curr_fn" > "$tmp_fn"
-	    curr_fn="$tmp_fn"
-	fi
+		if echo "$curr_fn" | grep '[.]bz2' > /dev/null; then
+		    if test "$last_fn" = "$unpacked2_fn"; then
+			tmp_fn="$unpacked1_fn"
+		    else
+			tmp_fn="$unpacked2_fn"
+		    fi
+		    bzip2 -dc "$HISTORYDIR/$curr_fn" > "$tmp_fn"
+		    curr_fn="$tmp_fn"
+		fi
 
-	pkg_cmp_summary -EA automatic,try_out,keep $cmp_summary_opts -p \
-	    "$curr_fn" "$last_fn" |
-	awk '$1 != "="' | @libexecdir@/nih/cmp2hr
+		do_history_show "$curr_fn" "$last_fn"
 
-	last="$curr"
-	last_fn="$curr_fn"
-    done |
+		last="$curr"
+		last_fn="$curr_fn"
+	    done
+	    verbose "0 A.D. vs. $last" 2>&1
+	    do_history_show /dev/null "$last_fn"
+	} |
     eval "$nih_pager"
 }
 
