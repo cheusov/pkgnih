@@ -165,7 +165,7 @@ remove_comments (){
 }
 
 create_cachedir (){
-    mkdir -p "$CACHEDIR/All"
+    mkdir -p "$CACHEDIR"
 }
 
 set_yes_var () {
@@ -965,7 +965,7 @@ do_install() {
     # creating cache dir
     if test -s "$inst_user_summary" -o -s "$inst_auto_summary"; then
 	create_cachedir
-	cd $CACHEDIR/All
+	cd "$CACHEDIR"
     fi
 
     ##################################################################
@@ -1821,7 +1821,7 @@ do_clean_cache() {
     shift `expr $OPTIND - 1`
 
     create_cachedir
-    cd $CACHEDIR/All
+    cd "$CACHEDIR"
 
     present=$tmp_dir/present
     installed=$tmp_dir/installed
