@@ -1,6 +1,5 @@
 EGDIR ?=		${DATADIR}/examples/nih # specific to pkgsrc
 PKGSRCDIR ?=		/usr/pkgsrc
-PACKAGES ?=		/usr/pkgsrc/packages # unused at this moment
 CACHEDIR ?=		${VARDIR}/cache/nih/packages
 HISTORYDIR ?=		${VARDIR}/cache/nih/history
 PKG_SUMMARY_DIR ?=	${VARDIR}/cache/nih/summary
@@ -33,7 +32,6 @@ INTEXTS_REPLS +=	FTP_CMD  ${FTP}
 INTEXTS_REPLS +=	WGET_CMD ${WGET}
 
 INTEXTS_REPLS +=	PREFIX         ${PREFIX}
-INTEXTS_REPLS +=	PACKAGES       ${PACKAGES}
 INTEXTS_REPLS +=	PKG_DBDIR      ${PKG_DBDIR}
 
 INTEXTS_REPLS +=	pkg_summary_dir	${PKG_SUMMARY_DIR}
