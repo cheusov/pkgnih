@@ -1,4 +1,48 @@
 ======================================================================
+Version 0.16.0, by Aleksey Cheusov, Mon, 27 May 2024 23:21:05 +0400
+
+  System-wide NIH config defaults to @SYSCONFDIR@/nih.conf.
+  User's NIH config defaults to $HOME/.nihrc.
+  Directory for history files defaults to @VARBASE@/cache/nih/history.
+  Binary packages cache directory defaults to @VARBASE@/cache/nih/packages.
+  pkg_summary(5) directory defaults to @VARBASE@/cache/nih/summary
+  Obsolete ~/.nih directory
+
+  nih:
+    - Fix "nih history" on Linux.
+    - On Y/n question consider <RET> as "No".
+    - update man page for "refresh" subcommand.
+    - Allow "history", "status" and other commands to unprivileged user.
+    - Create tiny bin_summary only once at the time of "nih refresh -b".
+    - Add support for unprivileged use of subcomands "search", "info", "list".
+
+  nih install:
+    - Add option -W.
+
+  nih remove:
+    - Fix issue when binary repository is not available.
+
+  nih deps:
+    - Fix help message (mark -b as the default).
+
+  nih.conf:
+    - Add example for getting URL to packages from pkg_install.conf(5).
+
+  nih.default.conf:
+    - Update REPOSITORY to https://cdn.NetBSD.org ...
+    - Add new formatter "show_summary_NPC".
+    - Adapt show_summary_BC formatter for rpm package numbers.
+
+  nih mark:
+    - Show error message when no PKGBASEs were specified.
+
+  pkg_status:
+    - Improve temporary directory removal.
+
+  pkg_update_plan:
+    - Add option -W for ignoring warnings.
+
+======================================================================
 Version 0.15.2, by Aleksey Cheusov, Fri,  1 Dec 2023 15:15:10 +0400
 
   Fix default REPOSITORY for Darwin
