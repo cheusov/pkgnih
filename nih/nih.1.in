@@ -409,7 +409,8 @@ To get package updated, run the following:
 .VE
 
 Before installation starts, a list of installed packages
-is saved to the history file (by default) @historydir@/installed_YYYYMMDD_hhmm.bz2 unless
+is saved to the history file (by default)
+@historydir@/installed_YYYYMMDD_hhmm.bz2 unless
 .I NO_INSTALLED_COPY
 variable is set in the config file. The same applies to
 .IR uninstall " and " "leaf -R"
