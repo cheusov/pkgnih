@@ -1803,7 +1803,7 @@ EOF
 }
 
 do_clean_cache() {
-    while getopts hnai f; do
+    while getopts aihnq f; do
 	case "$f" in
 	    '?')
 		exit 1;;
@@ -1816,6 +1816,8 @@ do_clean_cache() {
 		rem_all=1;;
 	    i)
 		keep_installed=1;;
+	    q)
+		quiet=1;;
 	esac
     done
     shift `expr $OPTIND - 1`
@@ -1852,7 +1854,7 @@ do_clean_cache() {
 
 	xargs rm -f < "$del"
     else
-	verbose 'No binaries to remove'
+	test -n "$quiet" || verbose 'No binaries to remove'
 	exit 0
     fi
 }

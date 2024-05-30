@@ -1066,6 +1066,9 @@ without options, running it with -i option
 does not remove binaries of packages that the user ever tried, since these
 packages are reflected in the history files (by default) @historydir@/installed_*.
 .TP
+.B -q
+Quiet mode, do not print "No binaries to remove" to stderr.
+.TP
 Config variables:
 .BR NIH_CLEAN_CACHE_OPTS " -- options passed to"
 .B "nih clean-cache"
