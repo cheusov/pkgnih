@@ -1790,7 +1790,7 @@ nih clean-cache [options] [pkgs...]
 
    options:
       -h    display this help message
-      -n    output files to be removed
+      -n    don't actually remove files, just output files to be removed
       -a    remove all binaries
       -i    binaries for packages listed in @historydir@/installed_*
             are not removed.
