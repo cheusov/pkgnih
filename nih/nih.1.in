@@ -527,7 +527,7 @@ downloaded binaries are not saved in
 If
 .I val
 is 1, PKG_PATH is set to
-.IR $CACHEDIR/All ,
+.IR $CACHEDIR ,
 if it is 2, PKG_PATH is set to
 .IR $REPOSITORY/All .
 Use this option with caution.

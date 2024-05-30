@@ -576,7 +576,7 @@ nih install [options] <packages>
       -R     update specified packages and their dependent packages
 
       -a <val>    set PKG_PATH and run pkg_add(8) directly
-             val=1 ==> PKG_PATH=$CACHEDIR/All
+             val=1 ==> PKG_PATH=$CACHEDIR
              val=2 ==> PKG_PATH=$REPOSITORY/All
 
       -B     consider packages different if their BUILD_DATE differ
@@ -661,7 +661,7 @@ download_pkgs (){ # TODO: adapt for rpmdb
     (
 	ex=0
 	while read pkg url; do
-	    cd "$CACHEDIR/All"
+	    cd "$CACHEDIR"
 	    verbose "  $pkg"
 	    if ! test -f "$pkg" || ! check_cksums "$pkg"; then
 		printf '    downloading... '
@@ -814,7 +814,7 @@ do_install() {
 	    1)
 		pkg_paths="$CACHEDIR";;
 	    2)
-		pkg_paths="$REPOSITORY";;
+		pkg_paths="$REPOSITORY/All";;
 	    *)
 		errmsg 'Bad argument for -a option'
 		errmsg 'See nih install -h for details'
@@ -823,7 +823,7 @@ do_install() {
 	ex=0
 	for path in $pkg_paths; do
 	    verbose "Trying $PKG_PATH repository"
-	    export PKG_PATH="$path/All"
+	    export PKG_PATH="$path"
 	    if $PKG_ADD_CMD "$@"; then
 		break
 	    else
