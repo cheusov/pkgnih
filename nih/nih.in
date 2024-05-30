@@ -1792,7 +1792,7 @@ nih clean-cache [options] [pkgs...]
       -h    display this help message
       -n    output files to be removed
       -a    remove all binaries
-      -i    binaries for packages listed in @pkg_summary_dir@/installed_*
+      -i    binaries for packages listed in @historydir@/installed_*
             are not removed.
 
 Examples:
@@ -1922,7 +1922,7 @@ usage_history (){
 nih history [options] [pkgs...]
 
       Output installed, removed or updated packages last nih sessions
-      using saved ~/.nih/installed_*.txt files.
+      using saved @historydir@/installed_*.txt files.
 
    options:
       -h           display this help message
