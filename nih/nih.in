@@ -2005,9 +2005,9 @@ do_history() {
 ######################################################################
 # main code
 
-check_for_obsolete_dotnih(){
+check_for_obsolete_dirs(){
     if test -d "$HOME"/.nih; then
-	cat <<EOF
+	cat 1>&2 <<EOF
 $HOME/.nih directory is obsolete.
   Move installed_*.* files to $HISTORYDIR directory.
   Move pkg_src_summary_* files to $PKG_SRC_SUMMARY_DIR directory.
@@ -2016,9 +2016,17 @@ $HOME/.nih directory is obsolete.
 EOF
 	exit 1
     fi
+
+    if test -d "$CACHEDIR"/All; then
+	cat 1>&2 <<EOF
+$CACHEDIR/All directory is obsolete.
+  Move $CACHEDIR/All/* files to $CACHEDIR directory.
+EOF
+	exit 1
+    fi
 }
 
-check_for_obsolete_dotnih
+check_for_obsolete_dirs
 
 # handling global options
 process_options (){
