@@ -16,7 +16,7 @@ case "$opsys" in
 	REPOSITORY="ftp://ftp.minix3.org/pub/minix/packages/$osver/$arch"
 	;;
     SunOS)
-	REPOSITORY="https://pkgsrc.smartos.org/packages/SmartOS/trunk/$arch"
+	REPOSITORY="https://pkgsrc.smartos.org/packages/SmartOS/trunk/x86_64"
 	;;
     Darwin)
 	REPOSITORY="https://pkgsrc.smartos.org/packages/Darwin/trunk/$arch"
