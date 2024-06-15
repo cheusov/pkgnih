@@ -85,7 +85,7 @@ verbose (){
 usage (){
     cat 1>&2 <<'EOF'
 Usage:
-  pkgnih [global options] command [command options] [--] [command args]
+  nih [global options] command [command options] [--] [command args]
 
 Global options:
  nih -h                 - Display help message
@@ -1726,7 +1726,7 @@ Examples:
    nih deps -PB
    nih deps glib2
    nih deps -r glib2
-   nih deps -ri pkgnih
+   nih deps -ri nih
    nih deps -lBP 'devel/glib2;glib2' 'devel/libmaa;libmaa'
    nih deps -P devel/glib2 devel/libmaa
 EOF
