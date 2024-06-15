@@ -377,8 +377,8 @@ nih refresh [options]
              is regenerated from scratch
 
 nih.conf:
-   REPOSITORY      - URL or file name for pkg_summary.gz/pkg_bin_summary.txt
-   PKG_SUMMARY     - path to pkg_bin_summary.txt, set this variable if you use
+   REPOSITORY      - URL or file name for pkg_summary.gz/pkg_summary.txt
+   PKG_SUMMARY     - path to pkg_summary.txt, set this variable if you use
                      local pkg_summary, otherwise keep it unset
    fetch function  - download command
 EOF
@@ -641,7 +641,7 @@ check_cksums (){ # TODO: adapt for rpmdb
     fi
 
     printf '    ckecksum... ' 1>&2
-    expected_sha512=`pkg_grep_summary -t suffix FILE_NAME "/$1" < "$PKG_SUMMARY_DIR/pkg_bin_summary.txt" |
+    expected_sha512=`pkg_grep_summary -t suffix FILE_NAME "/$1" < "$PKG_SUMMARY" |
 	sed -n 's,^FILE_CKSUM= *sha512  *,,p'`
     if test -z "$expected_sha512"; then
 	verbose 'skipped'
@@ -1198,13 +1198,13 @@ nih status -h
 nih status [-b] [-a|-u] [-r|-q|-A|-B] [PKGBASEs]
 nih status -p           [-r|-q|-A|-B] [PKGBASEs]
 
-      Compare installed packages with pkg_bin_summary.txt (default) or
+      Compare installed packages with pkg_summary.txt (default) or
       pkgsrc tree.
 
    options:
       -h     display this help message
 
-      -b     compare installed packages against pkg_bin_summary.txt (default)
+      -b     compare installed packages against pkg_summary.txt (default)
       -p     compare installed packages against pkgsrc tree
 
       -u     analyse packages installed by user (the default, see -a)
