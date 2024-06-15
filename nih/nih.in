@@ -29,6 +29,8 @@
 set -e
 export LC_ALL=C
 
+export PATH=@bindir@:$PATH
+
 ######################################################################
 sysconf=${NIH_SYSCONFDIR-@sysconfdir@}/nih.conf
 userconf="$HOME/.nihrc"

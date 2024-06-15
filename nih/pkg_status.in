@@ -37,6 +37,8 @@
 ############################################################
 set -e
 
+export PATH=@bindir@:$PATH
+
 . pipestatus
 
 export LC_ALL=C
