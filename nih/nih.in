@@ -74,6 +74,11 @@ fi
 . "$dfltconfdir/nih.default.conf"
 . "$conffile"
 
+if echo "$REPOSITORY" | grep -q ^/; then
+    CACHEDIR="$REPOSITORY/All"
+    PKG_SUMMARY="$REPOSITORY/All/pkg_summary.txt"
+fi
+
 : ${PKG_TINY_BIN_SUMMARY:=${PKG_SUMMARY_DIR}/pkg_tiny_bin_summary.txt}
 : ${PKG_TINY_INST_SUMMARY:=${PKG_SUMMARY_DIR}/pkg_tiny_inst_summary.txt}
 
@@ -660,6 +665,7 @@ check_cksums (){ # TODO: adapt for rpmdb
 
 download_pkgs (){ # TODO: adapt for rpmdb
     # stdin -- list of (pkg url) packages to download
+    set_pkg_summary
     (
 	ex=0
 	while read pkg url; do
