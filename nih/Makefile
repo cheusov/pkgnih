@@ -10,11 +10,13 @@ PKG_DBDIR ?=		${PREFIX}/pkgdb
 REAL_ROOT_USER ?=	root
 REAL_ROOT_GROUP ?=	wheel
 
-PKG_INFO ?=		${SBINDIR}/pkg_info
-PKG_ADMIN ?=		${SBINDIR}/pkg_admin
-PKG_ADD ?=		${SBINDIR}/pkg_add
-PKG_DELETE ?=		${SBINDIR}/pkg_delete
-PKG_CREATE ?=		${SBINDIR}/pkg_create
+PKG_TOOLS_BIN ?=	${SBINDIR}
+
+PKG_INFO ?=		${PKG_TOOLS_BIN}/pkg_info
+PKG_ADMIN ?=		${PKG_TOOLS_BIN}/pkg_admin
+PKG_ADD ?=		${PKG_TOOLS_BIN}/pkg_add
+PKG_DELETE ?=		${PKG_TOOLS_BIN}/pkg_delete
+PKG_CREATE ?=		${PKG_TOOLS_BIN}/pkg_create
 
 FTP ?=			ftp
 WGET ?=		wget
