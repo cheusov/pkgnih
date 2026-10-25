@@ -1,4 +1,16 @@
 ======================================================================
+Version 0.17.0, by Aleksey Cheusov, Sun, 25 Oct 2026 14:38:15 +0400
+
+  Do not use All/ subdirectory of $CACHEDIR
+  Fix help messages for "history" and "clean-cache" subcommands
+  Minor clean-ups in nih.1
+  nih clean-cache: add option -q
+  nih.default.conf: fix default REPOSITORY for SunOS/SmartOS -- always use x86_64 machine arch in URL
+  nih, pkg_status: prepand PATH with @bindir@
+  Fix support for local REPOSITORY
+  Use PKG_TOOLS_BIN instead of SBINDIR for pkg_{info,admin,add,delete,create}
+
+======================================================================
 Version 0.16.0, by Aleksey Cheusov, Mon, 27 May 2024 23:21:05 +0400
 
   System-wide NIH config defaults to @SYSCONFDIR@/nih.conf.
