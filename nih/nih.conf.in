@@ -3,11 +3,15 @@
 # For detailed list of settings see @dfltconfdir@/nih.default.conf
 # which is loaded before @sysconfdir@/nih/config.
 
-# Comment in the following in order to enable IPv6 while downloading
+# Comment in the following in order to disable IPv6 while downloading
 #FTP_OPTIONS='-4'
 #WGET_OPTIONS='-4'
 
-# If you don't like the default REPOSITORY,
-# modify the following lines.
-#REPOSITORY=$(pkg_admin config-var PKG_PATH | sed 's,/All,,')
-#REPOSITORY="https://cdn.netbsd.org/pub/pkgsrc/packages/$opsys/$arch/$osver"
+rep=$(pkg_admin config-var PKG_PATH | sed 's,/All,,')
+if test -n "$rep"; then
+    REPOSITORY="$rep"
+    unset rep
+fi
+
+# If you don't like the default REPOSITORY, modify the following lines.
+#REPOSITORY="https://cdn.netbsd.org/pub/pkgsrc/packages/$opsys/$(uname -p)/$osver"
